@@ -1,14 +1,44 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import * as React from 'react';
+import { Text, View, StyleSheet } from 'react-native';
+import * as Font from 'expo-font';
+import AppNavigator from './Navigation/AppNavigator';
+import { AppearanceProvider } from 'react-native-appearance';
+import { Provider } from 'react-redux';
+import { createStore } from 'redux';
+import reducers from './reducers';
+export default class App extends React.Component {
+  state = {
+    fontsLoaded: false,
+  };
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+  async loadFonts() {
+    await Font.loadAsync({
+      // Load a font `Montserrat` from a static resource
+      openSans: require('./assets/fonts/OpenSans-Regular.ttf'),
+
+
+    });
+    this.setState({ fontsLoaded: true });
+  }
+
+  componentDidMount() {
+    this.loadFonts();
+  }
+
+  render() {
+    // Use the font with the fontFamily property after loading
+    if (this.state.fontsLoaded) {
+      return (
+        <Provider store={createStore(reducers)}>
+          <AppearanceProvider>
+            <AppNavigator />
+          </AppearanceProvider>
+        </Provider>
+      );
+    } else {
+      return null;
+    }
+  }
 }
 
 const styles = StyleSheet.create({
