@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StatusBar, Dimensions, TouchableOpacity, StyleSheet, FlatList, Image} from 'react-native';
+import { View, Text, StatusBar, Dimensions, TouchableOpacity, StyleSheet, FlatList, Image, SafeAreaView} from 'react-native';
 import settings from '../AppSettings';
 import { connect } from 'react-redux';
 import { selectTheme } from '../actions';
@@ -7,6 +7,8 @@ const { height, width } = Dimensions.get("window");
 import { Ionicons } from '@expo/vector-icons';
 const fontFamily = settings.fontFamily;
 const themeColor = settings.themeColor;
+
+
 const data =[
   {
     dp:"https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg",
@@ -100,6 +102,9 @@ componentDidMount(){
 }
   render() {
     return (
+      <>
+        <SafeAreaView style={styles.topSafeArea} />
+        <SafeAreaView style={styles.bottomSafeArea}>
         <View style={{flex:1,backgroundColor:"#fff"}}>
             <StatusBar backgroundColor={themeColor} />
                     {/* HEADERS */}
@@ -147,6 +152,8 @@ componentDidMount(){
                   }}
                />          
       </View>
+        </SafeAreaView>
+      </>
     );
   }
 }
@@ -154,7 +161,14 @@ const styles = StyleSheet.create({
   text: {
     fontFamily
   },
- 
+  topSafeArea: {
+    flex: 0,
+    backgroundColor: themeColor
+  },
+  bottomSafeArea: {
+    flex: 1,
+    backgroundColor: "#fff"
+  },
 })
 const mapStateToProps = (state) => {
 

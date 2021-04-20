@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StatusBar, Dimensions, TouchableOpacity, StyleSheet, FlatList, Image, TextInput } from 'react-native';
+import { View, Text, StatusBar, Dimensions, TouchableOpacity, StyleSheet, FlatList, Image, TextInput, SafeAreaView } from 'react-native';
 import settings from '../AppSettings';
 import { connect } from 'react-redux';
 import { selectTheme } from '../actions';
@@ -10,8 +10,14 @@ import { Feather } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
 import * as Animatable from 'react-native-animatable';
+import * as ImagePicker from 'expo-image-picker';
+import {w3cwebsocket as W3CWebScoket} from  'websocket';
+// const client = new W3CWebScoket('ws://192.168.29.98:8000/messages/test/')
+const client = new WebSocket('ws://192.168.29.98:8000/chat/test/')
+import wamp from 'wamp.js2';
 const fontFamily = settings.fontFamily;
 const themeColor = settings.themeColor;
+const wampServer = settings.wampServer;
 
 const data =[
     {
@@ -37,6 +43,7 @@ const data =[
 ]
 class ChatScreen extends Component {
   constructor(props) {
+      
     super(props);
     this.state = {
         message:"",
@@ -44,9 +51,62 @@ class ChatScreen extends Component {
         pk:1,
         audio:null,
         showRecordMessage:false,
-        recording:false
+        recording:false,
+        
     };
   }
+
+    messageHandler = (args) => {
+        var details = args[0]
+        console.log(details, 'dfijd');
+    
+        
+    }
+    _pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsMultipleSelection: true
+        });
+        if (result.cancelled == true) {
+            return
+        }
+        let filename = result.uri.split('/').pop();
+        let match = /\.(\w+)$/.exec(filename);
+        var type = match ? `image/${match[1]}` : `image`;
+        const photo = {
+            uri: result.uri,
+            type: type,
+            name: filename,
+        };
+        this.setState({ openImageModal: false })
+        this.setState({ image: photo, changedImage: true })
+    //  let sendd =new FormData();
+    //  sendd.append('img',photo)
+    // console.log(sendd,"hhh"),
+    // client.send(sendd)
+    };
+  componentDidMount(){
+   
+    client.onopen =()=>{
+
+         console.log("connnn")
+     }
+     client.onmessage =(message)=>{
+         const data = JSON.parse(message.data);
+         console.log("repp",data)
+     }
+  
+  }
+ componentWillUnmount(){
+     client.close();
+ }
+//   setConnection =()=>{
+//       console.log(`${wampServer}/chat/test`)
+//       let socket = new WebSocket(`${wampServer}/messages/test`);
+//       socket.onopen = (e)=>{
+//           socket.send("hello server")
+//       }
+//   }
     showMessage =()=>{
         this.setState({showRecordMessage:true})
         setTimeout(()=>{
@@ -103,9 +163,21 @@ stopRecording =async()=>{
     }
    
 }
+sendMessage =async()=>{
+    client.send(JSON.stringify({
+       
+            type:'text',
+            data:this.state.message,
+        
+    }))
+    console.log("sent")
+}
   render() {
       const{ item }=this.state
     return (
+          <>
+            <SafeAreaView style={styles.topSafeArea} />
+            <SafeAreaView style={styles.bottomSafeArea}>
       <View style={{flex:1}}>
             {/* HEADERS */}
             <View style={{ height: height * 0.1, backgroundColor: themeColor, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, flexDirection: 'row', alignItems: "center" }}>
@@ -135,7 +207,7 @@ stopRecording =async()=>{
               renderItem={({item,index})=>{
                   if(item.pk!=this.state.pk){
                       return (
-                          <View style={{ alignSelf: "flex-start", backgroundColor:'#fff', padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10,marginLeft:20,maxWidth:width*0.6}}>
+                          <View style={{ alignSelf: "flex-start", backgroundColor:'#eeee', padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10,marginLeft:20,maxWidth:width*0.6}}>
                               <Text style={[styles.text]}>{item.message}</Text>
                               <View style={styles.leftArrow}></View>
 
@@ -163,9 +235,8 @@ stopRecording =async()=>{
                                 selectionColor={themeColor}
                                 placeholder="Write a message...."
                                 onChangeText={(text) => {
-                                    this.setState({ message: text }, () => {
-                                        console.log(this.state.message)
-                                    })
+                                    this.setState({message:text})
+                                   
                                 }}
                             />:
                             <View style={{justifyContent:'center',height:height*0.05,}}>
@@ -174,13 +245,17 @@ stopRecording =async()=>{
                         }
                       
                     </View>
-                    <TouchableOpacity style={{ flex: 0.2,alignItems:'center',justifyContent:"center"}}>
+                    <TouchableOpacity style={{ flex: 0.2,alignItems:'center',justifyContent:"center"}}
+                      onPress={()=>{this._pickImage()}}
+                    >
                         <Entypo name="attachment" size={24} color={themeColor} />
                     </TouchableOpacity>
                 </View>
 
                 <View style={{height:height*0.05,alignItems:'center',justifyContent:"center",}}>
-                    {this.state.message .length>0? <TouchableOpacity style={{ alignItems: "center", justifyContent: "center", height: height * 0.07, backgroundColor: themeColor, borderRadius: 30, height: height * 0.05, width: 40, margin: 10 }}>
+                    {this.state.message .length>0? <TouchableOpacity style={{ alignItems: "center", justifyContent: "center", height: height * 0.07, backgroundColor: themeColor, borderRadius: 30, height: height * 0.05, width: 40, margin: 10 }}
+                                onPress={() => { this.sendMessage()}}
+                    >
                         <Feather name="send" size={24} color="#fff" />
                     </TouchableOpacity> : 
                     <TouchableOpacity style={{ alignItems: "center", justifyContent: "center", height: height * 0.07, backgroundColor: themeColor, borderRadius: 30,  height:height*0.05, width: 40,margin:10 }}
@@ -204,6 +279,8 @@ stopRecording =async()=>{
             </View>
           
       </View>
+            </SafeAreaView>
+        </>
     );
   }
 }
@@ -224,7 +301,7 @@ const styles = StyleSheet.create({
 
     rightArrowOverlap: {
         position: "absolute",
-        backgroundColor: "#eeeeee",
+        backgroundColor: "#fff",
         //backgroundColor:"green",
         width: 20,
         height: 35,
@@ -235,7 +312,7 @@ const styles = StyleSheet.create({
     },
     leftArrow: {
         position: "absolute",
-        backgroundColor: "#fff",
+        backgroundColor: "#eeee",
         //backgroundColor:"red",
         width: 20,
         height: 25,
@@ -246,7 +323,7 @@ const styles = StyleSheet.create({
 
     leftArrowOverlap: {
         position: "absolute",
-        backgroundColor: "#eeeeee",
+        backgroundColor: "#fff",
         //backgroundColor:"green",
         width: 20,
         height: 35,
@@ -254,6 +331,14 @@ const styles = StyleSheet.create({
         borderBottomRightRadius: 18,
         left: -20
 
+    },
+    topSafeArea: {
+        flex: 0,
+        backgroundColor: themeColor
+    },
+    bottomSafeArea: {
+        flex: 1,
+        backgroundColor: "#fff"
     },
 })
 const mapStateToProps = (state) => {

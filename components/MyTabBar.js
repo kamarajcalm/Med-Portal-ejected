@@ -8,7 +8,8 @@ export default class MyTabBar extends Component {
  
         super(props);
         this.state = {
-           show:true
+           show:true,
+           user:"doctor"
         };
     }
 UNSAFE_componentWillReceiveProps(){
@@ -16,6 +17,7 @@ UNSAFE_componentWillReceiveProps(){
     {
         state.routes.map((route, index) => {
             const { options } = descriptors[route.key];
+            console.log(options.tabBarVisible,"ttttt")
             if (options.tabBarVisible == false) {
 
                return this.setState({ show: false })
@@ -29,6 +31,12 @@ UNSAFE_componentWillReceiveProps(){
         if (label == "priscription") {
             return (
                 <MaterialCommunityIcons name="cards" size={24} color={isFocused?"#fff":"gray"} />
+            )
+        }
+        if (label == "Appoinments") {
+            return (
+                <MaterialCommunityIcons name="timetable" size={24} color={isFocused ? "#fff" : "gray"} />
+               
             )
         }
         if (label == "doctor") {
@@ -68,6 +76,7 @@ UNSAFE_componentWillReceiveProps(){
                 {state.routes.map((route, index) => {
                     const { options } = descriptors[route.key];
                     if (options.tabBarVisible == false){
+                        console.log(options,"kk")
                           this.setState({show:false})
                     }
                     const label =
@@ -98,27 +107,57 @@ UNSAFE_componentWillReceiveProps(){
                             target: route.key,
                         });
                     };
-
-                    return (
-                        <TouchableOpacity
+                     if(label == 'Appoinments'){
+                         
+                         if(this.state.user=="doctor"){
                             
-                            key={index}
-                            accessibilityRole="button"
-                            accessibilityStates={isFocused ? ['selected'] : []}
-                            accessibilityLabel={options.tabBarAccessibilityLabel}
-                            testID={options.tabBarTestID}
-                            onPress={onPress}
-                            onLongPress={onLongPress}
-                            style={{ flex: 0.3, alignItems: "center", justifyContent: "center", }}
-                        >
-                            {
-                                this.icon(label, isFocused)
-                            }
-                            <Text style={[{ color: isFocused ? '#fff' : 'gray', fontFamily: "openSans", fontSize: label == "QuestionPapers" ? 10 : 12 }, styles.text]}>
-                                {label}
-                            </Text>
-                        </TouchableOpacity>
-                    );
+                             return (
+                                 <TouchableOpacity
+
+                                     key={index}
+                                     accessibilityRole="button"
+                                     accessibilityStates={isFocused ? ['selected'] : []}
+                                     accessibilityLabel={options.tabBarAccessibilityLabel}
+                                     testID={options.tabBarTestID}
+                                     onPress={onPress}
+                                     onLongPress={onLongPress}
+                                     style={{ flex: 0.2, alignItems: "center", justifyContent: "center", }}
+                                 >
+                                     {
+                                         this.icon(label, isFocused)
+                                     }
+                                     <Text style={[{ color: isFocused ? '#fff' : 'gray', fontFamily: "openSans", fontSize: 10 }, styles.text]}>
+                                         {label}
+                                     </Text>
+                                 </TouchableOpacity>
+                             );
+                         }
+                     
+                     }
+                    if (label != 'Appoinments'){
+                        return (
+                            <TouchableOpacity
+
+                                key={index}
+                                accessibilityRole="button"
+                                accessibilityStates={isFocused ? ['selected'] : []}
+                                accessibilityLabel={options.tabBarAccessibilityLabel}
+                                testID={options.tabBarTestID}
+                                onPress={onPress}
+                                onLongPress={onLongPress}
+                                style={{ flex: 0.2, alignItems: "center", justifyContent: "center", }}
+                            >
+                                {
+                                    this.icon(label, isFocused)
+                                }
+                                <Text style={[{ color: isFocused ? '#fff' : 'gray', fontFamily: "openSans", fontSize: label == "QuestionPapers" ? 10 : 12 }, styles.text]}>
+                                    {label}
+                                </Text>
+                            </TouchableOpacity>
+                        );
+                    }
+                  
+                   
                 })}
             </View>
         );

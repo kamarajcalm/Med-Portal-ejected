@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Dimensions, TextInput, TouchableOpacity, Image} from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TextInput, TouchableOpacity, Image, SafeAreaView} from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { connect } from 'react-redux';
 import { selectTheme } from '../actions';
@@ -33,11 +33,17 @@ class AddPrescription extends Component {
   constructor(props) {
     super(props);
     this.state = {
+        data
     };
   }
-
+timingSelect=(time,index)=>{
+   console.log(time,index,"hhhhh")
+}
   render() {
     return (
+        <>
+            <SafeAreaView style={styles.topSafeArea} />
+            <SafeAreaView style={styles.bottomSafeArea}>
         <View style={{flex:1}}>
                     {/* HEADERS */}
             <View style={{ height: height * 0.1, backgroundColor: themeColor, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, flexDirection:'row',alignItems:"center"}}>
@@ -71,6 +77,16 @@ class AddPrescription extends Component {
                         style={{ width: width * 0.9, height: height * 0.05, backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10 }}
                     />
                 </View>
+                        <View style={{ marginTop: 20 }}>
+                            <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>On Going Treatment</Text>
+                            <TextInput
+                                
+                                selectionColor={themeColor}
+                                multiline={true}
+                                keyboardType="numeric"
+                                style={{ width: width * 0.9, height: height * 0.15, backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10 }}
+                            />
+                        </View>
                 <View style={{ marginTop: 20 }}>
                     <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>Health issues</Text>
                     <TextInput
@@ -89,9 +105,9 @@ class AddPrescription extends Component {
                     </TouchableOpacity>
                 </View>
                 {
-                    data.map((item,index)=>{
+                   this.state.data.map((item,index)=>{
                         return(
-                          <MedicineDetails item ={item} index={index} />
+                            <MedicineDetails item={item} index={index} timingSelect={(time,index) => { this.timingSelect(time,index)}}/>
                         )
                     })
                 }
@@ -102,7 +118,11 @@ class AddPrescription extends Component {
                 </View>
             </ScrollView>
         </View>
+     </SafeAreaView>
+       </>
+        
     );
+ 
   }
 }
 const styles= StyleSheet.create({
@@ -128,7 +148,15 @@ const styles= StyleSheet.create({
         height: height * 0.2,
         borderRadius:10,
         flexDirection:"row"
-    }
+    },
+    topSafeArea: {
+        flex: 0,
+        backgroundColor: themeColor
+    },
+    bottomSafeArea: {
+        flex: 1,
+        backgroundColor: "#fff"
+    },
 })
 const mapStateToProps = (state) => {
 

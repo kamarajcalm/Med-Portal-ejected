@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Dimensions, TouchableOpacity, StyleSheet, TextInput, FlatList, Image } from 'react-native';
+import { View, Text, Dimensions, TouchableOpacity, StyleSheet, TextInput, FlatList, Image, SafeAreaView } from 'react-native';
 import { Ionicons, Entypo, AntDesign } from '@expo/vector-icons';
 import { connect } from 'react-redux';
 import { selectTheme } from '../actions';
@@ -14,11 +14,15 @@ class SearchDoctors extends Component {
     constructor(props) {
         super(props);
         this.state = {
+
         };
     }
 
     render() {
         return (
+              <>
+                <SafeAreaView style={styles.topSafeArea} />
+                <SafeAreaView style={styles.bottomSafeArea}>
             <View style={{ flex: 1 }}>
                 <View style={{ height: height * 0.1, backgroundColor: themeColor, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, flexDirection: 'row', alignItems: "center" }}>
                     <TouchableOpacity style={{ flex: 0.2, alignItems: "center", justifyContent: 'center' }}
@@ -38,6 +42,8 @@ class SearchDoctors extends Component {
                 </View>
              
             </View>
+                </SafeAreaView>
+            </>
         );
     }
 }

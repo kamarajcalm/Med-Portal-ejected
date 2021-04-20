@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { View, Text } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Profile from '../Screens/Profile';
+import ProfileEdit from '../Screens/ProfileEdit';
 const Stack = createStackNavigator();
 export default class ProfileStack extends Component {
   constructor(props) {
@@ -13,7 +14,8 @@ export default class ProfileStack extends Component {
   render() {
     return (
         <Stack.Navigator>
-            <Stack.Screen name="profile" component={Profile} options={{ headerShown: false }} />
+             <Stack.Screen name="ProfileHome" component={Profile} options={{ headerShown: false }} />
+             
         </Stack.Navigator>
     );
   }

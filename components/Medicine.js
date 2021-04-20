@@ -16,8 +16,8 @@ export default class Medicine extends Component {
   render() {
       const {item} =this.props
     return (
-        <View
-           
+        <TouchableOpacity
+            onPress={() => { this.props.selection(item);this.setState({ selected: !this.state.selected }) }}
             style={{ height: height * 0.1, marginTop: 10, flexDirection: "row" }}
         >
             <View style={{ flex: 0.2, alignItems: "center", justifyContent: "center" }}>
@@ -29,13 +29,13 @@ export default class Medicine extends Component {
             <View style={{ flex: 0.6, alignItems: "center", justifyContent: "center" }}>
                 <Text style={[styles.text]}>{item.name}</Text>
             </View>
-            <TouchableOpacity style={{ flex: 0.2, alignItems: "center", justifyContent: 'center' }}
-                onPress={() => { this.setState({ selected:!this.state.selected})}}
+            <View style={{ flex: 0.2, alignItems: "center", justifyContent: 'center' }}
+                
             >
                 <AntDesign name="medicinebox" size={24} color={this.state.selected?"green":"gray" } />
-            </TouchableOpacity>
-
-        </View>
+            </View>
+         
+        </TouchableOpacity>
     );
   }
 }

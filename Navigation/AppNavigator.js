@@ -17,92 +17,74 @@ import PriscriptionStack from '../stacks/PriscriptionStack';
 import DoctorsStack from '../stacks/DoctorsStack';
 import ChatStack from '../stacks/ChatStack';
 import ProfileStack from '../stacks/ProfileStack';
+import LoginStack from '../stacks/LoginStack';
+import TabNavigator from './TabNavigator';
+import AppLoading from 'expo-app-loading';
+import ProfileEdit from '../Screens/ProfileEdit';
+import AdminTab from './AdminTab';
+import DefaultScreen from '../Screens/DefaultScreen';
+import MediacalTab from './MediacalTab';
+
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
 
-class AppNavigator extends Component {
+const Main = {
+    MainTab: TabNavigator,
+
+};
+
+const authScreens = {
+    Login: LoginStack,
+};
+export default class AppNavigator extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            logged: false,
+            isReady: false,
         };
     }
-    getTheme = async () => {
-        // let theme = await AsyncStorage.getItem("theme")
-        // this.props.selectTheme(theme)
-    }
-    componentDidMount() {
-        this.getTheme()
-    }
-     getTabBarVisibility = (route) => {
-        const routeName = route.state ? route.state.routes[route.state.index].name : ''
-         if (routeName == "addPriscription"  ) {
-            return false
-        }
-         if (routeName == "SearchMedicines") {
-             return false
-         }
-        return true
-    }
-    getTabBarVisibility2 = (route)=>{
-        const routeName = route.state ? route.state.routes[route.state.index].name : ''
-        if (routeName == "ChatScreen") {
-            return false
-        }
-        
-        return true
-    }
-    getTabBarVisibility3 = (route)=>{
-        const routeName = route.state ? route.state.routes[route.state.index].name : ''
-        if (routeName == "SearchDoctors") {
-            return false
-        }
+    getUserDetails = async () => {
+        const login = await AsyncStorage.getItem("login")
 
-        return true
+        console.log(login, "lllllll")
+        if (login) {
+            this.setState({ logged: true })
+        }
     }
+    getTheme = async () => {
+        let theme = await AsyncStorage.getItem("theme")
+        this.props.selectTheme(theme)
+    }
+  
+    componentDidMount() {
+        this.getUserDetails()
+    }
+   
     render() {
+      
         return (
             <NavigationContainer >
-                <Tab.Navigator
-                    tabBar={props => <MyTabBar {...props} />}
-                >
-                    <Tab.Screen name="priscription" component={PriscriptionStack}
-                        options={({ route }) => ({
-                            
-                            tabBarVisible: this.getTabBarVisibility(route),
-                            
-                        })}
-                    />
-                    <Tab.Screen name="doctor" component={DoctorsStack}
-                        options={({ route }) => ({
+                <Stack.Navigator>
+                    {/* {Object.entries({
+                        ...(this.state.logged ? Main : authScreens),
+                        ...(!this.state.logged && Main),
+                      
+                    }).map(([name, component]) => (
+                        <Stack.Screen name={name} component={component} options={{ headerShown: false }} />
+                    ))} */}
+                    <Stack.Screen name="DefaultScreen" component={DefaultScreen} options={{ headerShown: false }} />
+                    
 
-                            tabBarVisible: this.getTabBarVisibility3(route),
-
-                        })}
-
-                    />
-                    <Tab.Screen name="chat" component={ChatStack}
-                        options={({ route }) => ({
-
-                            tabBarVisible: this.getTabBarVisibility2(route),
-
-                        })}
-
-                    />
-                    <Tab.Screen name="profile" component={ProfileStack}
-
-
-                    />
-                   
-                </Tab.Navigator>
+                    <Stack.Screen name="MainTab" component={TabNavigator} options={{ headerShown: false }} />
+                    <Stack.Screen name="Login" component={LoginStack} options={{ headerShown: false }} />
+                    <Stack.Screen name="ProfileEdit" component={ProfileEdit} options={{ headerShown: false }} />
+                    <Stack.Screen name="AdminTab" component={AdminTab} options={{ headerShown: false }} />
+                    <Stack.Screen name="MedicalTab" component={MediacalTab} options={{ headerShown: false }} />
+                 </Stack.Navigator>
+                
             </NavigationContainer>
         );
     }
 }
-const mapStateToProps = (state) => {
-
-    return {
-        theme: state.selectedTheme,
-
-    }
-}
-export default connect(mapStateToProps, { selectTheme })(AppNavigator)
