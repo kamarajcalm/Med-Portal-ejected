@@ -8,37 +8,17 @@ const fontFamily =settings.fontFamily;
 const themeColor =settings.themeColor;
 const height = Dimensions.get("window").height
 const width = Dimensions.get("window").width
-const data =[
-    {
-        medicine:"paracetomal",
-        qty:5
-    },
-    {
-        medicine: "nitric",
-        qty: 4
-    }
-    ,
-    {
-        medicine: "citric",
-        qty: 5
-    },
-    {
-        medicine: "ad-50",
-        qty: 2
-    },
-    {
-        medicine: "yigh-78",
-        qty: 1
-    }
-]
+const url = settings.url
 import { connect } from 'react-redux';
 import { selectTheme } from '../actions';
+import HttpsClient from '../api/HttpsClient';
+import Toast from 'react-native-simple-toast';
  class ShowCard extends Component {
   constructor(props) {
     super(props);
     this.state = {
         card:this.props.route.params.item,
-        valid:true,
+        valid:this.props.route.params.item.active,
     };
     } 
     onSwipeUp(gestureState) {
@@ -74,14 +54,43 @@ import { selectTheme } from '../actions';
                 break;
         }
     }
+    validate =async()=>{
+        let api = `${url}/api/prescription/prescriptions/${this.state.card.id}/`
+        console.log(api)
+        let sendData ={
+            active:!this.state.valid
+        }
+        let post = await HttpsClient.patch(api,sendData)
+        if(post.type == "success"){
+            this.setState({ valid: !this.state.valid })
+        }else{
+            Toast.show("try again");
+        }
+      
+    }
      header =()=>{
          return(
-             <View style={{ flexDirection: "row" ,}}>
-                 <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
-                     <Text style={[styles.text,{fontWeight:"bold",fontSize:18}]}>Medicine</Text>
+             <View style={{ flexDirection: "row" ,marginTop:20}}>
+                 <View style={{ flex: 0.2, alignItems: 'center', justifyContent: 'center' }}>
+                     <Text style={[styles.text,{fontWeight:"bold",fontSize:12}]}>Medicine</Text>
                  </View>
-                 <View style={{ flex: 0.3 ,alignItems:'center',justifyContent:"center"}}>
-                     <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Qty</Text>
+                 <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
+                     <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>AfterFood</Text>
+                 </View>
+                 <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
+                     <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>morning</Text>
+                 </View>
+                 <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
+                     <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>AfterNoon</Text>
+                 </View>
+                 <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
+                     <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>Night</Text>
+                 </View>
+                 <View style={{ flex: 0.2 ,alignItems:'center',justifyContent:"center"}}>
+                     <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>Qty</Text>
+                 </View>
+                 <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
+                     <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>days</Text>
                  </View>
              </View>
          )
@@ -126,7 +135,7 @@ import { selectTheme } from '../actions';
             >
                 
 
-                <Animatable.View style={[styles.elevation,{ height: height*0.65, backgroundColor: "#ffff", width: width * 0.8, borderRadius:20,}]}
+                <Animatable.View style={[styles.elevation,{ height: height*0.65, backgroundColor: "#ffff", width: width * 0.9, borderRadius:20,}]}
                     animation="slideInDown" 
                 
                 >
@@ -139,24 +148,37 @@ import { selectTheme } from '../actions';
                                     style={{ height: 60, width: 60, borderRadius: 30 }}
                                 />
                                 <View>
-                                    <Text style={[styles.text]}>kamaraj</Text>
+                                    <Text style={[styles.text]}>{card.username}</Text>
                                 </View>
                         </TouchableOpacity>
-                            <View style={{ margin: 20 }}>
-                                <Text style={[styles.text, { fontWeight: 'bold' ,fontSize:22,color:"gray",textDecorationLine:'underline'}]}>Priscription :</Text>
-                            </View>
+                           
                          <FlatList 
                             ListHeaderComponent ={this.header()}
-                            data={data}
+                            data={card.medicines}
                             keyExtractor={(item,index)=>index.toString()}
                             renderItem={({item,index})=>{
                                 return(
                                     <View style={{flexDirection:"row",marginTop:10}}>
-                                        <View style={{flex:0.5,alignItems:'center',justifyContent:'center'}}>
-                                           <Text style={[styles.text]}>{item.medicine}</Text> 
+                                        <View style={{ flex: 0.2, alignItems: 'center', justifyContent: 'center' }}>
+                                            <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>{item.medicinename}</Text>
                                         </View>
-                                        <View style={{flex:0.3,alignItems:"center",justifyContent:"center"}}> 
-                                            <Text>{item.qty}</Text>
+                                        <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
+                                            <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>{item.after_food?"yes":"no"}</Text>
+                                        </View>
+                                        <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
+                                            <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>{item.morning_count}</Text>
+                                        </View>
+                                        <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
+                                            <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>{item.afternoon_count}</Text>
+                                        </View>
+                                        <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
+                                            <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>{item.night_count}</Text>
+                                        </View>
+                                        <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
+                                            <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>{item.total_qty}</Text>
+                                        </View>
+                                        <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
+                                            <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>{item.days}</Text>
                                         </View>
                                     </View>
                                 )
@@ -165,13 +187,13 @@ import { selectTheme } from '../actions';
                     </View>
                 </Animatable.View>
 
-              <View style={{marginTop:30}}>
+                    {this.props.user.profile.occupation == "Doctor"&& <View style={{marginTop:30}}>
                   <TouchableOpacity style={{width:width*0.3,height:height*0.05,alignItems:"center",justifyContent:'center',borderRadius:10,backgroundColor:this.state.valid?themeColor:'gray'}}
-                   onPress={()=>{this.setState({valid:!this.state.valid})}}
+                   onPress={()=>{this.validate()}}
                   >
                       <Text style={[styles.text,{color:"#fff"}]}>{this.state.valid?"Make InValid":"MakeValid"}</Text>
                   </TouchableOpacity>
-              </View>
+              </View>}
             </GestureRecognizer>
             </SafeAreaView>
             </>
@@ -207,7 +229,7 @@ const mapStateToProps = (state) => {
 
     return {
         theme: state.selectedTheme,
-
+        user: state.selectedUser,
     }
 }
 export default connect(mapStateToProps, { selectTheme })(ShowCard)

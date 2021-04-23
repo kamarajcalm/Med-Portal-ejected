@@ -13,9 +13,12 @@ const url = settings.url;
 import HttpsClient from '../api/HttpsClient';
 class SearchDoctors extends Component {
     constructor(props) {
+        let clinic = props?.route?.params?.addDoctor
+        console.log(clinic)
         super(props);
         this.state = {
-            doctors:[]
+            doctors:[],
+            clinic
         };
     }
     searchDoctor = async (query) => {
@@ -27,6 +30,17 @@ class SearchDoctors extends Component {
         } 
     }
     componentDidMount(){
+       
+    }
+    handleDoctor =async(item)=>{
+        console.log(this.state.clinic)
+        if(this.state.clinic){
+          
+
+        }else{
+            this.props.route.params.backFunction(item)
+            this.props.navigation.goBack()
+        }
        
     }
     render() {
@@ -62,9 +76,7 @@ class SearchDoctors extends Component {
                                 <TouchableOpacity style={{ height: height * 0.1, backgroundColor: "#fafafa", marginTop: 1, flexDirection: 'row' }}
                                     onPress={() => {
 
-                                        this.props.route.params.backFunction(item)
-
-                                        this.props.navigation.goBack()
+                                        this.handleDoctor(item)
                                       }}
                                 >
                                     <View style={{ flex: 0.3, alignItems: "center", justifyContent: "center" }}>

@@ -8,18 +8,87 @@ import { Ionicons } from '@expo/vector-icons';
 import authAxios from '../api/authAxios';
 const fontFamily = settings.fontFamily;
 const themeColor = settings.themeColor;
+const url =settings.url;
+import { Entypo } from '@expo/vector-icons';
 import { Linking } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import HttpsClient from '../api/HttpsClient';
+import Modal from 'react-native-modal';
+import Toast from 'react-native-simple-toast';
 class ClinicDetails extends Component {
     constructor(props) {
         let item = props.route.params.item
+        console.log(item,"cccc")
         super(props);
         this.state = {
-            item
+            item,
+            receptionList:[],
+            doctors:[],
+            showModal:false,
+            deleteDoctor:null,
+            deleteDocorIndex:null,
+            deleteReceptionIndex:null,
+            deleteReceptionist:null,
         };
     }
+    getReceptionList =async()=>{
+        let api = `${url}/api/prescription/recopinists/?clinic=${this.state.item.id}`
+     console.log(api)
+     const data = await HttpsClient.get(api)
+     if(data.type=="success"){
+         this.setState({ receptionList:data.data})
+     }
+    }
+    backFunction = async (item) => {
+        console.log(item, "bbbbbb")
+        this.setState({ doctor: item })
+
+
+    }
+    getDoctors =async()=>{
+        let api = `${url}/api/prescription/clinicDoctors/?clinic=${this.state.item.id}`
+        const data = await HttpsClient.get(api)
+        console.log(data,"jjjjj")
+        if (data.type == "success") {
+            this.setState({ doctors: data.data })
+        }
+    }
+    deleteDoctor = async()=>{
+        let api = `${url}/api/prescription/clinicDoctors/${this.state.deleteDoctor.id}/`
+        let deletee = await  HttpsClient.delete(api);
+        if(deletee.type=="success"){
+              this.state.doctors.splice(this.state.deleteDocorIndex,1);
+              this.setState({doctors:this.state.doctors})
+              Toast.show("deleted Successfully")
+              this.setState({showModal:false})
+        }else{
+            Toast.show("Try again")
+        }
+        
+    }
+    deleteReceptionist =async()=>{
+        let api = `${url}/api/prescription/recopinists/${this.state.deleteReceptionist.id}/`
+        let deletee = await HttpsClient.delete(api);
+        if (deletee.type == "success") {
+            this.state.receptionList.splice(this.state.deleteReceptionIndex, 1);
+            this.setState({ receptionList: this.state.receptionList })
+            Toast.show("deleted Successfully")
+            this.setState({ showModal2: false })
+        } else {
+            Toast.show("Try again")
+        }
+    }
     componentDidMount() {
-        console.log(this.props.route.params.item)
+        this.getReceptionList();
+        this.getDoctors();
+        this._unsubscribe = this.props.navigation.addListener('focus', () => {
+
+            this.getReceptionList();
+            this.getDoctors();
+        });
+    }
+    componentWillUnmount() {
+        this._unsubscribe();
     }
     render() {
         return (
@@ -50,7 +119,7 @@ class ClinicDetails extends Component {
                            <View style={{height:height*0.2,width}}>
                                 <Image 
                                   style={{height:"100%",width:"100%",resizeMode:"cover",borderRadius:5}}
-                                    source={{ uri:"https://t2conline.com/wp-content/uploads/2019/04/thumbnail_Minor_Injury_Walk_In_Clinic1.jpg"}}
+                                    source={{ uri: this.state.item.displayPicture||"https://t2conline.com/wp-content/uploads/2019/04/thumbnail_Minor_Injury_Walk_In_Clinic1.jpg"}}
                                 />
                            </View>
                             
@@ -157,16 +226,143 @@ class ClinicDetails extends Component {
                                     <Feather name="phone" size={20} color="black" />
                                 </TouchableOpacity>
                             </View>
+                            <View style={{margin:20}}>
+                                <Text style={[styles.text,{fontWeight:"bold",fontSize:18}]}> Receptionist List:</Text>
+                                 <FlatList 
+                                    data={this.state.receptionList}
+                                    keyExtractor={(item,index)=>index.toString()}
+                                    renderItem={({item,index})=>{
+                                        return(
+                                            <View style={{flexDirection:"row",height:height*0.1,}}>
+                                                <View style={{alignItems:"center",justifyContent:"center",flex:0.33}}>
+                                                    <Image
+                                                        source={{ uri: item.user.profile.displayPicture || "https://s3-ap-southeast-1.amazonaws.com/practo-fabric/practices/711061/lotus-multi-speciality-health-care-bangalore-5edf8fe3ef253.jpeg" }}
+                                                        style={{ height: 60, width: 60, borderRadius: 30, }}
+                                                    />
+                                                </View>
+                                             
+                                                <View style={{alignItems:'center',justifyContent:"center",flex:0.33}}>
+                                                    <Text>{item.user.first_name}</Text>
+                                                </View>
+                                                <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', flex: 0.33}}
+                                                    onPress={() => { this.setState({ showModal2: true,deleteReceptionist: item,deleteReceptionIndex:index }) }}
+                                                >
+                                                    <Entypo name="circle-with-cross" size={24} color={themeColor} />
+                                                </TouchableOpacity>
+                                            </View>
+                                        )
+                                    }}
+                                 />
+                            </View>
+                            <View style={{ margin: 20 }}>
+                                <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}> Doctors List:</Text>
+                                <FlatList
+                                    data={this.state.doctors}
+                                    keyExtractor={(item, index) => index.toString()}
+                                    renderItem={({ item, index }) => {
+                                        return (
+                                            <View style={{ flexDirection: "row", height: height * 0.1, }}>
+                                                <View style={{ alignItems: "center", justifyContent: "center",flex:0.2 }}>
+                                                    <Image
+                                                        source={{ uri: item.doctor.profile.displayPicture || "https://s3-ap-southeast-1.amazonaws.com/practo-fabric/practices/711061/lotus-multi-speciality-health-care-bangalore-5edf8fe3ef253.jpeg" }}
+                                                        style={{ height: 60, width: 60, borderRadius: 30, }}
+                                                    />
+                                                </View>
+
+                                                <View style={{ alignItems: 'center', justifyContent: "center" ,flex:0.2}}>
+                                                    <Text>{item.doctor.first_name}</Text>
+                                                </View>
+                                                <View style={{ alignItems: 'center', justifyContent: "center", flex:0.2 }}>
+                                                    <Text style={[styles.text,{fontWeight:"bold"}]}>From :</Text>
+                                                    <Text style={[styles.text]}>{item.fromTimeStr}</Text>
+                                                </View>
+                                                <View style={{ alignItems: 'center', justifyContent: "center", flex:0.2 }}>
+                                                    <Text style={[styles.text, { fontWeight: "bold" }]}>To Time:</Text>
+                                                    <Text style={[styles.text]}>{item.toTimeStr}</Text>
+                                                </View>
+                                                <TouchableOpacity style={{alignItems:'center',justifyContent:'center',flex:0.2}} 
+                                                  onPress={()=>{this.setState({showModal:true,deleteDoctor:item,deleteDocorIndex:index})}}
+                                                >
+                                                    <Entypo name="circle-with-cross" size={24} color={themeColor} />
+                                                </TouchableOpacity>
+                                            </View>
+                                        )
+                                    }}
+                                />
+                            </View>
+                            <View style={{flexDirection:"row",alignItems:'center',justifyContent:'space-around',height:height*0.2}}>
+
+                            
                             <View style={{ flexDirection: "row", alignItems:'center',justifyContent:"center",marginTop:20}}>
                                 <TouchableOpacity style={{height:height*0.05,width:width*0.4,backgroundColor:themeColor,borderRadius:5,alignItems:'center',justifyContent:"center"}}
-                                    onPress={() => { this.props.navigation.navigate("CreateReceptionist")}}
+                                    onPress={() => { this.props.navigation.navigate("CreateReceptionist",{item:this.state.item})}}
                                 >
                                     <Text style={[styles.text,{color:"#fff"}]}>Create Receptionist</Text>
                                 </TouchableOpacity>
                             </View>
-                           
+                            <View style={{ flexDirection: "row", alignItems: 'center', justifyContent: "center", marginTop: 20 }}>
+                                <TouchableOpacity style={{ height: height * 0.05, width: width * 0.4, backgroundColor: themeColor, borderRadius: 5, alignItems: 'center', justifyContent: "center" }}
+                                        onPress={() => { this.props.navigation.navigate('AddDoctor',{clinic:this.state.item.id}) }}
+                                >
+                                    <Text style={[styles.text, { color: "#fff" }]}>Add Doctors</Text>
+                                </TouchableOpacity>
+                            </View>
+                            </View>
                        </ScrollView>
-                        
+                        <View>
+                            <Modal
+                                animationIn="slideInUp"
+                                animationOut="slideOutDown"
+                                isVisible={this.state.showModal}
+                                onBackdropPress={() => { this.setState({ showModal: false }) }}
+                            >
+                                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                                    <View style={{ height: height * 0.3, width: width * 0.9, backgroundColor: "#fff", borderRadius: 20, alignItems: "center", justifyContent: "space-around" }}>
+                                        <View>
+                                            <Text style={[styles.text, { fontWeight: "bold", color: themeColor, fontSize: 20 }]}>Do you want to Delete?</Text>
+                                        </View>
+                                        <View style={{ flexDirection: "row", alignItems: 'center', justifyContent: "space-around", width, }}>
+                                            <TouchableOpacity style={{ backgroundColor: themeColor, height: height * 0.05, width: width * 0.2, alignItems: "center", justifyContent: 'center', borderRadius: 10 }}
+                                                onPress={() => { this.deleteDoctor() }}
+                                            >
+                                                <Text style={[styles.text, { color: "#fff" }]}>Yes</Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity style={{ backgroundColor: themeColor, height: height * 0.05, width: width * 0.2, alignItems: "center", justifyContent: "center", borderRadius: 10 }}
+                                                onPress={() => { this.setState({ showModal: false }) }}
+                                            >
+                                                <Text style={[styles.text, { color: "#fff" }]}>No</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
+                                </View>
+                            </Modal>
+                            <Modal
+                                animationIn="slideInUp"
+                                animationOut="slideOutDown"
+                                isVisible={this.state.showModal2}
+                                onBackdropPress={() => { this.setState({ showModal2: false }) }}
+                            >
+                                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                                    <View style={{ height: height * 0.3, width: width * 0.9, backgroundColor: "#fff", borderRadius: 20, alignItems: "center", justifyContent: "space-around" }}>
+                                        <View>
+                                            <Text style={[styles.text, { fontWeight: "bold", color: themeColor, fontSize: 20 }]}>Do you want to Delete?</Text>
+                                        </View>
+                                        <View style={{ flexDirection: "row", alignItems: 'center', justifyContent: "space-around", width, }}>
+                                            <TouchableOpacity style={{ backgroundColor: themeColor, height: height * 0.05, width: width * 0.2, alignItems: "center", justifyContent: 'center', borderRadius: 10 }}
+                                                onPress={() => { this.deleteReceptionist() }}
+                                            >
+                                                <Text style={[styles.text, { color: "#fff" }]}>Yes</Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity style={{ backgroundColor: themeColor, height: height * 0.05, width: width * 0.2, alignItems: "center", justifyContent: "center", borderRadius: 10 }}
+                                                onPress={() => { this.setState({ showModal2: false }) }}
+                                            >
+                                                <Text style={[styles.text, { color: "#fff" }]}>No</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
+                                </View>
+                            </Modal>
+                        </View>
                     </View>
                 </SafeAreaView>
             </>

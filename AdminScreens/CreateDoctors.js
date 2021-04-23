@@ -77,7 +77,7 @@ class CreateDoctors extends Component {
           },2000)
          
       }else{
-          Toast.show(post.error);
+          Toast.show("Try again");
       }
     }
     

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Dimensions, TextInput, TouchableOpacity, Image, SafeAreaView} from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TextInput, TouchableOpacity, Image, SafeAreaView, ToastAndroid} from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { connect } from 'react-redux';
 import { selectTheme } from '../actions';
@@ -9,36 +9,91 @@ import { Ionicons } from '@expo/vector-icons';
 const { height ,width} = Dimensions.get("window");
 const fontFamily =settings.fontFamily;
 const themeColor=settings.themeColor;
-const data=[
-    {
-        img:"https://caringals.com/wp-content/uploads/2020/05/1200x900jpg.jpg",
-        name:'citrus' 
-    },
-    {
-        img: "https://caringals.com/wp-content/uploads/2020/05/1200x900jpg.jpg",
-        name: 'paracetomal'
-    },
-    {
-        img: "https://caringals.com/wp-content/uploads/2020/05/1200x900jpg.jpg",
-        name: 'antacin'
-    },
-    {
-        img: "https://caringals.com/wp-content/uploads/2020/05/1200x900jpg.jpg",
-        name: 'pencilin'
-    },
-]
+const url =settings.url
 import { AntDesign } from '@expo/vector-icons';
 import MedicineDetails from '../components/MedicineDetails';
+import HttpsClient from '../api/HttpsClient';
+import Toast from 'react-native-simple-toast';
 class AddPrescription extends Component {
   constructor(props) {
     super(props);
     this.state = {
-        data
+                medicines:[],
+                mobileNo:"6767676767",
+                patientsName:'muthu',
+                onGoingTreatMent:'cancer',
+                healthIssues:'sugar',
     };
   }
-timingSelect=(time,index)=>{
-   console.log(time,index,"hhhhh")
+    changeFunction = (type, value, index)=>{
+        let duplicate = this.state.medicines
+
+        if (type =="delete"){
+            duplicate.splice(index,1)
+            this.setState({ medicines:duplicate});
+        }
+        if (type =="morning_count"){
+            duplicate[index].morning_count =value
+            this.setState({ medicines:duplicate})
+        }
+        if (type == "afternoon_count"){
+            duplicate[index].afternoon_count = value
+            this.setState({ medicines: duplicate })
+        }
+        if (type == "night_count") {
+            duplicate[index].night_count = value
+            this.setState({ medicines: duplicate })
+        }
+        if (type =="after_food"){
+            duplicate[index].after_food = value
+            this.setState({ medicines: duplicate })
+        }
+        if (type == "total_qty") {
+            duplicate[index].total_qty = value
+            this.setState({ medicines: duplicate })
+        }
+        if (type == "days") {
+            duplicate[index].days = value
+            this.setState({ medicines: duplicate })
+        }
 }
+    backFunction =(medicines)=>{
+        medicines.forEach((i)=>{
+            i.after_food =false,
+            i.morning_count=0,
+            i.afternoon_count =0,
+            i.night_count = 0,
+            i.total_qty =0,
+            i.days =0,
+            i.medicine =i.id
+        })
+        this.setState({ medicines})
+    }
+    addPriscription = async()=>{
+        let api =`${url}/api/prescription/addPrescription/`
+        let sendData ={
+            doctor: this.props.user.id,
+            medicines:this.state.medicines,
+            health_issues:this.state.healthIssues,
+            username:this.state.patientsName,
+            usermobile:this.state.mobileNo,
+            ongoing_treatment:this.state.onGoingTreatMent,
+            doctor_fees:this.state.doctorFees,
+            clinic: this.props.clinic.pk
+
+        }
+      
+       const post = await HttpsClient.post(api,sendData)
+       if(post.type=="success"){
+           Toast.show("Added SuccessFully")
+           setTimeout(()=>{
+             this.props.navigation.goBack()
+           },1500)
+       }else{
+           Toast.show("Try again")
+       }
+       
+    }
   render() {
     return (
         <>
@@ -65,54 +120,72 @@ timingSelect=(time,index)=>{
                 <View style={{ marginTop: 20 }}>
                     <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>Mobile No</Text>
                     <TextInput
+                         value ={this.state.mobileNo}
                          selectionColor={themeColor}
                          keyboardType="numeric"
+                         onChangeText={(mobileNo) => { this.setState({ mobileNo})}}
                          style={{ width: width * 0.9, height: height * 0.05, backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10}}
                     />
                 </View>
                 <View style={{ marginTop: 20 }}>
                     <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>Patient's Name</Text>
                     <TextInput
+                        value ={this.state.patientsName}
                         selectionColor={themeColor}
+                        onChangeText={(patientsName) => { this.setState({ patientsName }) }}
                         style={{ width: width * 0.9, height: height * 0.05, backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10 }}
                     />
                 </View>
                         <View style={{ marginTop: 20 }}>
                             <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>On Going Treatment</Text>
                             <TextInput
-                                
+                                value ={this.state.onGoingTreatMent}
+                                onChangeText={(onGoingTreatMent) => { this.setState({onGoingTreatMent}) }}
                                 selectionColor={themeColor}
                                 multiline={true}
-                                keyboardType="numeric"
+                               
                                 style={{ width: width * 0.9, height: height * 0.15, backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10 }}
                             />
                         </View>
                 <View style={{ marginTop: 20 }}>
                     <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>Health issues</Text>
                     <TextInput
+                       value ={this.state.healthIssues}
                         selectionColor={themeColor}
                         multiline={true}
-                        keyboardType="numeric"
+                      onChangeText={(healthIssues) => { this.setState({ healthIssues }) }}
                         style={{ width: width * 0.9, height: height * 0.15, backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10 }}
                     />
                 </View>
                 <View style={{ marginTop: 20 }}>
                     <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>Add Medicines</Text>
                     <TouchableOpacity style={{marginTop:20,alignItems:"center",justifyContent:'center',flexDirection:"row"}}
-                        onPress={() => { this.props.navigation.navigate("SearchMedicines") }}
+                                onPress={() => { this.props.navigation.navigate("SearchMedicines", { backFunction: (medicines) => { this.backFunction(medicines) }}) }}
                     >
                         <AntDesign name="pluscircle" size={30} color={themeColor} />
                     </TouchableOpacity>
                 </View>
                 {
-                   this.state.data.map((item,index)=>{
+                   this.state.medicines.map((item,index)=>{
                         return(
-                            <MedicineDetails item={item} index={index} timingSelect={(time,index) => { this.timingSelect(time,index)}}/>
+                            <MedicineDetails item={item} index={index} changeFunction={(type, value, index) => { this.changeFunction(type, value, index)}} />
                         )
                     })
                 }
+                        <View style={{ marginTop: 20 }}>
+                            <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>Doctor Fees</Text>
+                            <TextInput
+                                value={this.state.doctorFees}
+                                selectionColor={themeColor}
+                                keyboardType="numeric"
+                                onChangeText={(doctorFees) => { this.setState({ doctorFees }) }}
+                                style={{ width: width * 0.9, height: height * 0.05, backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10 }}
+                            />
+                        </View>
                 <View style={{height:height*0.15,alignItems:"center",justifyContent:'center'}}>
-                    <TouchableOpacity style={{height:height*0.06,alignItems:"center",justifyContent:'center',backgroundColor:themeColor,width:width*0.3,borderRadius:15}}>
+                    <TouchableOpacity style={{height:height*0.06,alignItems:"center",justifyContent:'center',backgroundColor:themeColor,width:width*0.3,borderRadius:15}}
+                      onPress={()=>{this.addPriscription()}}
+                    >
                            <Text style={[styles.text,{color:"#fff"}]}>ADD</Text>
                     </TouchableOpacity>
                 </View>
@@ -162,7 +235,8 @@ const mapStateToProps = (state) => {
 
     return {
         theme: state.selectedTheme,
-
+        user:state.selectedUser,
+        clinic: state.selectedClinic
     }
 }
 export default connect(mapStateToProps, { selectTheme })(AddPrescription);

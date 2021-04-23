@@ -23,6 +23,7 @@ const url = settings.url;
       console.log(login,"jjj")
          if (login) {
               const data = await HttpsClient.get(`${url}/api/HR/users/?mode=mySelf&format=json`);
+              console.log(data)
               this.props.selectUser(data.data[0]);
               if (data.data[0].is_superuser){
                       return this.props.navigation.dispatch(
@@ -38,7 +39,21 @@ const url = settings.url;
                         })
                       )
               }
-          //  return this.props.navigation.navigate('MainTab')
+           if (!data.data[0].is_superuser) {
+             return this.props.navigation.dispatch(
+               CommonActions.reset({
+                 index: 0,
+                 routes: [
+                   {
+                     name: 'MainTab',
+
+                   },
+
+                 ],
+               })
+             )
+           }
+      
          }else{
            return this.props.navigation.navigate('Login')
          }

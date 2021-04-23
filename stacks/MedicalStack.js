@@ -5,6 +5,7 @@ import Medicals from '../AdminScreens/Medicals';
 import CreateMedicals from '../AdminScreens/CreateMedicals';
 import CreateRep from '../AdminScreens/CreateRep';
 import SearchRep from '../AdminScreens/SearchRep';
+import ViewMedicals from '../AdminScreens/ViewMedicals';
 const Stack = createStackNavigator();
 export default class MedicalStack extends Component {
     constructor(props) {
@@ -20,6 +21,7 @@ export default class MedicalStack extends Component {
                 <Stack.Screen name="CreateMedicals" component={CreateMedicals} options={{ headerShown: false }} />
                 <Stack.Screen name="CreateRep" component={CreateRep} options={{ headerShown: false }} />
                 <Stack.Screen name="SearchRep" component={SearchRep} options={{ headerShown: false }} />
+                <Stack.Screen name="ViewMedicals" component={ViewMedicals} options={{ headerShown: false }} />
 
             </Stack.Navigator>
         );

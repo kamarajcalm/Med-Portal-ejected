@@ -15,29 +15,42 @@ const url = settings.url
   constructor(props) {
     super(props);
     this.state = {
-      mobileNO:"7010117137",
-      password:'kamaraj',
+      username:"",
+      password:'',
     };
   }
    login =async()=>{
   // this.setState({loading:true})
    let api = `${url}/api/HR/login/?mode=api`
    let sendData= new FormData();
-   sendData.append('username','testuser')
-   sendData.append('password','123')
-   
+   sendData.append('username',this.state.username)
+   sendData.append('password',this.state.password)
+  //  console.log(sendData,"jjj")
    let login = await axios.post(api,sendData)
+console.log(login.data,"ggggggg")
    if(login.status==200){
      AsyncStorage.setItem('csrf', login.data.csrf_token)
      AsyncStorage.setItem('pk', login.data.pk)
      AsyncStorage.setItem('login', "true")
+     return this.props.navigation.dispatch(
+       CommonActions.reset({
+         index: 0,
+         routes: [
+           {
+             name: 'DefaultScreen',
+
+           },
+
+         ],
+       })
+     )
             if (login.data.title =="superadmin"){
               return this.props.navigation.dispatch(
                 CommonActions.reset({
                   index: 0,
                   routes: [
                     {
-                      name: 'AdminTab',
+                      name: 'DefaultScreen',
 
                     },
 
@@ -45,6 +58,20 @@ const url = settings.url
                 })
               )
             }
+     if (login.data.title == "Doctor") {
+       return this.props.navigation.dispatch(
+         CommonActions.reset({
+           index: 0,
+           routes: [
+             {
+               name: 'DefaultScreen',
+
+             },
+
+           ],
+         })
+       )
+     }
    }
 
  
@@ -60,15 +87,15 @@ const url = settings.url
               <Text style={styles.text_header}>Welcome !</Text>
           </View>
           <View style={styles.footer}>
-              <Text style={styles.text_footer}>Mobile</Text>
+              <Text style={styles.text_footer}>Mobile or username</Text>
               <View style={styles.action}>
                     <AntDesign name="mobile1" size={20} color="#05375a" />
                     <TextInput 
-                       value={this.state.mobileNO}
-                       keyboardType ="numeric"
-                       placeholder="your number"
+                       value={this.state.username}
+                 
+                       placeholder="your username or mobile"
                        style={styles.textInput}
-                       onChangeText={(text) => { this.setState({ mobileNO:text})}}
+              onChangeText={(text) => { this.setState({ username:text})}}
                     />
               </View>
           <Text style={[styles.text_footer,{marginTop:35}]}>Password</Text>
@@ -76,9 +103,10 @@ const url = settings.url
             <Entypo name="lock-open" size={24} color="#05375a" />
          
             <TextInput
+              value={this.state.password}
               placeholder="Your Password"
               style={styles.textInput}
-           
+              onChangeText={(password) => { this.setState({ password }) }}
             />
           </View>
           <View style={{marginTop:20}}>

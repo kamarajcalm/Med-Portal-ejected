@@ -22,12 +22,12 @@ export default class Medicine extends Component {
         >
             <View style={{ flex: 0.2, alignItems: "center", justifyContent: "center" }}>
                 <Image
-                    source={{ uri: item.img }}
+                    source={{ uri:"https://lh3.googleusercontent.com/proxy/-hC9-7bgQSA6mg2aIAdRbGAtwRX0MHjYEudKywiZGdS_wfVmm3DYdTrWFihHZtYTvevDjbaEnMSJW_dA8S2eITlWp3Q27yFEW_qge7xPHVOfuSzsuDru2IvyqXB28w" }}
                     style={{ height: "80%", width: "80%", resizeMode: "contain", borderRadius: 15 }}
                 />
             </View>
             <View style={{ flex: 0.6, alignItems: "center", justifyContent: "center" }}>
-                <Text style={[styles.text]}>{item.name}</Text>
+                <Text style={[styles.text]}>{item.title}</Text>
             </View>
             <View style={{ flex: 0.2, alignItems: "center", justifyContent: 'center' }}
                 

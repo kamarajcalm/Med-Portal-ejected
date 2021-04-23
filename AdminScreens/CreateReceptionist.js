@@ -23,6 +23,8 @@ import authAxios from '../api/authAxios';
 const url = settings.url
 class CreateReceptionist extends Component {
     constructor(props) {
+        let item = props.route.params.item
+        console.log(item,"lll")
         super(props);
         this.state = {
             showModal: false,
@@ -42,12 +44,13 @@ class CreateReceptionist extends Component {
             City: "Bengaluru",
             firstEmergencyContactNo: "9869669867",
             secondEmergencyContactNo: '9778776767',
-            image: null
+            image: null,
+            item
         };
     }
 
-    createDoctor = async () => {
-        let api = `${url}/api/profile/createRep/`
+    CreateReceptionist = async () => {
+        let api = `${url}/api/prescription/createAssitant/`
         let sendData = {
             name: this.state.Name,
             displayPicture: this.state.image,
@@ -62,7 +65,8 @@ class CreateReceptionist extends Component {
             specialization: this.state.Specialization,
             qualification: this.state.Qualification,
             clinicsHandling: this.state.NoOfClinics,
-            occupation: "MediacalRep"
+            occupation: "",
+            clinic:this.state.item.id
         }
         if (this.state.image) {
             sendData.bodyType = "formData"
@@ -77,7 +81,7 @@ class CreateReceptionist extends Component {
             }, 2000)
 
         } else {
-            Toast.show(post.error);
+            Toast.show("Try again");
         }
     }
 
@@ -331,20 +335,11 @@ class CreateReceptionist extends Component {
                                         style={{ width: width * 0.8, height: height * 0.05, borderRadius: 15, backgroundColor: "#eeee", margin: 10, paddingLeft: 10 }}
                                     />
                                 </View>
-                                <View>
-                                    <Text style={styles.text}>No of Medicals handling</Text>
-                                    <TextInput
-                                        value={this.state.NoOfClinics}
-                                        onChangeText={(NoOfClinics) => { this.setState({ NoOfClinics }) }}
-                                        keyboardType="numeric"
-                                        selectionColor={themeColor}
-                                        style={{ width: width * 0.8, height: height * 0.05, borderRadius: 15, backgroundColor: "#eeee", margin: 10, paddingLeft: 10 }}
-                                    />
-                                </View>
+                              
 
                                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                                     <TouchableOpacity style={{ width: width * 0.4, height: height * 0.05, borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: themeColor }}
-                                        onPress={() => { this.createDoctor() }}
+                                        onPress={() => { this.CreateReceptionist() }}
                                     >
                                         <Text style={[styles.text, { color: "#fff" }]}>Create</Text>
                                     </TouchableOpacity>

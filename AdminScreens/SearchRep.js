@@ -19,7 +19,8 @@ class SearchRep extends Component {
         };
     }
     searchDoctor = async (query) => {
-        let api = `${url}/api/profile/userss/?search=${query}&role=Doctor`
+        let api = `${url}/api/profile/userss/?search=${query}&role=MediacalRep`
+        console.log(api,"kkk")
         let data = await HttpsClient.get(api)
 
         if (data.type == "success") {
@@ -44,7 +45,7 @@ class SearchRep extends Component {
                                 autoFocus={true}
                                 selectionColor={themeColor}
                                 style={{ height: "45%", backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10, width: "100%" }}
-                                placeholder="search Doctors"
+                                placeholder="search "
                                 onChangeText={(text) => { this.searchDoctor(text) }}
                             />
                         </View>

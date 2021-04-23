@@ -28,14 +28,14 @@ class CreateMedicals extends Component {
             latitude: "",
             longitude: '',
 
-            clinicName: "Sri Devi Clinic",
+            clinicName: "Sri Annai Medicals",
             openingTime: null,
             closingTime: null,
             mode: 'time',
             date: new Date(),
             show1: false,
             show2: false,
-            mobile: "7878787878",
+            mobile: "7878987878",
             GST: "gytyg4565456",
             address: "5/3278 Adaiyar",
             pincode: "786656",
@@ -45,11 +45,11 @@ class CreateMedicals extends Component {
             secondEmergencyContactNo: '9778776767',
         };
     }
-    createClinic = async () => {
+    createMedical = async () => {
         let api = `${url}/api/prescription/createClinic/`
         console.log(api, "a")
         let sendData = {
-            owner: this.state.doctor.id,
+            owner: this.state.owner.user,
             displayPicture: this.state.image,
             mobile: this.state.mobile,
             gstin: this.state.GST,
@@ -64,6 +64,7 @@ class CreateMedicals extends Component {
             long: this.state.longitude,
             startingtime: this.state.openingTime,
             closingtime: this.state.closingTime,
+            type:"MedicalStore"
         }
         console.log(sendData, "hhh")
         if (this.state.image) {
@@ -76,13 +77,13 @@ class CreateMedicals extends Component {
                 this.props.navigation.goBack();
             }, 2000)
         } else {
-            Toast.show(post.error)
+            Toast.show("Try again")
         }
 
     }
     backFunction = async (item) => {
         console.log(item, "bbbbbb")
-        this.setState({ doctor: item })
+        this.setState({ owner: item })
 
 
     }
@@ -257,9 +258,9 @@ class CreateMedicals extends Component {
                                     <Text style={styles.text}>Owner Name</Text>
                                     <TouchableOpacity
                                         style={{ width: width * 0.8, height: height * 0.05, borderRadius: 15, backgroundColor: "#eeee", margin: 10, paddingLeft: 10, justifyContent: "center" }}
-                                        onPress={() => { this.props.navigation.navigate('SearchDoctors', { backFunction: (item) => { this.backFunction(item) } }) }}
+                                        onPress={() => { this.props.navigation.navigate('SearchRep', { backFunction: (item) => { this.backFunction(item) } }) }}
                                     >
-                                        <Text>{this.state?.doctor?.name}</Text>
+                                        <Text>{this.state?.owner?.name}</Text>
                                     </TouchableOpacity>
                                     {/* <TextInput
                                         value={this.state.Name}
@@ -407,7 +408,7 @@ class CreateMedicals extends Component {
                                 </View>
                                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                                     <TouchableOpacity style={{ width: width * 0.4, height: height * 0.05, borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: themeColor }}
-                                        onPress={() => { this.createClinic() }}
+                                        onPress={() => { this.createMedical() }}
                                     >
                                         <Text style={[styles.text, { color: "#fff" }]}>Create</Text>
                                     </TouchableOpacity>

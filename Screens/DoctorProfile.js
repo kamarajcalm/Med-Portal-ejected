@@ -9,19 +9,23 @@ import { Ionicons, Entypo, AntDesign, Feather, MaterialCommunityIcons } from '@e
 const themeColor = settings.themeColor;
 const fontFamily = settings.fontFamily;
 import { connect } from 'react-redux';
-import { selectTheme } from '../actions';
+import { selectTheme ,selectClinic} from '../actions';
 import { NavigationContainer, CommonActions } from '@react-navigation/native';
 
-export default class DoctorProfile extends Component {
+class DoctorProfile extends Component {
     constructor(props) {
         super(props);
         this.state = {
         };
     }
+    changeClinic=()=>{
 
+    }
     render() {
         return (
-            <ScrollView style={{ marginBottom: 90 }}>
+            <ScrollView style={{ }}
+             contentContainerStyle ={{paddingBottom:90}}
+            >
 
                 <View style={{ marginLeft: 27, flexDirection: "row", borderColor: "gray", borderBottomWidth: 0.5, height: height * 0.05, }}>
                     <View style={{flex:0.5,justifyContent:"center"}}>
@@ -97,6 +101,26 @@ export default class DoctorProfile extends Component {
                     </View>
 
                 </View>
+                <View style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 0.5, height: height * 0.05, }}>
+                    <View style={{ flex: 0.5, justifyContent: "center" }}>
+                        <Text style={[styles.text, { fontWeight: "bold" }]}>CurrentClinic: </Text>
+                    </View>
+                    <View style={{ flex: 0.5, alignItems: 'flex-end', marginRight: 10, justifyContent: "center" }}>
+                        <Text style={[styles.text, { marginLeft: 10 }]}>{this.props.clinic?.name}</Text>
+                    </View>
+
+                </View>
+                <TouchableOpacity style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 0.5, height: height * 0.05, }}
+                    onPress={() => { this.props.ClinicSelect()}}
+                >
+                    <View style={{ flex: 0.5, justifyContent: "center" }}>
+                        <Text style={[styles.text, { fontWeight: "bold" }]}>Change Clinic</Text>
+                    </View>
+                    <View style={{ flex: 0.5, alignItems: 'flex-end', marginRight: 10, justifyContent: "center" }}>
+                        <AntDesign name="rightcircleo" size={24} color="gray" />
+                    </View>
+
+                </TouchableOpacity>
             </ScrollView>
         );
     }
@@ -116,3 +140,11 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff"
     },
 })
+const mapStateToProps = (state) => {
+    return {
+        theme: state.selectedTheme,
+        user: state.selectedUser,
+        clinic: state.selectedClinic
+    }
+}
+export default connect(mapStateToProps, { selectTheme, selectClinic })(DoctorProfile)

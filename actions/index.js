@@ -10,3 +10,9 @@ export const selectUser = (user) => {
         payload: user
     }
 }
+export const selectClinic = (user) => {
+    return {
+        type: 'CLINIC_SELECTED',
+        payload: user
+    }
+}

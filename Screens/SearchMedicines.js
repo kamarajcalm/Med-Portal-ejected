@@ -6,32 +6,18 @@ import { selectTheme } from '../actions';
 import settings from '../AppSettings';
 import medicine from '../components/Medicine';
 import Medicine from '../components/Medicine';
+import HttpsClient from '../api/HttpsClient';
 const { height, width } = Dimensions.get("window");
 const fontFamily = settings.fontFamily;
 const themeColor = settings.themeColor;
-const data = [
-    {
-        img: "https://caringals.com/wp-content/uploads/2020/05/1200x900jpg.jpg",
-        name: 'citrus'
-    },
-    {
-        img: "https://caringals.com/wp-content/uploads/2020/05/1200x900jpg.jpg",
-        name: 'paracetomal'
-    },
-    {
-        img: "https://caringals.com/wp-content/uploads/2020/05/1200x900jpg.jpg",
-        name: 'antacin'
-    },
-    {
-        img: "https://caringals.com/wp-content/uploads/2020/05/1200x900jpg.jpg",
-        name: 'pencilin'
-    },
-]
+const url = settings.url;
+
  class SearchMedicines extends Component {
   constructor(props) {
     super(props);
     this.state = {
-        selected:[]
+        selected:[],
+        medicines:[]
     };
   }
      selectMedicine =(item)=>{
@@ -50,6 +36,14 @@ const data = [
          
          
      }
+     SearchMedicines =async(query)=>{
+      let api= `${url}/api/prescription/medicines/?name=${query}`
+      console.log
+      const data = await HttpsClient.get(api);
+        if(data.type=="success"){
+             this.setState({medicines:data.data})
+        }
+     }
   render() {
     return (
          <>
@@ -58,22 +52,26 @@ const data = [
       <View style={{flex:1}}>
             <View style={{ height: height * 0.1, backgroundColor: themeColor, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, flexDirection: 'row', alignItems: "center" }}>
                 <TouchableOpacity style={{ flex: 0.2, alignItems: "center", justifyContent: 'center' }}
-                    onPress={() => { this.props.navigation.goBack() }}
+                    onPress={() => { 
+                        this.props.route.params.backFunction(this.state.selected)
+                        this.props.navigation.goBack() 
+                    }}
                 >
                     <Ionicons name="chevron-back-circle" size={30} color="#fff" />
                 </TouchableOpacity>
                 <View style={{ flex: 0.7, alignItems: "center", justifyContent: "center" }}>
                     <TextInput
                         autoFocus={true}
-                         selectionColor={themeColor}
+                        selectionColor={themeColor}
                         style={{  height:"45%", backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10 ,width:"100%"}}
                         placeholder="search Medicines"
+                        onChangeText ={(text)=>{this.SearchMedicines(text)}}
                     />
                 </View>
                  
             </View>
             <FlatList
-                data={data}
+                data={this.state.medicines}
                 keyExtractor={(item,index)=>index.toString()}
                 renderItem={({item,index})=>{
                     return(
@@ -85,7 +83,10 @@ const data = [
                   <Text style={[styles.text,{color:"#fff"}]}>selected ({this.state.selected.length})</Text> 
             </View>
                     <TouchableOpacity style={{ position: "absolute", bottom: 30, right: 20, height: height * 0.05, width: width * 0.4, backgroundColor: themeColor, borderRadius: 15, alignItems: "center", justifyContent: 'center' }}
-                      onPress={()=>this.props.navigation.goBack()}
+                      onPress={()=>{
+                          this.props.route.params.backFunction(this.state.selected)
+                          this.props.navigation.goBack()
+                        }}
                     >
                         <Text style={[styles.text, { color: "#fff" }]}>Proceed</Text>
                     </TouchableOpacity>

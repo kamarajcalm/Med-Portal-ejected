@@ -3,7 +3,7 @@ import { View, Text, StatusBar, Dimensions, Image, StyleSheet, TouchableOpacity,
 import settings from '../AppSettings';
 import axios from 'axios';
 import Modal from 'react-native-modal';
-import { Ionicons, Entypo, AntDesign } from '@expo/vector-icons';
+import { Ionicons, Entypo, AntDesign, FontAwesome, MaterialCommunityIcons} from '@expo/vector-icons';
 const { height } = Dimensions.get("window");
 const { width } = Dimensions.get("window");
 
@@ -14,9 +14,11 @@ import { selectTheme } from '../actions';
 import { NavigationContainer, CommonActions } from '@react-navigation/native';
 class ProfileView extends Component {
     constructor(props) {
+        let item = props.route.params.item
         super(props);
         this.state = {
-            showModal: false
+            showModal: false,
+            item
         };
     }
     request = async () => {
@@ -45,60 +47,59 @@ class ProfileView extends Component {
                                 <Text style={[styles.text, { color: "#fff" }]}>Profile</Text>
                             </View>
                             <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
-
+                               
                             </View>
                         </View>
                         <View style={{ flex: 1 }}>
-                            <View style={{ height: height * 0.12, alignItems: "center", justifyContent: 'center', }}>
-                                <Image
-                                    source={{ uri: "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
-                                    style={{ height: 60, width: 60, borderRadius: 30 }}
-                                />
-                                <Text style={[styles.text]}>kamaraj</Text>
-                            </View>
-                       
-                            <ScrollView style={{marginBottom:90}}>
-                                <View style={{ margin: 20 }}>
-                                    <Text style={[styles.text], { textDecorationLine: "underline", fontWeight: "bold", fontSize: 18, color: "gray" }}>INFO:</Text>
-                                </View>
-                                <View style={{ marginLeft: 27, flexDirection: "row" ,borderColor:"gray",borderBottomWidth:1,height:height*0.05,alignItems:"center"}}>
-                                    <Text style={[styles.text], { fontWeight: "bold" }}>Age:</Text>
-                                    <Text style={[styles.text, { marginLeft: 10 }]}>20</Text>
-                                </View>
-                                <View style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 1, height: height * 0.05, alignItems: "center"}}>
-                                    <Text style={[styles.text], { fontWeight: "bold" }}>height:</Text>
-                                    <Text style={[styles.text, { marginLeft: 10 }]}>6.7 feet</Text>
-                                </View>
-                                <View style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 1, height: height * 0.05, alignItems: "center"}}>
-                                    <Text style={[styles.text], { fontWeight: "bold" }}>weight: </Text>
-                                    <Text style={[styles.text, { marginLeft: 10 }]}>50kg</Text>
-                                </View>
-                                <View style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 1, height: height * 0.05, alignItems: "center"}}>
-                                    <Text style={[styles.text], { fontWeight: "bold" }}>Age:</Text>
-                                    <Text style={[styles.text, { marginLeft: 10 }]}>50kg</Text>
-                                </View>
-                                <View style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 1, height: height * 0.05, alignItems: "center" }}>
-                                    <Text style={[styles.text], { fontWeight: "bold" }}>blood group: </Text>
-                                    <Text style={[styles.text, { marginLeft: 10 }]}> o+ve</Text>
-                                </View>
-                                <View style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 1, height: height * 0.05, alignItems: "center" }}>
-                                    <Text style={[styles.text], { fontWeight: "bold" }}>Medical history: </Text>
-                                    <Text style={[styles.text, { marginLeft: 10 }]}>none</Text>
-                                </View>
-                                <View style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 1, height: height * 0.05, alignItems: "center" }}>
-                                    <Text style={[styles.text], { fontWeight: "bold" }}>Location: </Text>
-                                    <Text style={[styles.text, { marginLeft: 10 }]}>Bengaluru</Text>
-                                </View>
-                                <View style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 1, height: height * 0.05, alignItems: "center"}}>
-                                    <Text style={[styles.text], { fontWeight: "bold" }}>PhoneNo: </Text>
-                                    <Text style={[styles.text, { marginLeft: 10, fontWeight: "bold", color: "gray" }]}>7010117137</Text>
+                            <ScrollView>
+                                <View style={{ marginTop: 20, flexDirection: "row" }}>
+                                    <View style={{ flex: 0.4, height: height * 0.2, alignItems: 'center', justifyContent: "center" }}>
+                                        <Image
+                                            source={{ uri: "https://images.unsplash.com/photo-1558507652-2d9626c4e67a?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cG9ydHJhaXRzfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80" }}
+                                            style={{ height: "100%", width: "70%", borderRadius: 10 }}
+                                        />
+                                    </View>
+                                    <View style={{ flex: 0.6, height: height * 0.2, }}>
+                                        <View style={{flex:0.33,justifyContent:"space-between"}}>
+                                            <Text style={[styles.text, { fontSize: 20, color:"#0F2851",fontWeight:"bold"}]}>{this.state.item.name}</Text>
+                                            <Text style={[styles.text, { fontSize: 15, color:"gray"}]}>{this.state.item.specialization}</Text>
+                                        </View>
+                                        <View style={{ flex: 0.33 ,flexDirection:"row",alignItems:'center'}}>
+                                            <View style={{ height: 35, width: 35, borderRadius: 5, backgroundColor:"#FAFAFF",elevation:5,alignItems:"center",justifyContent:"center"}}>
+                                                <FontAwesome name="star" size={24} color="#FFC000" />
+                                            </View>
+                                           <View style={{justifyContent:'center',marginLeft:20}}>
+                                                <Text style={[styles.text, { fontSize: 15, color: "gray" }]}>Rating</Text>
+                                                <Text style={[styles.text, { fontSize: 15, color: "#0F2851",fontWeight:"bold" }]}>4.5 out of 5</Text>
+                                           </View>
+                                        </View>
+                                        <View style={{ flex: 0.33, flexDirection: "row", alignItems: 'center' }}>
+                                            <View style={{ height: 35, width: 35, borderRadius: 5, backgroundColor: "#FAFAFF", elevation: 5, alignItems: "center", justifyContent: "center" }}>
+                                                <MaterialCommunityIcons name="account-group" size={24} color="#0F2851" />
+                                            </View>
+                                            <View style={{ justifyContent: 'center', marginLeft: 20 }}>
+                                                <Text style={[styles.text, { fontSize: 15, color: "gray" }]}>Pateint</Text>
+                                                <Text style={[styles.text, { fontSize: 15, color: "#0F2851", fontWeight: "bold" }]}>1000+</Text>
+                                            </View>
+                                        </View>
+                                    </View>
                                 </View>
                             </ScrollView>
+                           
                          
                         </View>
                        
-
+                        <TouchableOpacity style={{ height: height * 0.07, position: 'absolute', width: width * 0.7, backgroundColor: themeColor ,bottom:30,left:60,borderRadius:20,alignItems:"center",justifyContent:"center",flexDirection:"row"}}
+                          onPress ={()=>{this.props.navigation.navigate('MakeAppoinment',{item:this.state.item})}}
+                        >
+                            <Text style={[styles.text,{color:"#fff"}]}>Make Appoinment</Text>
+                            <View style={{marginLeft:20}}>
+                                <AntDesign name="right" size={20} color="#fff"/>
+                            </View>
+                         
+                        </TouchableOpacity>
                     </View>
+                   
                 </SafeAreaView>
 
             </>

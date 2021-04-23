@@ -28,7 +28,7 @@ class Clinics extends Component {
     }
     searchClincs = async(query)=>{
       
-        let api = `${url}/api/prescription/clinics/?search=${query}`
+        let api = `${url}/api/prescription/clinics/?storeType=Clinic&search=${query}`
         console.log(api)
         const data = await HttpsClient.get(api)
         console.log(data,"jj")

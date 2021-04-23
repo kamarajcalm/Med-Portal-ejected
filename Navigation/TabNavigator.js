@@ -58,7 +58,12 @@ class TabNavigator extends Component {
         if (routeName == "SearchDoctors") {
             return false
         }
-
+        if (routeName == "ProfileView"){
+            return false
+        }
+        if (routeName == "MakeAppoinment") {
+            return false
+        }
         return true
     }
  

@@ -27,7 +27,6 @@ class CreateClinics extends Component {
             openImageModal: false,
             latitude: "",
             longitude: '',
-           
             clinicName: "Sri Devi Clinic",
             openingTime: null,
             closingTime: null,
@@ -49,7 +48,7 @@ class CreateClinics extends Component {
         let api =  `${url}/api/prescription/createClinic/`
         console.log(api,"a")
         let sendData ={
-            owner:this.state.doctor.id,
+            owner: this.state.doctor.user,
             displayPicture:this.state.image,
             mobile:this.state.mobile,
             gstin:this.state.GST,
@@ -76,7 +75,7 @@ class CreateClinics extends Component {
                this.props.navigation.goBack();
            }, 2000)
        }else{
-           Toast.show(post.error)
+           Toast.show("Try again")
        }
 
     }
@@ -390,6 +389,8 @@ class CreateClinics extends Component {
                                 <View>
                                     <Text style={styles.text}>Latitude</Text>
                                     <TextInput
+                                       keyboardType ="numeric"
+                                        onChangeText={(text) => { this.setState({ latitude:text})}}
                                         value={this.state?.latitude.toString()}
                                         multiline={true}
                                         selectionColor={themeColor}
@@ -399,6 +400,7 @@ class CreateClinics extends Component {
                                 <View>
                                     <Text style={styles.text}>Longitude</Text>
                                     <TextInput
+                                        onChangeText={(text) => { this.setState({ longitude: text }) }}
                                         value={this.state?.longitude.toString()}
                                         multiline={true}
                                         selectionColor={themeColor}
