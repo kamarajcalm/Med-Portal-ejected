@@ -18,7 +18,7 @@ class Clinics extends Component {
         };
     }
     getClinics =async()=>{
-        const api =`${url}/api/prescription/clinics/`
+        const api = `${url}/api/prescription/clinics/?storeType=Clinic`
         console.log(api)
         const data =await HttpsClient.get(api)
         

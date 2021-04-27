@@ -75,13 +75,13 @@ import Toast from 'react-native-simple-toast';
                      <Text style={[styles.text,{fontWeight:"bold",fontSize:12}]}>Medicine</Text>
                  </View>
                  <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
-                     <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>AfterFood</Text>
+                     <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>AF</Text>
                  </View>
                  <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
                      <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>morning</Text>
                  </View>
                  <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
-                     <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>AfterNoon</Text>
+                     <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>ANoon</Text>
                  </View>
                  <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
                      <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>Night</Text>

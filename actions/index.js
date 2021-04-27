@@ -10,9 +10,15 @@ export const selectUser = (user) => {
         payload: user
     }
 }
-export const selectClinic = (user) => {
+export const selectClinic = (clinic) => {
     return {
         type: 'CLINIC_SELECTED',
-        payload: user
+        payload: clinic
+    }
+}
+export const selectMedical = (medical) => {
+    return {
+        type: 'MEDICAL_SELECTED',
+        payload: medical
     }
 }

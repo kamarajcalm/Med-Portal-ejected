@@ -19,6 +19,7 @@ import DoctorsAdminStack from '../stacks/DoctorsAdminStack';
 import MedicalStack from '../stacks/MedicalStack';
 import AdminProfileStack from '../stacks/AdminProfileStack';
 import ClincicPriscriptionStack from '../stacks/ClincicPriscriptionStack';
+import MedicalInventoryStack from '../stacks/MedicalInventoryStack';
 
 const Tab = createBottomTabNavigator();
 
@@ -60,43 +61,30 @@ class MediacalTab extends Component {
                 <Tab.Screen name="ClincicPriscriptionStack" component={ClincicPriscriptionStack}
                     options={{
                         tabBarIcon: ({ focused, color, size }) => {
-                            return <MaterialCommunityIcons name="cards" size={24} color="#fff" />
+                            return <MaterialCommunityIcons name="cards" size={24} color={focused?"#fff":"gray"} />
 
                         }
                         ,
                         tabBarLabel: ({ focused }) => {
-                            return <Text style={{ color: focused ? "#fff" : "gray", fontFamily }}>Clincs</Text>
+                            return <Text style={{ color: focused ? "#fff" : "gray", fontFamily }}>Priscription</Text>
                         }
                     }}
 
                 />
-                <Tab.Screen name="DoctorsAdminStack" component={DoctorsAdminStack}
+                <Tab.Screen name="Inventory" component={MedicalInventoryStack}
                     options={{
                         tabBarIcon: ({ focused, color, size }) => {
-                            return <Fontisto name="doctor" size={24} color={focused ? "#fff" : "gray"} />
+                            return <MaterialIcons name="inventory" size={24} color={focused?"#fff":"gray"} />
 
                         },
                         tabBarLabel: ({ focused }) => {
-                            return <Text style={{ color: focused ? "#fff" : "gray", fontFamily }}>doctors</Text>
+                            return <Text style={{ color: focused ? "#fff" : "gray", fontFamily }}>Inventory</Text>
                         }
 
                     }}
 
                 />
-                <Tab.Screen name="MedicalStack" component={MedicalStack}
-                    options={{
-
-                        tabBarIcon: ({ focused, color, size }) => {
-                            return <FontAwesome5 name="hand-holding-medical" size={24} color={focused ? "#fff" : "gray"} />
-
-                        },
-                        tabBarLabel: ({ focused }) => {
-                            return <Text style={{ color: focused ? "#fff" : "gray", fontFamily }}>medicals</Text>
-                        }
-
-                    }}
-
-                />
+            
                 <Tab.Screen name="AdminProfileStack" component={AdminProfileStack}
                     options={{
                         tabBarIcon: ({ focused, color, size }) => {

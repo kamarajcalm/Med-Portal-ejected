@@ -21,10 +21,10 @@ import HttpsClient from '../api/HttpsClient';
 import Toast from 'react-native-simple-toast';
 import authAxios from '../api/authAxios';
 const url = settings.url
-class CreateReceptionist extends Component {
+class CreateReceptionistMedical extends Component {
     constructor(props) {
         let item = props.route.params.item
-        console.log(item,"lll")
+        console.log(item, "lll")
         super(props);
         this.state = {
             showModal: false,
@@ -65,15 +65,16 @@ class CreateReceptionist extends Component {
             specialization: this.state.Specialization,
             qualification: this.state.Qualification,
             clinicsHandling: this.state.NoOfClinics,
-            occupation: "ClinicRecoptionist",
-            clinic:this.state.item.id,
-            type:"Clinic"
+            occupation: "MedicalRecoptionist",
+            clinic: this.state.item.id,
+            type:"MedicalStore"
         }
         if (this.state.image) {
             sendData.bodyType = "formData"
         }
 
         let post = await HttpsClient.post(api, sendData)
+        console.log(sendData,'jjj')
         console.log(post, "hhh")
         if (post.type == "success") {
             Toast.show('created SuccessFully');
@@ -336,7 +337,7 @@ class CreateReceptionist extends Component {
                                         style={{ width: width * 0.8, height: height * 0.05, borderRadius: 15, backgroundColor: "#eeee", margin: 10, paddingLeft: 10 }}
                                     />
                                 </View>
-                              
+
 
                                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                                     <TouchableOpacity style={{ width: width * 0.4, height: height * 0.05, borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: themeColor }}
@@ -388,4 +389,4 @@ const mapStateToProps = (state) => {
 
     }
 }
-export default connect(mapStateToProps, { selectTheme })(CreateReceptionist)
+export default connect(mapStateToProps, { selectTheme })(CreateReceptionistMedical)

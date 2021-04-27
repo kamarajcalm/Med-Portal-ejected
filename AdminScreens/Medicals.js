@@ -123,7 +123,7 @@ class Medicals extends Component {
                   >
                     <View style={{ flex: 0.3, alignItems: "center", justifyContent: "center" }}>
                       <Image
-                        source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/practo-fabric/practices/711061/lotus-multi-speciality-health-care-bangalore-5edf8fe3ef253.jpeg" }}
+                        source={{ uri: item.displayPicture||"https://s3-ap-southeast-1.amazonaws.com/practo-fabric/practices/711061/lotus-multi-speciality-health-care-bangalore-5edf8fe3ef253.jpeg" }}
                         style={{ height: 60, width: 60, borderRadius: 30, }}
                       />
                     </View>

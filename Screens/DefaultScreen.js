@@ -18,44 +18,75 @@ const url = settings.url;
     };
   }
      getUserDetails = async () => {
+      //  return this.props.navigation.dispatch(
+      //    CommonActions.reset({
+      //      index: 0,
+      //      routes: [
+      //        {
+      //          name: 'MedicalTab',
+
+      //        },
+
+      //      ],
+      //    })
+      //  )
          const login = await AsyncStorage.getItem("login")
         
-      console.log(login,"jjj")
+          
          if (login) {
               const data = await HttpsClient.get(`${url}/api/HR/users/?mode=mySelf&format=json`);
               console.log(data)
-              this.props.selectUser(data.data[0]);
-              if (data.data[0].is_superuser){
-                      return this.props.navigation.dispatch(
-                        CommonActions.reset({
-                          index: 0,
-                          routes: [
-                            {
-                              name: 'AdminTab',
+              if(data.type =="success"){
+                console.log("Geeeee")
+                this.props.selectUser(data.data[0]);
+                if (data.data[0].is_superuser) {
+                  return this.props.navigation.dispatch(
+                    CommonActions.reset({
+                      index: 0,
+                      routes: [
+                        {
+                          name: 'AdminTab',
 
-                            },
+                        },
 
-                          ],
-                        })
-                      )
+                      ],
+                    })
+                  )
+                }
+                if (data.data[0].profile.occupation == "MediacalRep" || data.data[0].profile.occupation == "MedicalRecoptionist"){
+                  return this.props.navigation.dispatch(
+                    CommonActions.reset({
+                      index: 0,
+                      routes: [
+                        {
+                          name: 'MedicalTab',
+
+                        },
+
+                      ],
+                    })
+                  )
+                }
+                if (data.data[0].profile.occupation =="Doctor") {
+                  return this.props.navigation.dispatch(
+                    CommonActions.reset({
+                      index: 0,
+                      routes: [
+                        {
+                          name: 'MainTab',
+
+                        },
+
+                      ],
+                    })
+                  )
+                }
+
               }
-           if (!data.data[0].is_superuser) {
-             return this.props.navigation.dispatch(
-               CommonActions.reset({
-                 index: 0,
-                 routes: [
-                   {
-                     name: 'MainTab',
-
-                   },
-
-                 ],
-               })
-             )
-           }
-      
-         }else{
-           return this.props.navigation.navigate('Login')
+              else {
+                return this.props.navigation.navigate('Login')
+              }
+              
          }
      }
   componentDidMount(){

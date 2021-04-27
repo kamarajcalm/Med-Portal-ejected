@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Dimensions, TextInput, TouchableOpacity, Image, SafeAreaView, ToastAndroid} from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TextInput, TouchableOpacity, Image, SafeAreaView, ToastAndroid, Modal, Pressable, ActivityIndicator} from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { connect } from 'react-redux';
 import { selectTheme } from '../actions';
@@ -19,10 +19,11 @@ class AddPrescription extends Component {
     super(props);
     this.state = {
                 medicines:[],
-                mobileNo:"6767676767",
-                patientsName:'muthu',
-                onGoingTreatMent:'cancer',
-                healthIssues:'sugar',
+                mobileNo:"",
+                patientsName:'',
+                onGoingTreatMent:'',
+                healthIssues:'',
+                loading: false
     };
   }
     changeFunction = (type, value, index)=>{
@@ -94,7 +95,26 @@ class AddPrescription extends Component {
        }
        
     }
+    searchUser = async(mobileNo)=>{
+        let api = `${url}/api/profile/userss/?search=${mobileNo}&role=Customer`
+        this.setState({mobileNo})
+        if(mobileNo.length>9){
+            this.setState({loading:true})
+           const data = await HttpsClient.get(api)
+           console.log(data)
+           if(data.type =="success"){
+               if (data.data[0]?.mobile == mobileNo){
+                   this.setState({ patientsName: data.data[0].name, health_issues: data.data[0].health_issues})
+               }
+             this.setState({loading:false})
+           }
+        }
+    }
+    setModalVisible = (visible) => {
+        this.setState({ loading: visible });
+    }
   render() {
+      const { loading } = this.state;
     return (
         <>
             <SafeAreaView style={styles.topSafeArea} />
@@ -123,7 +143,7 @@ class AddPrescription extends Component {
                          value ={this.state.mobileNo}
                          selectionColor={themeColor}
                          keyboardType="numeric"
-                         onChangeText={(mobileNo) => { this.setState({ mobileNo})}}
+                                onChangeText={(mobileNo) => { this.searchUser(mobileNo)}}
                          style={{ width: width * 0.9, height: height * 0.05, backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10}}
                     />
                 </View>
@@ -137,6 +157,16 @@ class AddPrescription extends Component {
                     />
                 </View>
                         <View style={{ marginTop: 20 }}>
+                            <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>Health issues</Text>
+                            <TextInput
+                                value={this.state.healthIssues}
+                                selectionColor={themeColor}
+                                multiline={true}
+                                onChangeText={(healthIssues) => { this.setState({ healthIssues }) }}
+                                style={{ width: width * 0.9, height: height * 0.15, backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10 ,}}
+                            />
+                        </View>
+                        <View style={{ marginTop: 20 }}>
                             <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>On Going Treatment</Text>
                             <TextInput
                                 value ={this.state.onGoingTreatMent}
@@ -147,16 +177,7 @@ class AddPrescription extends Component {
                                 style={{ width: width * 0.9, height: height * 0.15, backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10 }}
                             />
                         </View>
-                <View style={{ marginTop: 20 }}>
-                    <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>Health issues</Text>
-                    <TextInput
-                       value ={this.state.healthIssues}
-                        selectionColor={themeColor}
-                        multiline={true}
-                      onChangeText={(healthIssues) => { this.setState({ healthIssues }) }}
-                        style={{ width: width * 0.9, height: height * 0.15, backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10 }}
-                    />
-                </View>
+              
                 <View style={{ marginTop: 20 }}>
                     <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>Add Medicines</Text>
                     <TouchableOpacity style={{marginTop:20,alignItems:"center",justifyContent:'center',flexDirection:"row"}}
@@ -189,7 +210,24 @@ class AddPrescription extends Component {
                            <Text style={[styles.text,{color:"#fff"}]}>ADD</Text>
                     </TouchableOpacity>
                 </View>
+                        <View style={styles.centeredView}>
+                            <Modal
+                                animationType="fade"
+                                transparent={true}
+                                visible={loading}
+                              
+                            >
+                                <View style={styles.centeredView}>
+                                    <View style={styles.modalView}>
+                                     <ActivityIndicator color={themeColor} size ="large" />
+                                      
+                                    </View>
+                                </View>
+                            </Modal>
+                        
+                        </View>
             </ScrollView>
+                   
         </View>
      </SafeAreaView>
        </>
@@ -230,6 +268,49 @@ const styles= StyleSheet.create({
         flex: 1,
         backgroundColor: "#fff"
     },
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 22
+    },
+    modalView: {
+         height:60,
+         width:60,
+        backgroundColor: "white",
+        borderRadius: 30,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+        alignItems:"center",
+        justifyContent:"center"
+    },
+    button: {
+        borderRadius: 20,
+        padding: 10,
+        elevation: 2
+    },
+    buttonOpen: {
+        backgroundColor: "#F194FF",
+    },
+    buttonClose: {
+        backgroundColor: "#2196F3",
+    },
+    textStyle: {
+        color: "white",
+        fontWeight: "bold",
+        textAlign: "center"
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: "center"
+    }
 })
 const mapStateToProps = (state) => {
 

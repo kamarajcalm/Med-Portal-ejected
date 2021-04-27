@@ -95,16 +95,33 @@ class Priscription extends React.Component {
       }
     }
     getClinics = async()=>{
-    
         const api = `${url}/api/prescription/getDoctorClinics/?doctor=${this.props.user.id}`
-        
         const data = await HttpsClient.get(api)
-       
+       console.log(data)
         if(data.type=="success"){
+      
             this.setState({ clinics: data.data.workingclinics})
-            this.props.selectClinic(data.data.workingclinics[0])
+            let activeClinic = data.data.workingclinics.filter((i)=>{
+                return i.active
+            })
+         console.log(activeClinic[0])
+            this.props.selectClinic(activeClinic[0]||data.data.workingclinics[0])
       
         }
+    }
+    setActiveClinic = async(item) => {
+        const api = `${url}/api/prescription/doctorActive/`
+        let sendData ={
+            deactiveClinic:this.props.clinic.pk,
+            activeClinic:item.pk
+        }
+        let patch = await HttpsClient.post(api,sendData)
+        if(patch.type =="success"){
+        
+            this.props.selectClinic(item)
+            this.setState({showModal:false})
+        }
+    
     }
     findUser =()=>{
         if (this.props.user.profile.occupation =="Doctor"){
@@ -130,6 +147,7 @@ class Priscription extends React.Component {
     componentWillUnmount(){
         this._unsubscribe();
     }
+ 
     render() {
         const y= new Animated.Value(0);
         const onScroll = Animated.event([{nativeEvent:{contentOffset:{y}}}],{
@@ -290,7 +308,7 @@ class Priscription extends React.Component {
                                     renderItem={({ item, index }) => {
                                         return (
                                             <TouchableOpacity style={{ flexDirection: "row", marginTop: 20, alignItems: 'center', justifyContent: "space-around", width }}
-                                                onPress={() => { this.props.selectClinic(item) }}
+                                                onPress={() => { this.setActiveClinic(item) }}
                                             >
                                                 <Text style={[styles.text]}>{item.name}</Text>
                                                 <View >

@@ -36,10 +36,26 @@ class Appointments extends Component {
             selectedIndex:null
         };
     }
+    getAppointments2 = async () => {
+        let api = ""
+        if (this.props.user.profile.occupation == "Doctor") {
+            api = `${url}/api/prescription/appointments/?doctor=${this.props.user.id}&status=Completed`
+        } else {
+            api = `${url}/api/prescription/appointments/?requesteduser=${this.props.user.id}`
+        }
+
+        const data = await HttpsClient.get(api)
+        console.log(data)
+        if (data.type == "success") {
+            let appoinments = this.state.appoinments
+
+            this.setState({ appoinments: data.data })
+        }
+    }
     getAppointments =async()=>{
         let api =""
         if (this.props.user.profile.occupation == "Doctor") {
-            api = `${url}/api/prescription/appointments/?doctor=${this.props.user.id}`
+            api = `${url}/api/prescription/appointments/?doctor=${this.props.user.id}&status=Pending&status=Accepted`
         }else{
             api = `${url}/api/prescription/appointments/?requesteduser=${this.props.user.id}`
         }
@@ -79,6 +95,15 @@ class Appointments extends Component {
     componentDidMount() {
         
       this.getAppointments()
+        this._unsubscribe = this.props.navigation.addListener('focus', () => {
+            
+                this.getAppointments()
+            
+
+        });
+    }
+    componentWillUnmount(){
+        this._unsubscribe();
     }
     acceptAppoinment =async()=>{
         let api = `${url}/api/prescription/appointments/${this.state.selectedAppointment.id}/`
@@ -101,8 +126,7 @@ class Appointments extends Component {
     }
     RejectAppointment =async()=>{
         let api = `${url}/api/prescription/appointments/${this.state.selectedAppointment.id}/`
-        let sendData = {
-            
+        let sendData = { 
             status: "Declined"
         }
         console.log(sendData)
@@ -135,7 +159,7 @@ class Appointments extends Component {
         }
     }
     onChange = (selectedDate) => {
-        if (selectedDate.type == "set") {
+        if (selectedDate.type == "set"){
             this.setState({ today: moment(new Date(selectedDate.nativeEvent.timestamp)).format('YYYY-MM-DD'), show: false, date: new Date(selectedDate.nativeEvent.timestamp) }, () => {
                 console.log(this.state.today, "jjjj")
 
@@ -216,11 +240,15 @@ class Appointments extends Component {
                                 <Text style={[styles.text]}>{item.patientname.mobile}</Text>
                             </View>
 
-                            {/* TABS */}
+                       
 
                             <View style={{ flex: 0.4, flexDirection: "row", alignItems: "center", justifyContent: 'center' }}>
-                            
+                                   {/* this */}
+                                {item.status != "Completed"  ? 
+                                
+                                
                                 <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
+                                    
                                     {item.status =="Pending"?<TouchableOpacity style={{ height: height * 0.05, width: "80%", borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: "#32CD32" }}
                                         onPress={() => { this.setState({ modal: true, selectedAppointment:item,selectedIndex:index})}}
                         >
@@ -232,9 +260,14 @@ class Appointments extends Component {
                                     >
                                         <Text style={[styles.text, { color: "#fff" }]}>finish</Text>
                                     </TouchableOpacity>}
-                    </View>
-                    <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
-                        {<TouchableOpacity style={{ height: height * 0.05, width: "80%", borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: "#B22222" }}
+                                </View> :
+                                // or
+                                <View style={{ alignItems: 'center', justifyContent: "center" }}>
+                                    <Text style={[styles.text]}>Status:</Text>
+                                    <Text style={[styles.text]}>{item.status}</Text>
+                                </View>}
+                                {item.status != "Completed" && <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
+                                    <TouchableOpacity style={{ height: height * 0.05, width: "80%", borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: "#B22222" }}
                                         onPress={() => {
                                             this.setState({ selectedAppointment: item, selectedIndex: index }, () => {
                                                 this.RejectAppointment()
@@ -242,8 +275,8 @@ class Appointments extends Component {
                                         }}
                         >
                             <Text style={[styles.text, { color: "#fff" }]}>Reject</Text>
-                        </TouchableOpacity>}
-                    </View>
+                        </TouchableOpacity>
+                    </View>}
                             </View>
                         </View>
                     )
@@ -254,7 +287,12 @@ class Appointments extends Component {
         )
     }
     indexChange = async (index,) => {
-    
+           if(index == 0){
+             this.getAppointments()
+           }
+           if(index == 1){
+               this.getAppointments2()
+           }
             this.setState({ index })
         
     }

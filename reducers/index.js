@@ -20,8 +20,15 @@ const selectedClinicReducer = (selectedClinic= null, action) => {
     }
     return selectedClinic
 }
+const selectedMedicalReducer = (selectedMedical = null, action) => {
+    if (action.type === "MEDICAL_SELECTED") {
+        return action.payload;
+    }
+    return selectedMedical
+}
 export default combineReducers({
-    selectedTheme: selectedThemeReducer,
-    selectedUser: selectedUserReducer,
-    selectedClinic:selectedClinicReducer
+    selectedTheme:selectedThemeReducer,
+    selectedUser:selectedUserReducer,
+    selectedClinic:selectedClinicReducer,
+    selectedMedical:selectedMedicalReducer,
 })

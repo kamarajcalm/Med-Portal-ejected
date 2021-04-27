@@ -27,7 +27,7 @@ class DoctorProfile extends Component {
              contentContainerStyle ={{paddingBottom:90}}
             >
 
-                <View style={{ marginLeft: 27, flexDirection: "row", borderColor: "gray", borderBottomWidth: 0.5, height: height * 0.05, }}>
+                <View style={{ marginLeft: 27, flexDirection: "row", borderColor: "gray", borderBottomWidth: 0.5, minHeight: height * 0.05, }}>
                     <View style={{flex:0.5,justifyContent:"center"}}>
                         <Text style={[styles.text,{fontWeight:"bold"}]}>Age:</Text>
                     </View>
@@ -36,7 +36,7 @@ class DoctorProfile extends Component {
                     </View>
                    
                 </View>
-                <View style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 0.5, height: height * 0.05, }}>
+                <View style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 0.5, minHeight: height * 0.05, }}>
                      <View style={{flex:0.5,justifyContent:'center'}}>
                         <Text style={[styles.text,{fontWeight:"bold"}]}>Specialization:</Text>
                      </View>
@@ -45,7 +45,7 @@ class DoctorProfile extends Component {
                     </View>
                     
                 </View>
-                <View style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 0.5, height: height * 0.05,  }}>
+                <View style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 0.5, minHeight: height * 0.05,  }}>
                     <View style={{flex:0.5,justifyContent:"center"}}>
                         <Text style={[styles.text, { fontWeight: "bold" }]}>Experience: </Text>
                     </View>
@@ -55,7 +55,7 @@ class DoctorProfile extends Component {
                  
                     
                 </View>
-                <View style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 0.5, height: height * 0.05,  }}>
+                <View style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 0.5, minHeight: height * 0.05,  }}>
                     <View style={{flex:0.5,justifyContent:"center"}}>
                         <Text style={[styles.text, { fontWeight: "bold" }]}>Patient Treated:</Text>
                     </View>
@@ -64,7 +64,7 @@ class DoctorProfile extends Component {
                    </View>
                     
                 </View>
-                <View style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 0.5, height: height * 0.05, }}>
+                <View style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 0.5, minHeight: height * 0.05, }}>
                       <View style={{flex:0.5,justifyContent:"center"}}>
                         <Text style={[styles.text, { fontWeight: "bold" }]}>Working in Clinics: </Text>
                       </View>
@@ -74,7 +74,7 @@ class DoctorProfile extends Component {
                  
                 </View>
                 
-                <View style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 0.5, height: height * 0.05,  }}>
+                <View style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 0.5, minHeight: height * 0.05,  }}>
                     <View style={{ flex: 0.5, justifyContent: "center" }}>
                         <Text style={[styles.text, { fontWeight: "bold" }]}>Location: </Text>
                     </View>
@@ -83,7 +83,7 @@ class DoctorProfile extends Component {
                     </View>
                 
                 </View>
-                <View style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 0.5, height: height * 0.05, }}>
+                <View style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 0.5, minHeight: height * 0.05, }}>
                     <View style={{ flex: 0.5, justifyContent: "center" }}>
                         <Text style={[styles.text, { fontWeight: "bold" }]}>PhoneNo: </Text>
                     </View>
@@ -92,7 +92,7 @@ class DoctorProfile extends Component {
                     </View>
                    
                 </View>
-                <View style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 0.5, height: height * 0.05, }}>
+                <View style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 0.5, minHeight: height * 0.05, }}>
                     <View style={{ flex: 0.5, justifyContent: "center" }}>
                         <Text style={[styles.text, { fontWeight: "bold" }]}>Total Priscription: </Text>
                     </View>
@@ -101,16 +101,19 @@ class DoctorProfile extends Component {
                     </View>
 
                 </View>
-                <View style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 0.5, height: height * 0.05, }}>
+                <View style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 0.5, minHeight: height * 0.05, }}>
                     <View style={{ flex: 0.5, justifyContent: "center" }}>
                         <Text style={[styles.text, { fontWeight: "bold" }]}>CurrentClinic: </Text>
                     </View>
                     <View style={{ flex: 0.5, alignItems: 'flex-end', marginRight: 10, justifyContent: "center" }}>
-                        <Text style={[styles.text, { marginLeft: 10 }]}>{this.props.clinic?.name}</Text>
+                        <View>
+                            <Text style={[styles.text, { marginLeft: 10 }]}>{this.props.clinic?.name}</Text>
+                        </View>
+                     
                     </View>
 
                 </View>
-                <TouchableOpacity style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 0.5, height: height * 0.05, }}
+                <TouchableOpacity style={{ marginLeft: 27, marginTop: 10, flexDirection: "row", borderColor: "gray", borderBottomWidth: 0.5, minHeight: height * 0.05, }}
                     onPress={() => { this.props.ClinicSelect()}}
                 >
                     <View style={{ flex: 0.5, justifyContent: "center" }}>

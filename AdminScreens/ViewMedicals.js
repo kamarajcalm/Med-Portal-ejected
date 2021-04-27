@@ -8,18 +8,34 @@ import { Ionicons } from '@expo/vector-icons';
 import authAxios from '../api/authAxios';
 const fontFamily = settings.fontFamily;
 const themeColor = settings.themeColor;
+const url =settings.url;
 import { Linking } from 'react-native';
-import { Feather } from '@expo/vector-icons';
+import { Feather ,Entypo} from '@expo/vector-icons';
+import HttpsClient from '../api/HttpsClient';
 class ViewMedicals extends Component {
     constructor(props) {
         let item = props.route.params.item
         super(props);
         this.state = {
-            item
+            item,
+            receptionList:[]
         };
     }
+    getReceptionList = async () => {
+        let api = `${url}/api/prescription/recopinists/?clinic=${this.state.item.id}`
+        console.log(api)
+        const data = await HttpsClient.get(api)
+        // console.log(data,"kkk")
+        if (data.type == "success") {
+            this.setState({ receptionList: data.data })
+        }
+    }
     componentDidMount() {
-        console.log(this.props.route.params.item)
+        this.getReceptionList()
+        this._unsubscribe = this.props.navigation.addListener('focus', () => {
+
+            this.getReceptionList()
+        });
     }
     render() {
         return (
@@ -157,14 +173,42 @@ class ViewMedicals extends Component {
                                     <Feather name="phone" size={20} color="black" />
                                 </TouchableOpacity>
                             </View>
-                            {/* <View style={{ flexDirection: "row", alignItems: 'center', justifyContent: "center", marginTop: 20 }}>
+                            <View style={{ margin: 20 }}>
+                                <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}> Receptionist List:</Text>
+                                <FlatList
+                                    data={this.state.receptionList}
+                                    keyExtractor={(item, index) => index.toString()}
+                                    renderItem={({ item, index }) => {
+                                        return (
+                                            <View style={{ flexDirection: "row", height: height * 0.1, }}>
+                                                <View style={{ alignItems: "center", justifyContent: "center", flex: 0.33 }}>
+                                                    <Image
+                                                        source={{ uri: item.user.profile.displayPicture || "https://s3-ap-southeast-1.amazonaws.com/practo-fabric/practices/711061/lotus-multi-speciality-health-care-bangalore-5edf8fe3ef253.jpeg" }}
+                                                        style={{ height: 60, width: 60, borderRadius: 30, }}
+                                                    />
+                                                </View>
+
+                                                <View style={{ alignItems: 'center', justifyContent: "center", flex: 0.33 }}>
+                                                    <Text>{item.user.first_name}</Text>
+                                                </View>
+                                                <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', flex: 0.33 }}
+                                                    onPress={() => { this.setState({ showModal2: true, deleteReceptionist: item, deleteReceptionIndex: index }) }}
+                                                >
+                                                    <Entypo name="circle-with-cross" size={24} color={themeColor} />
+                                                </TouchableOpacity>
+                                            </View>
+                                        )
+                                    }}
+                                />
+                            </View>
+                            <View style={{ flexDirection: "row", alignItems: 'center', justifyContent: "center", marginTop: 20 }}>
                                 <TouchableOpacity style={{ height: height * 0.05, width: width * 0.4, backgroundColor: themeColor, borderRadius: 5, alignItems: 'center', justifyContent: "center" }}
-                                    onPress={() => { this.props.navigation.navigate("CreateReceptionist") }}
+                                    onPress={() => { this.props.navigation.navigate("CreateReceptionistMedical", { item: this.state.item }) }}
                                 >
                                     <Text style={[styles.text, { color: "#fff" }]}>Create Receptionist</Text>
                                 </TouchableOpacity>
-                            </View> */}
-
+                            </View>
+                             
                         </ScrollView>
 
                     </View>

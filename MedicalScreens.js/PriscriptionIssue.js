@@ -2,112 +2,16 @@ import React, { Component } from 'react';
 import { View, Text, StatusBar, Dimensions, TouchableOpacity, StyleSheet, FlatList, Image, SafeAreaView } from 'react-native';
 import settings from '../AppSettings';
 import { connect } from 'react-redux';
-import { selectTheme } from '../actions';
+import { selectTheme,selectMedical} from '../actions';
 const { height, width } = Dimensions.get("window");
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons, AntDesign, Fontisto } from '@expo/vector-icons';
 import authAxios from '../api/authAxios';
+import HttpsClient from '../api/HttpsClient';
 const fontFamily = settings.fontFamily;
 const themeColor = settings.themeColor;
-const cards = [
-    {
-        name: "Sri clinic",
-        color: themeColor,
-        doctor: "kamaraj",
-        No: "7010117137"
-    },
-    {
-        name: "Ram clinic",
-        color: "#eba65c",
-        doctor: "kamaraj",
-        No: "7010117137"
-    },
-    {
-        name: "take care hospital",
-        color: "#ffff",
-        doctor: "kamaraj",
-        No: "7010117137"
-    },
-    {
-        name: "Make well",
-        color: "#eba",
-        doctor: "kamaraj",
-        No: "7010117137"
-    },
-    {
-        name: "Sri clinic",
-        color: themeColor,
-        doctor: "kamaraj",
-        No: "7010117137"
-    },
-    {
-        name: "Ram clinic",
-        color: "#eba65c",
-        doctor: "kamaraj",
-        No: "7010117137"
-    },
-    {
-        name: "take care hospital",
-        color: "#ffff",
-        doctor: "kamaraj",
-        No: "7010117137"
-    },
-    {
-        name: "Make well",
-        color: "#eba",
-        doctor: "kamaraj",
-        No: "7010117137"
-    },
-    {
-        name: "Sri clinic",
-        color: themeColor,
-        doctor: "kamaraj",
-        No: "7010117137"
-    },
-    {
-        name: "Ram clinic",
-        color: "#eba65c",
-        doctor: "kamaraj",
-        No: "7010117137"
-    },
-    {
-        name: "take care hospital",
-        color: "#ffff",
-        doctor: "kamaraj",
-        No: "7010117137"
-    },
-    {
-        name: "Make well",
-        color: "#eba",
-        doctor: "kamaraj",
-        No: "7010117137"
-    },
-    {
-        name: "Sri clinic",
-        color: themeColor,
-        doctor: "kamaraj",
-        No: "7010117137"
-    },
-    {
-        name: "Ram clinic",
-        color: "#eba65c",
-        doctor: "kamaraj",
-        No: "7010117137"
-    },
-    {
-        name: "take care hospital",
-        color: "#ffff",
-        doctor: "kamaraj",
-        No: "7010117137"
-    },
-    {
-        name: "Make well",
-        color: "#eba",
-        doctor: "kamaraj",
-        No: "7010117137"
-    },
+const url = settings.url;
 
-];
 class PriscriptionIssue extends Component {
     constructor(props) {
         const Date1 = new Date()
@@ -121,6 +25,7 @@ class PriscriptionIssue extends Component {
             mode: 'date',
             date: new Date(),
             show: false,
+            priscriptions:[]
         };
     }
     onChange = (selectedDate) => {
@@ -135,8 +40,24 @@ class PriscriptionIssue extends Component {
         }
 
     }
+    getPriscriptions =()=>{
+        console.log(this.props.user.profile.occupation)
+    }
+    getClinic = async()=>{
+        let api = `${url}/api/prescription/recopinists/?user=${this.props.user.id}`
+        let data =await HttpsClient.get(api)
+        if(data.type =="success"){
+           
+            this.props.selectMedical(data.data[0].clinic)
+           
+        }
+    }
     componentDidMount() {
-        console.log(this.props)
+        this.getPriscriptions()
+        if (this.props.user.profile.occupation =="MedicalRecoptionist"){
+              this.getClinic()
+        }
+        
     }
     render() {
         return (
@@ -175,13 +96,13 @@ class PriscriptionIssue extends Component {
                                 )}
                             </View>
                             <View>
-                                <Text style={[styles.text,]}> Total:{cards.length}</Text>
+                                <Text style={[styles.text,]}> Total:{this.state.priscriptions.length}</Text>
                             </View>
                         </View>
                         {/* CHATS */}
                         <FlatList
                             style={{  }}
-                            data={cards}
+                            data={this.state.priscriptions}
                             keyExtractor={(item, index) => index.toString()}
                             renderItem={({ item, index }) => {
                                 return (
@@ -254,7 +175,8 @@ const mapStateToProps = (state) => {
 
     return {
         theme: state.selectedTheme,
-        user: state.selectedUser
+        user: state.selectedUser,
+        medical:state.selectedMedical
     }
 }
-export default connect(mapStateToProps, { selectTheme })(PriscriptionIssue);
+export default connect(mapStateToProps, { selectTheme, selectMedical})(PriscriptionIssue);

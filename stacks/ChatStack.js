@@ -13,7 +13,9 @@ export default class ChatStack extends Component {
 
   render() {
     return (
-        <Stack.Navigator>
+        <Stack.Navigator 
+        
+        >
             <Stack.Screen name="Chat" component={Chat} options={{ headerShown: false }} />
             <Stack.Screen name="ChatScreen" component={ChatScreen} options={{ headerShown: false }} />
         </Stack.Navigator>

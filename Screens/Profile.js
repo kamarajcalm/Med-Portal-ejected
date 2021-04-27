@@ -61,12 +61,25 @@ componentDidMount(){
   console.log(this.props.clinic,"ccccccc")
 
 }
+   setActiveClinic = async (item) => {
+     const api = `${url}/api/prescription/doctorActive/`
+     let sendData = {
+       deactiveClinic: this.props.clinic.pk,
+       activeClinic: item.pk
+     }
+     let patch = await HttpsClient.post(api, sendData)
+     if (patch.type == "success") {
+       this.props.selectClinic(item)
+       this.setState({ showClinics: false })
+     }
+
+   }
   render() {
     return (
         <>
         <SafeAreaView style={styles.topSafeArea} />
         <SafeAreaView style={styles.bottomSafeArea}>
-        <View style={{ flex: 1, }}>
+        <View style={{ flex:1,}}>
             <StatusBar backgroundColor={themeColor} />
             <View style={{ height: height * 0.1, backgroundColor: themeColor, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, justifyContent: "center", flexDirection: "row" }}>
               
@@ -157,7 +170,7 @@ componentDidMount(){
                         console.log(this.props.clinic,"clinic")
                         return (
                           <TouchableOpacity style={{ flexDirection: "row", marginTop: 20, alignItems: 'center', justifyContent: "space-around", width }}
-                            onPress={() => { this.props.selectClinic(item) }}
+                            onPress={() => { this.setActiveClinic(item) }}
                           >
                             <Text style={[styles.text]}>{item.name}</Text>
                             <View >
@@ -194,7 +207,6 @@ const styles =StyleSheet.create({
     backgroundColor: "#fff"
   },
 })
-
 const mapStateToProps = (state) => {
   return {
     theme: state.selectedTheme,

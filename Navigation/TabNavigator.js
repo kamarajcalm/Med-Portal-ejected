@@ -73,6 +73,7 @@ class TabNavigator extends Component {
             
                 <Tab.Navigator
                     tabBar={props => <MyTabBar {...props} />}
+                    
                 >
                     <Tab.Screen name="priscription" component={PriscriptionStack}
                         options={({ route }) => ({
