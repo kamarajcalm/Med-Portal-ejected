@@ -14,6 +14,7 @@ import { AntDesign } from '@expo/vector-icons';
 import MedicineDetails from '../components/MedicineDetails';
 import HttpsClient from '../api/HttpsClient';
 import Toast from 'react-native-simple-toast';
+import SimpleToast from 'react-native-simple-toast';
 class AddPrescription extends Component {
   constructor(props) {
     super(props);
@@ -23,7 +24,8 @@ class AddPrescription extends Component {
                 patientsName:'',
                 onGoingTreatMent:'',
                 healthIssues:'',
-                loading: false
+                loading: false,
+                doctorFees:""
     };
   }
     changeFunction = (type, value, index)=>{
@@ -72,6 +74,17 @@ class AddPrescription extends Component {
     }
     addPriscription = async()=>{
         let api =`${url}/api/prescription/addPrescription/`
+        
+        if(this.state.medicines.length == 0){
+            return SimpleToast.show("Please add medicine")
+        }
+        if (this.state.doctorFees =="") {
+            console.log("hererr")
+            return SimpleToast.show("Please fill doctorFees")
+        }
+        if (this.state.onGoingTreatMent ="") {
+            return SimpleToast.show("Please fill onGoingTreatMent")
+        }
         let sendData ={
             doctor: this.props.user.id,
             medicines:this.state.medicines,
@@ -85,6 +98,7 @@ class AddPrescription extends Component {
         }
       
        const post = await HttpsClient.post(api,sendData)
+       console.log(post,"kkk")
        if(post.type=="success"){
            Toast.show("Added SuccessFully")
            setTimeout(()=>{
@@ -167,7 +181,7 @@ class AddPrescription extends Component {
                             />
                         </View>
                         <View style={{ marginTop: 20 }}>
-                            <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>On Going Treatment</Text>
+                            <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>On Going Treatment For</Text>
                             <TextInput
                                 value ={this.state.onGoingTreatMent}
                                 onChangeText={(onGoingTreatMent) => { this.setState({onGoingTreatMent}) }}

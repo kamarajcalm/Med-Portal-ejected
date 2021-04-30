@@ -5,6 +5,7 @@ import axios from 'axios';
 import Modal from 'react-native-modal';
 const { height } = Dimensions.get("window");
 const { width } = Dimensions.get("window");
+const screenHeight = Dimensions.get("screen").height
 import { Ionicons, Entypo, AntDesign, Feather, MaterialCommunityIcons, FontAwesome} from '@expo/vector-icons';
 const themeColor = settings.themeColor;
 const fontFamily = settings.fontFamily;
@@ -14,6 +15,7 @@ import { selectTheme ,selectClinic} from '../actions';
 import { NavigationContainer, CommonActions } from '@react-navigation/native';
 import DoctorProfile from './DoctorProfile';
 import HttpsClient from '../api/HttpsClient';
+import ReceptionistsProfile from './ReceptionistsProfile';
 const DATA =["clinic 1","clinic 2","clinic3","clinic4"]
  class Profile extends Component {
   constructor(props) {
@@ -21,7 +23,10 @@ const DATA =["clinic 1","clinic 2","clinic3","clinic4"]
     this.state = {
       showModal:false,
       showClinics:false,
-      clinics:[]
+      clinics:[],
+      isDoctor:false,
+      isReceptionist:false,
+      isPatient:false
     };
   }
     request =async()=>{
@@ -56,9 +61,21 @@ const DATA =["clinic 1","clinic 2","clinic3","clinic4"]
        this.setState({ clinics: data.data.workingclinics })
      }
    }
+   findUser = () => {
+     if (this.props.user.profile.occupation == "Doctor") {
+       this.getClinics()
+       this.setState({ isDoctor: true, })
+     } else if (this.props.user.profile.occupation == "ClinicRecoptionist") {
+       this.setState({ isReceptionist: true, })
+    }
+    else {
+       this.setState({ isPatient: true, })
+     }
+
+   
+   }
 componentDidMount(){
-  this.getClinics()
-  console.log(this.props.clinic,"ccccccc")
+  this.findUser()
 
 }
    setActiveClinic = async (item) => {
@@ -74,13 +91,63 @@ componentDidMount(){
      }
 
    }
+
+   diffrentiateUsers =()=>{
+     if(this.state.isDoctor){
+       return (
+         <>
+           <View style={{ height: height * 0.15, alignItems: "center", justifyContent: "space-around", flexDirection: "row" }}>
+             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+               <Text style={[styles.text]}>Total patients</Text>
+               <Text style={[styles.text, { fontWeight: "bold", fontSize: 20 }]}>100</Text>
+             </View>
+             <TouchableOpacity style={{ alignItems: "center", justifyContent: "center" }}>
+               <Text style={[styles.text]}>Priscription balance</Text>
+               <View style={{ flexDirection: "row" }}>
+                 <Entypo name="wallet" size={24} color={themeColor} />
+                 <Text style={[styles.text, { fontWeight: "bold", fontSize: 20 }]}>250</Text>
+               </View>
+
+             </TouchableOpacity>
+           </View>
+           <DoctorProfile ClinicSelect={() => { this.ClinicSelect() }} />
+         </>
+       )
+     }
+     if(this.state.isReceptionist){
+       return(
+         <>
+           <View style={{ height: height * 0.15, alignItems: "center", justifyContent: "space-around", flexDirection: "row" }}>
+             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+               <Text style={[styles.text]}>Total patients</Text>
+               <Text style={[styles.text, { fontWeight: "bold", fontSize: 20 }]}>100</Text>
+             </View>
+             <TouchableOpacity style={{ alignItems: "center", justifyContent: "center" }}>
+               <Text style={[styles.text]}>Priscription balance</Text>
+               <View style={{ flexDirection: "row" }}>
+                 <Entypo name="wallet" size={24} color={themeColor} />
+                 <Text style={[styles.text, { fontWeight: "bold", fontSize: 20 }]}>250</Text>
+               </View>
+
+             </TouchableOpacity>
+           </View>
+           <ReceptionistsProfile />
+         </>
+       )
+     }
+    
+   }
   render() {
+    console.log(this.props.user.profile.displayPicture)
     return (
         <>
         <SafeAreaView style={styles.topSafeArea} />
         <SafeAreaView style={styles.bottomSafeArea}>
         <View style={{ flex:1,}}>
             <StatusBar backgroundColor={themeColor} />
+
+                             {/* headers */}
+
             <View style={{ height: height * 0.1, backgroundColor: themeColor, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, justifyContent: "center", flexDirection: "row" }}>
               
               <View style={{ flex: 0.5, alignItems: 'center', justifyContent: "center" }}>
@@ -93,15 +160,24 @@ componentDidMount(){
                 <Text style={[styles.text,{marginLeft:10,color:"#fff"}]}>Log out</Text>
               </TouchableOpacity>
             </View>
+
+
             <View style={{flex:1}}>
                  <View style={{height:height*0.12,alignItems:"center",justifyContent:'center',flexDirection:"row"}}>
-                      <View>
-                        <Image
-                          source={{ uri: "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
-                          style={{ height: 60, width: 60, borderRadius: 30 }}
-                        />
-                        <Text style={[styles.text]}>kamaraj</Text>
-                      </View>
+                  <View>
+                  <View style={{ alignItems: "center", justifyContent: "center" }}>
+                    <Image
+                      source={{ uri: this.props.user.profile.displayPicture || "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
+                      style={{ height: 60, width: 60, borderRadius: 30 }}
+                    />
+                  </View>
+                  <View style={{alignItems:'center',justifyContent:"center"}}>
+                    <Text style={[styles.text]}>{this.props.user.first_name}</Text>
+                  </View>
+                  </View>
+                        
+
+                   
                     
                 <TouchableOpacity style={{}}
                   onPress={() => { this.props.navigation.navigate('ProfileEdit') }}
@@ -111,25 +187,15 @@ componentDidMount(){
                
                  </View>
                                {/* STATISTICS */}
-                 <View style={{height:height*0.15,alignItems:"center",justifyContent:"space-around",flexDirection:"row"}}>
-                      <View style={{alignItems:'center',justifyContent:'center'}}>
-                          <Text style={[styles.text]}>Total patients</Text>
-              <Text style={[styles.text, { fontWeight: "bold", fontSize: 20 }]}>100</Text>
-                      </View>
-                      <TouchableOpacity style={{alignItems:"center",justifyContent:"center"}}>
-                          <Text style={[styles.text]}>Priscription balance</Text>
-                          <View style={{flexDirection:"row"}}>
-                               <Entypo name="wallet" size={24} color={themeColor} />
-                                <Text style={[styles.text, { fontWeight: "bold", fontSize: 20 }]}>250</Text>
-                          </View>
-                         
-                      </TouchableOpacity>
-                 </View>
-              <DoctorProfile ClinicSelect={() => { this.ClinicSelect() }}/>
+                        {
+                          this.diffrentiateUsers()
+                        }
+                
             </View>
                          {/* Modal */}
                   <View>
                     <Modal
+                       deviceHeight ={screenHeight}
                          animationIn="slideInUp"
                          animationOut="slideOutDown"
                          isVisible={this.state.showModal}
@@ -156,6 +222,7 @@ componentDidMount(){
                         </View>
                       </Modal>
               <Modal
+                deviceHeight ={screenHeight}
                 animationIn="slideInUp"
                 animationOut="slideOutDown"
                 isVisible={this.state.showClinics}

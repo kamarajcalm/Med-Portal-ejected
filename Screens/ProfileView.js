@@ -3,7 +3,7 @@ import { View, Text, StatusBar, Dimensions, Image, StyleSheet, TouchableOpacity,
 import settings from '../AppSettings';
 import axios from 'axios';
 import Modal from 'react-native-modal';
-import { Ionicons, Entypo, AntDesign, FontAwesome, MaterialCommunityIcons} from '@expo/vector-icons';
+import { Ionicons, Entypo, AntDesign, FontAwesome, MaterialCommunityIcons, MaterialIcons, FontAwesome5} from '@expo/vector-icons';
 const { height } = Dimensions.get("window");
 const { width } = Dimensions.get("window");
 
@@ -12,6 +12,8 @@ const fontFamily = settings.fontFamily;
 import { connect } from 'react-redux';
 import { selectTheme } from '../actions';
 import { NavigationContainer, CommonActions } from '@react-navigation/native';
+import openMap ,{createOpenLink} from 'react-native-open-maps';
+import * as Linking from 'expo-linking';
 class ProfileView extends Component {
     constructor(props) {
         let item = props.route.params.item
@@ -55,13 +57,13 @@ class ProfileView extends Component {
                                 <View style={{ marginTop: 20, flexDirection: "row" }}>
                                     <View style={{ flex: 0.4, height: height * 0.2, alignItems: 'center', justifyContent: "center" }}>
                                         <Image
-                                            source={{ uri: "https://images.unsplash.com/photo-1558507652-2d9626c4e67a?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cG9ydHJhaXRzfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80" }}
+                                            source={{ uri: this.state.item.displayPicture||"https://images.unsplash.com/photo-1558507652-2d9626c4e67a?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cG9ydHJhaXRzfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80" }}
                                             style={{ height: "100%", width: "70%", borderRadius: 10 }}
                                         />
                                     </View>
                                     <View style={{ flex: 0.6, height: height * 0.2, }}>
                                         <View style={{flex:0.33,justifyContent:"space-between"}}>
-                                            <Text style={[styles.text, { fontSize: 20, color:"#0F2851",fontWeight:"bold"}]}>{this.state.item.name}</Text>
+                                            <Text style={[styles.text, { fontSize: 20, color: "#0F2851", fontWeight: "bold" }]}>{this.state.item.name}</Text>
                                             <Text style={[styles.text, { fontSize: 15, color:"gray"}]}>{this.state.item.specialization}</Text>
                                         </View>
                                         <View style={{ flex: 0.33 ,flexDirection:"row",alignItems:'center'}}>
@@ -84,12 +86,56 @@ class ProfileView extends Component {
                                         </View>
                                     </View>
                                 </View>
+                                <View style={{ margin:20}}>
+                                   <Text style={[styles.text,{fontWeight:"bold",fontSize:20}]}>Working clinics:</Text>
+                                   {
+                                        this.state.item.workingclinics.map((item,index)=>{
+                                            return(
+                                                <View 
+                                                 style ={{height:height*0.15,backgroundColor:"#fafafa",borderRadius:10,marginTop:20,flexDirection:"row"}}
+                                                 key ={index}
+                                                 
+                                                > 
+                                                <View style={{flex:0.5,alignItems:'center',justifyContent:"space-around"}}>
+                                                        <Text style={[styles.text]}>{item.clinicname}</Text>
+                                                        <View style={{alignItems:"center",justifyContent:'center'}}>
+                                                            <Text style={[styles.text, { fontWeight: "bold" }]}>Working Hours:</Text>
+                                                            <Text style={[styles.text, { color:"gray"}]}>{item.fromTime} to {item.toTime}</Text>
+                                                        </View>
+                                                        
+                                                </View>
+                                                   <View style={{flex:0.5,alignItems:"center",justifyContent:"space-around"}}>
+                                                       <TouchableOpacity style={{alignItems:'center',justifyContent:'center'}}>
+                                                            <MaterialIcons name="chat" size={24} color="black" />
+                                                            <Text>with clinic</Text>
+                                                       </TouchableOpacity>
+                                                        <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center' }}
+                                                            onPress={() => { 
+
+                                                                Linking.openURL(
+                                                                    `https://www.google.com/maps/dir/?api=1&destination=` +
+                                                                 item.lat +
+                                                                    `,` +
+                                                                    item.long +
+                                                                    `&travelmode=driving`
+                                                                );
+                                                            }}
+                                                        >
+                                                            <FontAwesome5 name="directions" size={24} color="black" />
+                                                            <Text>get Directions</Text>
+                                                        </TouchableOpacity>
+                                                   </View>
+                                                </View>
+                                            )
+                                        })
+                                   }
+                               </View>
                             </ScrollView>
                            
                          
                         </View>
                        
-                        <TouchableOpacity style={{ height: height * 0.07, position: 'absolute', width: width * 0.7, backgroundColor: themeColor ,bottom:30,left:60,borderRadius:20,alignItems:"center",justifyContent:"center",flexDirection:"row"}}
+                        <TouchableOpacity style={{ height: height * 0.07, position: 'absolute', width: width * 0.6, backgroundColor: themeColor ,bottom:30,left:70,borderRadius:20,alignItems:"center",justifyContent:"center",flexDirection:"row"}}
                           onPress ={()=>{this.props.navigation.navigate('MakeAppoinment',{item:this.state.item})}}
                         >
                             <Text style={[styles.text,{color:"#fff"}]}>Make Appoinment</Text>

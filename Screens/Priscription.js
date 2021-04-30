@@ -36,7 +36,7 @@ const cardTitle = 75;
 const cardPadding = 20;
 
 const { height,width } = Dimensions.get("window");
-
+const screenHeight =Dimensions.get('screen').height;
 
 class Priscription extends React.Component {
     constructor(props) {
@@ -62,13 +62,19 @@ class Priscription extends React.Component {
             selectedClinic:null,
             clinics:[],
             prescriptions:[],
+            isReceptionist:false,
+            isFetching:false
         };
     }
     onChange = (selectedDate) => {
         if (selectedDate.type == "set") {
             this.setState({ today: moment(new Date(selectedDate.nativeEvent.timestamp)).format('YYYY-MM-DD'), show: false, date: new Date(selectedDate.nativeEvent.timestamp) }, () => {
-                
-              this.getPrescription()
+                if(this.state.isDoctor){
+                    this.getPrescription()
+                }else{
+                    this.getClinicPrescription()
+                }
+             
             })
 
         } else {
@@ -80,7 +86,7 @@ class Priscription extends React.Component {
         let api = `${url}/api/prescription/prescriptions/?forUser=${this.props.user.id}`
         let data =await HttpsClient.get(api)
         if(data.type =="success"){
-            this.setState({ prescriptions:data.data})
+            this.setState({ prescriptions:data.data,isFetching:false})
         }
     }
     getPrescription = async()=>{
@@ -91,8 +97,18 @@ class Priscription extends React.Component {
     
       if(data.type == 'success'){
           this.setState({ prescriptions:data.data})
-          this.setState({ loading: false })
+          this.setState({ loading: false ,isFetching:false})
       }
+    }
+    getClinicPrescription = async()=>{
+        let api = `${url}/api/prescription/prescriptions/?clinic=${this.props.user.profile.recopinistclinics[0].clinicpk}&date=${moment(this.state.date).format("YYYY-MM-DD")}`
+        let data = await HttpsClient.get(api)
+  console.log(api)
+        if (data.type == 'success') {
+            this.setState({ prescriptions: data.data })
+            this.setState({ loading: false ,isFetching:false})
+        }
+     
     }
     getClinics = async()=>{
         const api = `${url}/api/prescription/getDoctorClinics/?doctor=${this.props.user.id}`
@@ -129,7 +145,11 @@ class Priscription extends React.Component {
               this.getClinics()
               this.getPrescription()
               this.setState({isDoctor:true,})
-        }else{
+        } else if (this.props.user.profile.occupation == "ClinicRecoptionist"){
+            this.getClinicPrescription()
+            this.setState({ isReceptionist: true, })
+        }
+        else{
             this.getPateintPrescription()
         }
 
@@ -147,7 +167,116 @@ class Priscription extends React.Component {
     componentWillUnmount(){
         this._unsubscribe();
     }
- 
+    showDifferentPriscription =(item,index)=>{
+      if(this.state.isDoctor){
+          return(
+              <TouchableOpacity style={[styles.card, { flexDirection: "row", borderRadius: 5 }]}
+                  onPress={() => { this.props.navigation.navigate('showCard', { item }) }}
+              >
+                  <View style={{ flex: 0.3, alignItems: 'center', justifyContent: "center" }}>
+                      <Image
+                          source={{ uri: "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
+                          style={{ height: 60, width: 60, borderRadius: 30 }}
+                      />
+                  </View>
+                  <View style={{ flex: 0.4, justifyContent: 'center', alignItems: 'center' }}>
+                      <View >
+                          <Text style={[styles.text, { fontSize: 18, }]}>{item.username}</Text>
+                      </View>
+
+                  </View>
+                  <View style={{ flex: 0.3, justifyContent: 'center', alignItems: "center" }}>
+                      <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
+                          <Text>{moment(item.created).format("DD/MM/YYYY")}</Text>
+
+                      </View>
+                      <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
+                          <Text>{moment(item.created).format("h:mm a")}</Text>
+                      </View>
+
+                  </View>
+              </TouchableOpacity>
+          )
+      }
+      if(this.state.isReceptionist){
+
+           let dp =null
+          if (item?.doctordetails?.dp){
+              dp = `${url}${item?.doctordetails?.dp}`
+          }
+         
+          return(
+              <TouchableOpacity style={[styles.card, { flexDirection: "row", borderRadius: 5 }]}
+                  onPress={() => { this.props.navigation.navigate('showCard', { item }) }}
+              >
+                  <View style={{ flex: 0.3, alignItems: 'center', justifyContent: "center" }}>
+                      <Image
+                          source={{ uri:dp|| "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
+                          style={{ height: 60, width: 60, borderRadius: 30 }}
+                      />
+                  </View>
+                  <View style={{ flex: 0.4, justifyContent: 'center', alignItems: 'center' }}>
+                      <View >
+                          <Text style={[styles.text, { fontSize: 18, }]}>{item?.username}</Text>
+                          <Text style={[styles.text, { fontSize: 12, }]}>{item?.doctordetails?.name}</Text>
+                  
+                      </View>
+
+                  </View>
+                  <View style={{ flex: 0.3, justifyContent: 'center', alignItems: "center" }}>
+                      <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
+                          <Text>{moment(item.created).format("DD/MM/YYYY")}</Text>
+
+                      </View>
+                      <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
+                          <Text>{moment(item.created).format("h:mm a")}</Text>
+                      </View>
+
+                  </View>
+              </TouchableOpacity>
+          )
+      }
+                // if patient
+      return(
+          <TouchableOpacity style={[styles.card, { flexDirection: "row", borderRadius: 5 }]}
+              onPress={() => { this.props.navigation.navigate('showCard', { item }) }}
+          >
+              <View style={{ flex: 0.3, alignItems: 'center', justifyContent: "center" }}>
+                  <Image
+                      source={{ uri: item?.doctordetails?.dp || "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
+                      style={{ height: 60, width: 60, borderRadius: 30 }}
+                  />
+              </View>
+              <View style={{ flex: 0.4, justifyContent: 'center', alignItems: 'center' }}>
+                  <View >
+                      <Text style={[styles.text, { fontSize: 18, }]}>{item?.doctordetails?.name}</Text>
+                      <Text style={[styles.text, { fontSize: 12, }]}>{item?.clinicname}</Text>
+                  </View>
+
+              </View>
+              <View style={{ flex: 0.3, justifyContent: 'center', alignItems: "center" }}>
+                  <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
+                      <Text>{moment(item.created).format("DD/MM/YYYY")}</Text>
+
+                  </View>
+                  <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
+                      <Text>{moment(item.created).format("h:mm a")}</Text>
+                  </View>
+
+              </View>
+          </TouchableOpacity>
+      )
+    }
+    onRefresh =()=>{
+        this.setState({isFetching:true})
+        if(this.state.isDoctor){
+            this.getPrescription()
+        }else if(this.state.isReceptionist){
+            this.getClinicPrescription()
+        }else{
+            this.getPateintPrescription()
+        }
+    }
     render() {
         const y= new Animated.Value(0);
         const onScroll = Animated.event([{nativeEvent:{contentOffset:{y}}}],{
@@ -178,7 +307,7 @@ class Priscription extends React.Component {
    {  !this.state.loading?       <View style={{flex:1,backgroundColor:"#f3f3f3f3"}}>
            
                  
-                        {this.state.isDoctor &&<View style={{height: height * 0.07,alignItems:"center",justifyContent:"space-around",flexDirection:"row"}}>
+                        {this.state.isDoctor || this.state.isReceptionist&&<View style={{height: height * 0.07,alignItems:"center",justifyContent:"space-around",flexDirection:"row"}}>
                  <View style={{flexDirection:"row"}}>
                                 <Text style={[styles.text, { color: "#000" }]}>{this.state.today}</Text>
                                 <TouchableOpacity
@@ -203,69 +332,18 @@ class Priscription extends React.Component {
                     </View>
                 </View>}
                         <FlatList
-                          
-                            contentContainerStyle={{ paddingBottom: 90 }}
-                         
+                          contentContainerStyle={{ paddingBottom: 90 }}
+                          onRefresh={() => this.onRefresh()}
+                          refreshing={this.state.isFetching}
                           data={this.state.prescriptions}
                           keyExtractor={(item,index)=>index.toString()}
                           renderItem={({item,index})=>{
                                return(
                                    <View>
-                                     {this.state.isDoctor?  <TouchableOpacity style={[styles.card, { flexDirection: "row", borderRadius: 5 }]}
-                                           onPress={() => { this.props.navigation.navigate('showCard', { item }) }}
-                                       >
-                                           <View style={{ flex: 0.3, alignItems: 'center', justifyContent: "center" }}>
-                                               <Image
-                                                   source={{ uri: "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
-                                                   style={{ height: 60, width: 60, borderRadius: 30 }}
-                                               />
-                                           </View>
-                                           <View style={{ flex: 0.4, justifyContent: 'center', alignItems: 'center' }}>
-                                               <View >
-                                                   <Text style={[styles.text, { fontSize: 18, }]}>{item.username}</Text>
-                                               </View>
-
-                                           </View>
-                                           <View style={{ flex: 0.3, justifyContent: 'center', alignItems: "center" }}>
-                                               <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
-                                                   <Text>{moment(item.created).format("DD/MM/YYYY")}</Text>
-
-                                               </View>
-                                               <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
-                                                   <Text>{moment(item.created).format("h:mm a")}</Text>
-                                               </View>
-
-                                           </View>
-                                       </TouchableOpacity>:
-                                           <TouchableOpacity style={[styles.card, { flexDirection: "row", borderRadius: 5 }]}
-                                               onPress={() => { this.props.navigation.navigate('showCard', { item }) }}
-                                           >
-                                               <View style={{ flex: 0.3, alignItems: 'center', justifyContent: "center" }}>
-                                                   <Image
-                                                       source={{ uri: item?.doctordetails?.dp||"https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
-                                                       style={{ height: 60, width: 60, borderRadius: 30 }}
-                                                   />
-                                               </View>
-                                               <View style={{ flex: 0.4, justifyContent: 'center', alignItems: 'center' }}>
-                                                   <View >
-                                                       <Text style={[styles.text, { fontSize: 18, }]}>{item?.doctordetails?.name}</Text>
-                                                       <Text style={[styles.text, { fontSize: 12, }]}>{item?.clinicname}</Text>
-                                                   </View>
-
-                                               </View>
-                                               <View style={{ flex: 0.3, justifyContent: 'center', alignItems: "center" }}>
-                                                   <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
-                                                       <Text>{moment(item.created).format("DD/MM/YYYY")}</Text>
-
-                                                   </View>
-                                                   <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
-                                                       <Text>{moment(item.created).format("h:mm a")}</Text>
-                                                   </View>
-
-                                               </View>
-                                           </TouchableOpacity>
-                                       
+                                       {
+                                           this.showDifferentPriscription(item,index)
                                        }
+                              
                                    </View>
                                   
                                )
@@ -295,6 +373,7 @@ class Priscription extends React.Component {
                 <ActivityIndicator size="large" color={themeColor}/>
                 </View>}
                     <Modal
+                        deviceHeight={screenHeight}
                         animationIn="slideInUp"
                         animationOut="slideOutDown"
                         isVisible={this.state.showModal}

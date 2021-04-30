@@ -67,7 +67,7 @@ const url = settings.url;
                     })
                   )
                 }
-                if (data.data[0].profile.occupation =="Doctor") {
+                if (data.data[0].profile.occupation == "Doctor" || data.data[0].profile.occupation == "ClinicRecoptionist") {
                   return this.props.navigation.dispatch(
                     CommonActions.reset({
                       index: 0,

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Dimensions, StatusBar, TouchableOpacity, SafeAreaView, Image} from 'react-native';
+import { View, Text, StyleSheet, Dimensions, StatusBar, TouchableOpacity, SafeAreaView, Image, ActivityIndicator} from 'react-native';
 import MapView,{Marker,PROVIDER_GOOGLE,Callout} from 'react-native-maps';
 import settings from '../AppSettings';
 import { connect } from 'react-redux';
@@ -45,16 +45,14 @@ const fontFamily =settings.fontFamily;
         <SafeAreaView style={styles.bottomSafeArea}>
         <View style={styles.container}>
             <StatusBar backgroundColor={themeColor} />
-            <MapView 
+         {location?<MapView 
                provider ={PROVIDER_GOOGLE}
                style={styles.map} 
                region={this.state?.location}
      
             >
-             { location&&<Marker
+             <Marker
                 coordinate={{ latitude: location?.latitude, longitude: location?.longitude }}
-              
-              
                 >
                 <MapView.Callout tooltip={true}>
                    <View>
@@ -64,7 +62,6 @@ const fontFamily =settings.fontFamily;
                         <ImageSvg
                           width={"100%"}
                           height={"100%"}
-                          preserveAspectRatio="xMidYMid slice"
                           href={{ uri: "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
                         />
                       </Svg>
@@ -78,8 +75,10 @@ const fontFamily =settings.fontFamily;
                 </MapView.Callout>
 
                 </Marker>
-                }
-            </MapView>
+                
+            </MapView>:<View>
+                 <ActivityIndicator size ="large" color ={themeColor} />
+              </View>}
             
            
          

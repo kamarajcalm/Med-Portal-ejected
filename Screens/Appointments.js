@@ -40,8 +40,12 @@ class Appointments extends Component {
         let api = ""
         if (this.props.user.profile.occupation == "Doctor") {
             api = `${url}/api/prescription/appointments/?doctor=${this.props.user.id}&status=Completed`
-        } else {
-            api = `${url}/api/prescription/appointments/?requesteduser=${this.props.user.id}`
+        } else if (this.props.user.profile.occupation == "ClinicRecoptionist") {
+            api = `${url}/api/prescription/appointments/?clinic=${this.props.user.profile.recopinistclinics[0].clinicpk}&status=Completed`
+        }
+        
+        else {
+            api = `${url}/api/prescription/appointments/?requesteduser=${this.props.user.id}&status=Completed`
         }
 
         const data = await HttpsClient.get(api)
@@ -56,7 +60,10 @@ class Appointments extends Component {
         let api =""
         if (this.props.user.profile.occupation == "Doctor") {
             api = `${url}/api/prescription/appointments/?doctor=${this.props.user.id}&status=Pending&status=Accepted`
-        }else{
+        } else if (this.props.user.profile.occupation == "ClinicRecoptionist"){
+            api = `${url}/api/prescription/appointments/?clinic=${this.props.user.profile.recopinistclinics[0].clinicpk}&status=Pending&status=Accepted`
+        }
+        else{
             api = `${url}/api/prescription/appointments/?requesteduser=${this.props.user.id}`
         }
    
@@ -176,6 +183,8 @@ class Appointments extends Component {
             data ={this.state.appoinments}
             keyExtractor ={(item,index)=>index.toString()}
             renderItem ={({item,index})=>{
+
+                
                 if (this.props.user.profile.occupation !="Doctor"){
                 return(
                     <View

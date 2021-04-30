@@ -42,7 +42,9 @@ class Inventory extends Component {
     }
     getCategories =async()=>{
         let api = `${url}/api/prescription/maincategory/?inventory=${this.props.medical.inventory}`
+        console.log(api)
         const data =await HttpsClient.get(api)
+        console.log(data,"jjj")
             if(data.type =="success"){
                 this.setState({ categories:data.data})
             }
@@ -69,6 +71,8 @@ class Inventory extends Component {
                   
                     <FlatList 
                       data ={this.state.categories}
+                      contentContainerStyle={{alignItems:"center",justifyContent:"space-around"}}
+                      numColumns ={2}
                       keyExtractor ={(item,index)=>index.toString()}
                       renderItem ={({item,index})=>{
                          return(

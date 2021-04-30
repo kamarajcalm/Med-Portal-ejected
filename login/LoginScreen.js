@@ -28,6 +28,7 @@ const url = settings.url
   //  console.log(sendData,"jjj")
    let login = await axios.post(api,sendData)
 console.log(login.data,"ggggggg")
+
    if(login.status==200){
      AsyncStorage.setItem('csrf', login.data.csrf_token)
      AsyncStorage.setItem('pk', login.data.pk)

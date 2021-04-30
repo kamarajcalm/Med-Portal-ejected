@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StatusBar, Dimensions, Image, StyleSheet, TouchableOpacity, AsyncStorage, SafeAreaView, ScrollView } from 'react-native';
+import { View, Text, StatusBar, Dimensions, Image, StyleSheet, TouchableOpacity, AsyncStorage, SafeAreaView, ScrollView, RefreshControl} from 'react-native';
 import settings from '../AppSettings';
 import axios from 'axios';
 import Modal from 'react-native-modal';
@@ -19,6 +19,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 import HttpsClient from '../api/HttpsClient';
 import Toast from 'react-native-simple-toast';
+import SimpleToast from 'react-native-simple-toast';
 class CreateClinics extends Component {
     constructor(props) {
         super(props);
@@ -27,24 +28,101 @@ class CreateClinics extends Component {
             openImageModal: false,
             latitude: "",
             longitude: '',
-            clinicName: "Sri Devi Clinic",
+            clinicName: "",
             openingTime: null,
             closingTime: null,
             mode: 'time',
             date: new Date(),
             show1: false,
             show2: false,
-            mobile:"7878787878",
-            GST:"gytyg4565456",
-            address:"5/3278 Adaiyar",
-            pincode:"786656",
-            state:"Karnataka",
-            city:"Bengaluru",
-            firstEmergencyContactNo: "9869669867",
-            secondEmergencyContactNo: '9778776767',
+            mobile:"",
+            GST:"",
+            address:"",
+            pincode:"",
+            state:"",
+            city:"",
+            firstEmergencyContactNo: "",
+            secondEmergencyContactNo: '',
+            startingArray:[],
+            closingArray: [],
+            Sun:{
+                day:"Sun"
+            },
+            Mon:{
+                day: "Mon"
+            },
+            Tue:{
+                day: "Tue"
+            },
+            Wed:{
+                day: "Wed"
+            },
+            Thu:{
+                day: "Thu"
+            },
+            Fri:{
+                day: "Fri"
+            },
+            Sat:{
+                day: "Sat"
+            },
+            day: "",
+            isFetching:false,
+            doctor:null
         };
     }
     createClinic = async()=>{
+     
+       let times =[]
+        times.push(
+           this.state.Sun,
+           this.state.Mon,
+           this.state.Tue,
+           this.state.Wed,
+           this.state.Thu,
+           this.state.Fri,
+           this.state.Sat
+           )
+         if(this.state.doctor == null){
+             return SimpleToast.show("Please select owner")
+         }
+        if (this.state.clinicName == "") {
+            return SimpleToast.show("Please fill clinicName")
+        }
+        if (this.state.mobile == "") {
+            return SimpleToast.show("Please fill mobile")
+        }
+        if (this.state.GST == "") {
+            return SimpleToast.show("Please fill GST")
+        }
+        if (this.state.pincode == "") {
+            return SimpleToast.show("Please fill pincode")
+        }
+        if (this.state.address == "") {
+            return SimpleToast.show("Please fill address")
+        }
+        if (this.state.city == "") {
+            return SimpleToast.show("Please fill city")
+        }
+        if(this.state.state ==""){
+            return SimpleToast.show("Please fill state")
+        }
+        if (this.state.latitude == "") {
+            return SimpleToast.show("Please fill latitude")
+        }
+        if (this.state.longitude == "") {
+            return SimpleToast.show("Please fill longitude")
+        }
+         times.forEach((i)=>{
+             
+             if (i.endtime == undefined ){
+                 return SimpleToast.show(`please fill the endtime of ${i.day}`)
+             }
+             if (i.starttime == undefined){
+                 return SimpleToast.show(`please fill the starttime of ${i.day}`)
+             }
+         })
+        
         let api =  `${url}/api/prescription/createClinic/`
         console.log(api,"a")
         let sendData ={
@@ -61,14 +139,15 @@ class CreateClinics extends Component {
             secondEmergencyContactNo:this.state.secondEmergencyContactNo,
             lat:this.state.latitude,
             long:this.state.longitude,
-            startingtime: this.state.openingTime,
-            closingtime: this.state.closingTime,
+            times
+           
         }
       console.log(sendData,"hhh")
         if(this.state.image){
             sendData.bodyType="formData"
         }
         const post = await HttpsClient.post(api,sendData)
+        console.log(post,"pppp")
        if(post.type=="success"){
            Toast.show('created SuccessFully');
            setTimeout(() => {
@@ -87,9 +166,70 @@ class CreateClinics extends Component {
     }
     onChange1 = (selectedDate) => {
         if (selectedDate.type == "set") {
-            this.setState({ openingTime: moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a'), show1: false, startingtime: new Date(selectedDate.nativeEvent.timestamp) }, () => {
-                console.log(this.state.openingTime, "jjjj")
-
+            this.setState({show1: false,}, () => {
+                if (this.state.day =="Sun"){
+                    let duplicate =this.state.Sun
+                    
+                      duplicate.day= "Sun",
+                       duplicate.index= 0,
+                       duplicate.starttime= moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+                    
+                    return this.setState({ Sun: duplicate })
+                }
+                if (this.state.day =="Mon"){
+                    let duplicate =this.state.Mon
+               
+                       duplicate.day= "Mon",
+                        duplicate.index= 1,
+                       duplicate.starttime= moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+                    
+                    return this.setState({ Mon: duplicate })
+                }
+                if(this.state.day =="Tue"){
+                    let duplicate =this.state.Tue
+              
+                    duplicate.day ="Tue",
+                    duplicate.index =2,
+                    duplicate.starttime= moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+                    
+                    return this.setState({ Tue: duplicate })
+                }
+                if (this.state.day == "Wed") {
+                    let duplicate =this.state.Wed
+                        duplicate.day= "Wed",
+                        duplicate.index = 3,
+                        duplicate.starttime =moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+                    
+                    return this.setState({ Wed: duplicate })
+                }
+                if(this.state.day =="Thu"){
+                    let duplicate =this.state.Thu
+                
+                    duplicate.day = "Thu",
+                        duplicate.index= 4,
+                        duplicate.starttime= moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+                    
+                    return this.setState({ Thu: duplicate })
+                }
+                if (this.state.day == "Fri") {
+                    let duplicate = this.state.Fri
+                    
+                    duplicate.day ="Fri",
+                        duplicate.index= 5,
+                        duplicate.starttime= moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+                   
+                return this.setState({ Fri: duplicate })
+                }
+                if (this.state.day == "Sat"){
+                    let duplicate = this.state.Sat
+                   
+                      duplicate.day= "Sat",
+                        duplicate.index= 6,
+                        duplicate.starttime=  moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+                    
+                    return this.setState({ Sat: duplicate })
+                }
+            
             })
 
         } else {
@@ -99,8 +239,45 @@ class CreateClinics extends Component {
     }
     onChange2 = (selectedDate) => {
         if (selectedDate.type == "set") {
-            this.setState({ closingTime: moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a'), show2: false, }, () => {
-                console.log(this.state.closingTime, "jjjj")
+            this.setState({show2: false, }, () => {
+               
+               if(this.state.day =="Sun"){
+                   let duplicate = this.state.Sun
+                   duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+                 return  this.setState({ Sun:duplicate})
+               }
+                if (this.state.day == "Mon") {
+                    let duplicate = this.state.Mon
+                    duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+                    return this.setState({ Mon: duplicate })
+                }
+                if (this.state.day == "Tue") {
+                    let duplicate = this.state.Tue
+                    duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+                    return this.setState({ Tue: duplicate })
+                }
+                if (this.state.day == "Wed") {
+                    let duplicate = this.state.Wed
+                    duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+                    return this.setState({ Wed: duplicate })
+                }
+                if (this.state.day == "Thu") {
+                    let duplicate = this.state.Thu
+                    duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+                    return this.setState({ Thu: duplicate })
+                }
+                if (this.state.day == "Fri") {
+                    let duplicate = this.state.Fri
+                    duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+                    return this.setState({ Fri: duplicate })
+                }
+                if (this.state.day == "Sat") {
+                    let duplicate = this.state.Sat
+                    duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+                    return this.setState({ Sat: duplicate })
+                }
+            
+                
 
             })
 
@@ -164,9 +341,14 @@ class CreateClinics extends Component {
         let location = await Location.getCurrentPositionAsync({});
         console.log(location, "jjjj")
         this.setState({
+            isFetching:false,
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
         })
+    }
+    onRefresh =()=>{
+        this.setState({isFetching:true})
+        this.getLocation()
     }
     renderModal = () => {
         return (
@@ -237,6 +419,12 @@ class CreateClinics extends Component {
 
 
                             <ScrollView style={{ margin: 20 }}
+                                refreshControl ={
+                                    <RefreshControl
+                                        refreshing={this.state.isFetching}
+                                        onRefresh={()=>{this.onRefresh()}}
+                                    />
+                                }
                                 showsVerticalScrollIndicator={false}
                             >
                                 <View style={{ height: height * 0.12, alignItems: "center", justifyContent: 'center' }}>
@@ -277,18 +465,23 @@ class CreateClinics extends Component {
                                         style={{ width: width * 0.8, height: height * 0.05, borderRadius: 15, backgroundColor: "#eeee", margin: 10, paddingLeft: 10 }}
                                     />
                                 </View>
+
+                                <View>
+                                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Sun :</Text>
+                                </View>
                                 <View style={{ height: height * 0.07, flexDirection: "row", }}>
+
                                     <View style={{ flex: 0.5 }}>
                                         <Text style={styles.text}>Opening Time</Text>
                                         <View style={{ flexDirection: "row", marginTop: 5, alignItems: "center", }}>
                                             <TouchableOpacity
-                                                onPress={() => { this.setState({ show1: true }) }}
+                                                onPress={() => { this.setState({ show1: true, day: "Sun" }) }}
                                             >
                                                 <Entypo name="clock" size={24} color="black" />
 
                                             </TouchableOpacity>
 
-                                            <Text style={{ marginLeft: 10 }}>{this.state.openingTime}</Text>
+                                            <Text style={{ marginLeft: 10 }}>{this.state.Sun?.starttime}</Text>
                                         </View>
 
                                     </View>
@@ -297,17 +490,236 @@ class CreateClinics extends Component {
                                         <Text style={styles.text}>Closing Time</Text>
                                         <View style={{ flexDirection: "row", marginTop: 5, alignItems: "center", }}>
                                             <TouchableOpacity
-                                                onPress={() => { this.setState({ show2: true }) }}
+                                                onPress={() => { this.setState({ show2: true, day: "Sun" }) }}
                                             >
                                                 <Entypo name="clock" size={24} color="black" />
 
                                             </TouchableOpacity>
 
-                                            <Text style={{ marginLeft: 10 }}>{this.state.closingTime}</Text>
+                                            <Text style={{ marginLeft: 10 }}>{this.state.Sun?.endtime}</Text>
                                         </View>
 
                                     </View>
                                 </View>
+                                <View>
+                                    <Text style={[styles.text,{fontWeight:"bold",fontSize:18}]}>Mon :</Text>
+                                </View>
+                                <View style={{ height: height * 0.07, flexDirection: "row", }}>
+                                    
+                                    <View style={{ flex: 0.5 }}>
+                                        <Text style={styles.text}>Opening Time</Text>
+                                        <View style={{ flexDirection: "row", marginTop: 5, alignItems: "center", }}>
+                                            <TouchableOpacity
+                                                onPress={() => { this.setState({ show1: true ,day:"Mon"}) }}
+                                            >
+                                                <Entypo name="clock" size={24} color="black" />
+
+                                            </TouchableOpacity>
+
+                                            <Text style={{ marginLeft: 10 }}>{this.state.Mon?.starttime}</Text>
+                                        </View>
+
+                                    </View>
+
+                                    <View style={{ flex: 0.5, }}>
+                                        <Text style={styles.text}>Closing Time</Text>
+                                        <View style={{ flexDirection: "row", marginTop: 5, alignItems: "center", }}>
+                                            <TouchableOpacity
+                                                onPress={() => { this.setState({ show2: true, day: "Mon"}) }}
+                                            >
+                                                <Entypo name="clock" size={24} color="black" />
+
+                                            </TouchableOpacity>
+
+                                            <Text style={{ marginLeft: 10 }}>{this.state.Mon?.endtime}</Text>
+                                        </View>
+
+                                    </View>
+                                </View>
+
+                                <View>
+                                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Tue :</Text>
+                                </View>
+                                <View style={{ height: height * 0.07, flexDirection: "row", }}>
+
+                                    <View style={{ flex: 0.5 }}>
+                                        <Text style={styles.text}>Opening Time</Text>
+                                        <View style={{ flexDirection: "row", marginTop: 5, alignItems: "center", }}>
+                                            <TouchableOpacity
+                                                onPress={() => { this.setState({ show1: true ,day:"Tue"}) }}
+                                            >
+                                                <Entypo name="clock" size={24} color="black" />
+
+                                            </TouchableOpacity>
+
+                                            <Text style={{ marginLeft: 10 }}>{this.state.Tue?.starttime}</Text>
+                                        </View>
+
+                                    </View>
+
+                                    <View style={{ flex: 0.5, }}>
+                                        <Text style={styles.text}>Closing Time</Text>
+                                        <View style={{ flexDirection: "row", marginTop: 5, alignItems: "center", }}>
+                                            <TouchableOpacity
+                                                onPress={() => { this.setState({ show2: true ,day:"Tue"}) }}
+                                            >
+                                                <Entypo name="clock" size={24} color="black" />
+
+                                            </TouchableOpacity>
+
+                                            <Text style={{ marginLeft: 10 }}>{this.state.Tue?.endtime}</Text>
+                                        </View>
+
+                                    </View>
+                                </View>
+
+                                <View>
+                                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Wed :</Text>
+                                </View>
+                                <View style={{ height: height * 0.07, flexDirection: "row", }}>
+
+                                    <View style={{ flex: 0.5 }}>
+                                        <Text style={styles.text}>Opening Time</Text>
+                                        <View style={{ flexDirection: "row", marginTop: 5, alignItems: "center", }}>
+                                            <TouchableOpacity
+                                                onPress={() => { this.setState({ show1: true ,day:"Wed"}) }}
+                                            >
+                                                <Entypo name="clock" size={24} color="black" />
+
+                                            </TouchableOpacity>
+
+                                            <Text style={{ marginLeft: 10 }}>{this.state.Wed?.starttime}</Text>
+                                        </View>
+
+                                    </View>
+
+                                    <View style={{ flex: 0.5, }}>
+                                        <Text style={styles.text}>Closing Time</Text>
+                                        <View style={{ flexDirection: "row", marginTop: 5, alignItems: "center", }}>
+                                            <TouchableOpacity
+                                                onPress={() => { this.setState({ show2: true,day:"Wed" }) }}
+                                            >
+                                                <Entypo name="clock" size={24} color="black" />
+
+                                            </TouchableOpacity>
+
+                                            <Text style={{ marginLeft: 10 }}>{this.state.Wed?.endtime}</Text>
+                                        </View>
+
+                                    </View>
+                                </View>
+                                <View>
+                                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Thu :</Text>
+                                </View>
+                                <View style={{ height: height * 0.07, flexDirection: "row", }}>
+
+                                    <View style={{ flex: 0.5 }}>
+                                        <Text style={styles.text}>Opening Time</Text>
+                                        <View style={{ flexDirection: "row", marginTop: 5, alignItems: "center", }}>
+                                            <TouchableOpacity
+                                                onPress={() => { this.setState({ show1: true,day:"Thu" }) }}
+                                            >
+                                                <Entypo name="clock" size={24} color="black" />
+
+                                            </TouchableOpacity>
+
+                                            <Text style={{ marginLeft: 10 }}>{this.state.Thu?.starttime}</Text>
+                                        </View>
+
+                                    </View>
+
+                                    <View style={{ flex: 0.5, }}>
+                                        <Text style={styles.text}>Closing Time</Text>
+                                        <View style={{ flexDirection: "row", marginTop: 5, alignItems: "center", }}>
+                                            <TouchableOpacity
+                                                onPress={() => { this.setState({ show2: true,day:"Thu" }) }}
+                                            >
+                                                <Entypo name="clock" size={24} color="black" />
+
+                                            </TouchableOpacity>
+
+                                            <Text style={{ marginLeft: 10 }}>{this.state.Thu?.endtime}</Text>
+                                        </View>
+
+                                    </View>
+                                </View>
+
+                               
+                                <View>
+                                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Fri :</Text>
+                                </View>
+                                <View style={{ height: height * 0.07, flexDirection: "row", }}>
+
+                                    <View style={{ flex: 0.5 }}>
+                                        <Text style={styles.text}>Opening Time</Text>
+                                        <View style={{ flexDirection: "row", marginTop: 5, alignItems: "center", }}>
+                                            <TouchableOpacity
+                                                onPress={() => { this.setState({ show1: true, day: "Fri"}) }}
+                                            >
+                                                <Entypo name="clock" size={24} color="black" />
+
+                                            </TouchableOpacity>
+
+                                            <Text style={{ marginLeft: 10 }}>{this.state.Fri?.starttime}</Text>
+                                        </View>
+
+                                    </View>
+
+                                    <View style={{ flex: 0.5, }}>
+                                        <Text style={styles.text}>Closing Time</Text>
+                                        <View style={{ flexDirection: "row", marginTop: 5, alignItems: "center", }}>
+                                            <TouchableOpacity
+                                                onPress={() => { this.setState({ show2: true, day: "Fri"}) }}
+                                            >
+                                                <Entypo name="clock" size={24} color="black" />
+
+                                            </TouchableOpacity>
+
+                                            <Text style={{ marginLeft: 10 }}>{this.state.Fri?.endtime}</Text>
+                                        </View>
+
+                                    </View>
+                                </View>
+
+                                
+                                <View>
+                                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Sat :</Text>
+                                </View>
+                                <View style={{ height: height * 0.07, flexDirection: "row", }}>
+
+                                    <View style={{ flex: 0.5 }}>
+                                        <Text style={styles.text}>Opening Time</Text>
+                                        <View style={{ flexDirection: "row", marginTop: 5, alignItems: "center", }}>
+                                            <TouchableOpacity
+                                                onPress={() => { this.setState({ show1: true ,day:"Sat"}) }}
+                                            >
+                                                <Entypo name="clock" size={24} color="black" />
+
+                                            </TouchableOpacity>
+
+                                            <Text style={{ marginLeft: 10 }}>{this.state.Sat?.starttime}</Text>
+                                        </View>
+
+                                    </View>
+
+                                    <View style={{ flex: 0.5, }}>
+                                        <Text style={styles.text}>Closing Time</Text>
+                                        <View style={{ flexDirection: "row", marginTop: 5, alignItems: "center", }}>
+                                            <TouchableOpacity
+                                                onPress={() => { this.setState({ show2: true ,day:"Sat"}) }}
+                                            >
+                                                <Entypo name="clock" size={24} color="black" />
+
+                                            </TouchableOpacity>
+
+                                            <Text style={{ marginLeft: 10 }}>{this.state.Sat?.endtime}</Text>
+                                        </View>
+
+                                    </View>
+                                </View>
+
+                                
+                               
                                 <View>
                                     <Text style={styles.text}>Mobile</Text>
                                     <TextInput

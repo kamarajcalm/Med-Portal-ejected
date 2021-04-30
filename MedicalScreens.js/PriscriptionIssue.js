@@ -5,9 +5,11 @@ import { connect } from 'react-redux';
 import { selectTheme,selectMedical} from '../actions';
 const { height, width } = Dimensions.get("window");
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Ionicons, AntDesign, Fontisto } from '@expo/vector-icons';
+import { Ionicons, AntDesign, Fontisto, FontAwesome} from '@expo/vector-icons';
 import authAxios from '../api/authAxios';
 import HttpsClient from '../api/HttpsClient';
+import moment from 'moment';
+import Modal from 'react-native-modal';
 const fontFamily = settings.fontFamily;
 const themeColor = settings.themeColor;
 const url = settings.url;
@@ -25,13 +27,16 @@ class PriscriptionIssue extends Component {
             mode: 'date',
             date: new Date(),
             show: false,
-            priscriptions:[]
+            priscriptions:[],
+            showModal:false,
+            medicals:[]
         };
     }
     onChange = (selectedDate) => {
         if (selectedDate.type == "set") {
             this.setState({ today: moment(new Date(selectedDate.nativeEvent.timestamp)).format('YYYY-MM-DD'), show: false, date: new Date(selectedDate.nativeEvent.timestamp) }, () => {
-                console.log(this.state.today, "jjjj")
+                this.getPriscriptions(this.props.medical.clinicpk)
+                console.log(this.props.medical,"vvvv")
 
             })
 
@@ -40,23 +45,54 @@ class PriscriptionIssue extends Component {
         }
 
     }
-    getPriscriptions =()=>{
-        console.log(this.props.user.profile.occupation)
+    getPriscriptions =async(pk)=>{
+        let api = `${url}/api/prescription/issued/?clinic=${pk}&date=${moment(this.state.date).format("YYYY-MM-DD")}`
+        console.log(api)
+        const data = await HttpsClient.get(api)
+        console.log(data)
+        if(data.type =="success"){
+            this.setState({ priscriptions:data.data})
+        }
     }
     getClinic = async()=>{
-        let api = `${url}/api/prescription/recopinists/?user=${this.props.user.id}`
-        let data =await HttpsClient.get(api)
-        if(data.type =="success"){
-           
-            this.props.selectMedical(data.data[0].clinic)
-           
+   
+        if (this.props.user.profile.occupation == "MedicalRecoptionist") {
+  
+           let api = `${url}/api/prescription/recopinists/?user=${this.props.user.id}`
+            let data = await HttpsClient.get(api)
+            if (data.type == "success") {
+
+                this.props.selectMedical(data.data[0].clinic)
+                this.getPriscriptions(data.data[0].clinic.id)
+            }
+          
+        }else{
+            
+            let api = `${url}/api/prescription/getDoctorClinics/?medicalRep=${this.props.user.id}`
+            let data = await HttpsClient.get(api)
+            if(data.type =="success"){
+                this.setState({ medicals: data.data.ownedclinics})
+                this.props.selectMedical(data.data.ownedclinics[0])
+                this.getPriscriptions(data.data.ownedclinics[0].clinicpk)
+            }
+            console.log(data,api)
+
         }
+
+    
+        
+       
+    }
+    setActiveMedical =(item)=>{
+        this.props.selectMedical(item)
+        this.getPriscriptions(item.clinicpk)
+        this.setState({showModal:false})
     }
     componentDidMount() {
-        this.getPriscriptions()
-        if (this.props.user.profile.occupation =="MedicalRecoptionist"){
+       
+       
               this.getClinic()
-        }
+       
         
     }
     render() {
@@ -69,8 +105,22 @@ class PriscriptionIssue extends Component {
                         {/* HEADERS */}
                         <View style={{ height: height * 0.1, backgroundColor: themeColor, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, flexDirection: 'row', alignItems: "center" }}>
                           
-                            <View style={{ flex: 1, }}>
-                                <Text style={[styles.text, { color: '#fff', fontWeight: 'bold', fontSize: 23 ,marginLeft:20}]}>Priscription</Text>
+                            <View style={{ flex: 1, flexDirection:"row"}}>
+                                <View style={{flex:0.5,alignItems:"center",justifyContent:"center"}}>
+                                    <Text style={[styles.text, { color: '#fff', fontWeight: 'bold', fontSize: 23, marginLeft: 20 }]}>Priscription</Text>
+                                </View>
+                                {this.props.user.profile.occupation == "MediacalRep" &&<TouchableOpacity style={{ flex: 0.5, alignItems: "center", justifyContent: "center" ,flexDirection:"row"}}
+                                  onPress ={()=>{this.setState({showModal:true})}}
+                                >
+                                    <View style={{alignItems:"center",justifyContent:"center"}}>
+                                        <Text style={[styles.text, { color: '#fff', }]}>{this.props?.medical?.name}</Text>
+
+                                    </View>
+                                    <View style={{alignItems:"center",justifyContent:"center"}}>
+                                        <AntDesign name="right" size={20} color="#fff" />
+                                    </View>
+                                  
+                                </TouchableOpacity>}
                             </View>
                    
                         </View>
@@ -117,18 +167,18 @@ class PriscriptionIssue extends Component {
                                         </View>
                                         <View style={{ flex: 0.4, justifyContent: 'center', alignItems: 'center' }}>
                                             <View >
-                                                <Text style={[styles.text, { fontSize: 18, }]}>{item.doctor}</Text>
-                                                <Text style={[styles.text, { fontSize: 12, }]}>Sri periandavar clinic</Text>
+                                                <Text style={[styles.text,{ fontSize: 18, }]}>{item.patientdetails.name}</Text>
+                                                <Text style={[styles.text,{ fontSize: 12, }]}>{item.patientdetails.clinicname}</Text>
                                             </View>
 
                                         </View>
                                         <View style={{ flex: 0.3, justifyContent: 'center', alignItems: "center" }}>
                                             <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
-                                                <Text>14/06/2021</Text>
+                                                <Text>{moment(item.created).format("DD/MM/YYYY")}</Text>
 
                                             </View>
                                             <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
-                                                <Text>11:00 am</Text>
+                                                <Text>{moment(item.created).format("hh:mm a")}</Text>
                                             </View>
 
                                         </View>
@@ -153,6 +203,38 @@ class PriscriptionIssue extends Component {
                             </TouchableOpacity>
                         </View>
                     </View>
+                    <Modal
+                        animationIn="slideInUp"
+                        animationOut="slideOutDown"
+                        isVisible={this.state.showModal}
+                        onBackdropPress={() => { this.setState({ showModal: false }) }}
+                    >
+                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                            <View style={{ height: height * 0.3, width: width * 0.9, backgroundColor: "#fff", borderRadius: 20, alignItems: "center", justifyContent: "center" }}>
+                                <FlatList
+                                    data={this.state.medicals}
+                                    keyExtractor={(item, index) => index.toString()}
+                                    renderItem={({ item, index }) => {
+                                        return (
+                                            <TouchableOpacity style={{ flexDirection: "row", marginTop: 20, alignItems: 'center', justifyContent: "space-around", width }}
+                                                onPress={() => { this.setActiveMedical(item) }}
+                                            >   
+                                                <View style={{flex:0.6,alignItems:"center",justifyContent:'center'}}>
+                                                    <Text style={[styles.text]}>{item.name}</Text>
+                                                </View>
+                                              
+                                                <View style={{flex:0.4,alignItems:'center',justifyContent:"center"}}>
+                                                    <FontAwesome name="dot-circle-o" size={24} color={this.props.medical == item ? themeColor : "gray"} />
+
+                                                </View>
+                                            </TouchableOpacity>
+                                        )
+                                    }}
+                                />
+
+                            </View>
+                        </View>
+                    </Modal>
                 </SafeAreaView>
             </>
         );

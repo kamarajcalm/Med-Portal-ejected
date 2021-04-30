@@ -48,6 +48,44 @@ class CreateRep extends Component {
 
     createDoctor = async () => {
         let api = `${url}/api/profile/createRep/`
+        if (this.state.Name == "") {
+            return SimpleToast.show("Please fill Name")
+        }
+
+        if (this.state.Mobile == "") {
+            return SimpleToast.show("Please fill Mobile")
+        }
+        if (this.state.Pan == "") {
+            return SimpleToast.show("Please fill Pan")
+        }
+        if (this.state.Age == "") {
+            return SimpleToast.show("Please fill Age")
+        }
+        if (this.state.Qualification == "") {
+            return SimpleToast.show("Please fill Qualification")
+        }
+     
+        if (this.state.Experience == "") {
+            return SimpleToast.show("Please fill Experience")
+        }
+        if (this.state.Pan == "") {
+            return SimpleToast.show("Please fill Pan")
+        }
+        if (this.state.Address == "") {
+            return SimpleToast.show("Please fill Address")
+        }
+        if (this.state.Pincode == "") {
+            return SimpleToast.show("Please fill Pincode")
+        }
+        if (this.state.State == "") {
+            return SimpleToast.show("Please fill State")
+        }
+        if (this.state.City == "") {
+            return SimpleToast.show("Please fill City")
+        }
+        if (this.state.NoOfClinics == "") {
+            return SimpleToast.show("Please fill No Of Medicals")
+        }
         let sendData = {
             name: this.state.Name,
             displayPicture: this.state.image,

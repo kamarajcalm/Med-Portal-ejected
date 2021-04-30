@@ -13,6 +13,7 @@ import { connect } from 'react-redux';
 import { selectTheme } from '../actions';
 import HttpsClient from '../api/HttpsClient';
 import Toast from 'react-native-simple-toast';
+import SimpleToast from 'react-native-simple-toast';
  class ShowCard2 extends Component {
   constructor(props) {
     super(props);
@@ -21,8 +22,18 @@ import Toast from 'react-native-simple-toast';
         valid:this.props.route.params.item.active,
     };
     } 
-     IssuePriscription = () => {
+     IssuePriscription = async() => {
+         let api = `${url}/api/prescription/issuedPrescription/`
+         let sendData ={
+             prescription:this.state.item.id,
+             clinic: this.props.medical.id,
 
+         }
+         
+         let post = await HttpsClient.post(api,sendData)
+         if(post.type =="success"){
+             SimpleToast.show("issued SuccessFully")
+         }
      }
    
      header = () => {
@@ -100,6 +111,11 @@ renderItem =(item)=>{
      }
   render() {
       const {item} = this.state
+      let dp = null
+      if (this.state.item.doctordetails.dp){
+          dp = `${url}${this.state.item.doctordetails.dp}`
+      }
+       
        console.log(item,"iiii")
     return (
       <>
@@ -131,7 +147,7 @@ renderItem =(item)=>{
                      </View>
                         <View style={{ alignItems: "center", justifyContent: "center" }}>
                             <Image
-                                source={{ uri: "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
+                                source={{ uri: dp||"https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
                                 style={{ height: 30, width: 30, borderRadius: 15 }}
                             />
                         </View>
@@ -197,6 +213,7 @@ const mapStateToProps = (state) => {
     return {
         theme: state.selectedTheme,
         user: state.selectedUser,
+        medical: state.selectedMedical
     }
 }
 export default connect(mapStateToProps, { selectTheme })(ShowCard2)

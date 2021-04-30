@@ -122,8 +122,8 @@ componentDidMount(){
             </View>
                          {/* CHATS */}
                <FlatList 
-                  onScroll={()=>{console.log(this.flatRef)}}
-                  style={{marginBottom:90}}
+                   contentContainerStyle ={{paddingBottom:90}}
+                
                   data={data}
                   
                   keyExtractor={(item,index)=>index.toString()}

@@ -70,13 +70,14 @@ class SearchDoctors extends Component {
                    data ={this.state.doctors}
                    keyExtractor ={(item,index)=>index.toString()}
                    renderItem ={({item,index})=>{
+                       console.log(item,"jjj")
                      return(
                          <TouchableOpacity style={{height:height*0.07,marginTop:20,flexDirection:"row"}}
                              onPress={() => { this.props.navigation.navigate("ProfileView",{item})}}
                          >
                              <View style={{ flex: 0.3, alignItems: 'center', justifyContent: "center" }}>
                                  <Image
-                                     source={{ uri: "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
+                                     source={{ uri: item.displayPicture ||"https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
                                      style={{ height: 60, width: 60, borderRadius: 30 }}
                                  />
                              </View>

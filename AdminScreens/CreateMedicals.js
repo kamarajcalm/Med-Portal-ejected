@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StatusBar, Dimensions, Image, StyleSheet, TouchableOpacity, AsyncStorage, SafeAreaView, ScrollView } from 'react-native';
+import { View,Text, StatusBar, Dimensions, Image, StyleSheet, TouchableOpacity, AsyncStorage, SafeAreaView, ScrollView,RefreshControl } from 'react-native';
 import settings from '../AppSettings';
 import axios from 'axios';
 import Modal from 'react-native-modal';
@@ -43,6 +43,7 @@ class CreateMedicals extends Component {
             city: "Bengaluru",
             firstEmergencyContactNo: "9869669867",
             secondEmergencyContactNo: '9778776767',
+            isFetching:false
         };
     }
     createMedical = async () => {
@@ -168,6 +169,7 @@ class CreateMedicals extends Component {
         this.setState({
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
+            isFetching:false
         })
     }
     renderModal = () => {
@@ -211,6 +213,10 @@ class CreateMedicals extends Component {
     componentDidMount() {
         this.getLocation()
     }
+    onRefresh = () => {
+        this.setState({ isFetching: true })
+        this.getLocation()
+    }
     render() {
         console.log(this.state.latitude, "hhhhh")
         return (
@@ -239,6 +245,12 @@ class CreateMedicals extends Component {
 
 
                             <ScrollView style={{ margin: 20 }}
+                                refreshControl={
+                                    <RefreshControl
+                                        refreshing={this.state.isFetching}
+                                        onRefresh={() => { this.onRefresh() }}
+                                    />
+                                }
                                 showsVerticalScrollIndicator={false}
                             >
                                 <View style={{ height: height * 0.12, alignItems: "center", justifyContent: 'center' }}>
