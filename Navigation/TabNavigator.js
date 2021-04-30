@@ -64,6 +64,9 @@ class TabNavigator extends Component {
         if (routeName == "MakeAppoinment") {
             return false
         }
+        if (routeName == "Chat") {
+            return false
+        }
         return true
     }
  

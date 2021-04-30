@@ -20,6 +20,9 @@ const fontFamily =settings.fontFamily;
       location:null
     };
   }
+   getMarkers =()=>{
+       
+   }
    getLocation =async()=>{
      let { status } = await Location.requestPermissionsAsync()
      if (status !== 'granted') {
@@ -27,6 +30,7 @@ const fontFamily =settings.fontFamily;
        return;
      }
      let location = await Location.getCurrentPositionAsync({});
+     this.getMarkers(location.coords.latitude,location.coords.longitude)
      this.setState({ location: {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude, 
@@ -54,20 +58,25 @@ const fontFamily =settings.fontFamily;
              <Marker
                 coordinate={{ latitude: location?.latitude, longitude: location?.longitude }}
                 >
-                <MapView.Callout tooltip={true}>
-                   <View>
-                      <View style={{backgroundColor:"#fff",height:height*0.2,width:0.4}}>
+                <MapView.Callout 
+                tooltip={true}
+                  onPress={()=>{console.log("pressed")}}
+                >
+                   <View style={{height:height*0.2,backgroundColor:"#fff",width:width*0.4,alignItems:"center",justifyContent:"center"}}>
+                      <Text style={{height:60}}>
+                      <Image
+                        source={{
+                          uri: "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"
+                        }}
+                        style={{ width: 40, height: 40, resizeMode: "cover" }}
+                      />
+                      </Text>
                     
-                      <Svg>
-                        <ImageSvg
-                          width={"100%"}
-                          height={"100%"}
-                          href={{ uri: "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
-                        />
-                      </Svg>
+                      <Text style={[styles.text]}>Doctor Name</Text>
+                      <Text style={[styles.text,{color:"gray"}]}>Specialization</Text>
             
                      
-                      </View>
+              
                   
                  
                    </View>

@@ -11,36 +11,13 @@ import { FontAwesome } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
 import * as Animatable from 'react-native-animatable';
 import * as ImagePicker from 'expo-image-picker';
-import {w3cwebsocket as W3CWebScoket} from  'websocket';
-// const client = new W3CWebScoket('ws://192.168.29.98:8000/messages/test/')
-const client = new WebSocket('ws://192.168.29.98:8000/chat/test/')
+
 import wamp from 'wamp.js2';
+import HttpsClient from '../api/HttpsClient';
 const fontFamily = settings.fontFamily;
 const themeColor = settings.themeColor;
 const wampServer = settings.wampServer;
-
-const data =[
-    {
-        message:"hi 2",
-        pk:2,
-        time:"10.30 am"
-    },
-    {
-        message: "hi !",
-        pk: 1,
-        time: "10.30 am"
-    },
-    {
-        message: "how r u i am waiting for u r meaasage for so long?",
-        pk: 2,
-        time: "10.30 am"
-    },
-    {
-        message: "i am fine !",
-        pk: 1,
-        time: "10.30 am"
-    },
-]
+const url =settings.url
 class ChatScreen extends Component {
   constructor(props) {
       
@@ -52,14 +29,14 @@ class ChatScreen extends Component {
         audio:null,
         showRecordMessage:false,
         recording:false,
-        
+        Messages:[]
     };
   }
 
     messageHandler = (args) => {
         var details = args[0]
         console.log(details, 'dfijd');
-    
+        
         
     }
     _pickImage = async () => {
@@ -78,35 +55,45 @@ class ChatScreen extends Component {
             type: type,
             name: filename,
         };
-        this.setState({ openImageModal: false })
-        this.setState({ image: photo, changedImage: true })
+        this.setState({ selectedFile: photo, selectedType: 'image' })
     //  let sendd =new FormData();
     //  sendd.append('img',photo)
     // console.log(sendd,"hhh"),
     // client.send(sendd)
     };
-  componentDidMount(){
-   
-    client.onopen =()=>{
+    getChatMessage =()=>{
+      
+        this.setConnection()
+    }
+    setConnection = (task) => {
 
-         console.log("connnn")
-     }
-     client.onmessage =(message)=>{
-         const data = JSON.parse(message.data);
-         console.log("repp",data)
-     }
+        var connection = new wamp.Connection({ url: wampServer, realm: 'default' });
+      
+        if (connection != null ) {
+            connection.onopen = (session, details) => {
+                session.subscribe(this.state.item.uid, this.messageHandler).then(
+                    (sub) => {
+                    },
+                    (err) => {
+                    });
+            }
+            connection.open();
+            
+   
+        } else if (task == "close"){
+            connection.close()
+        }
+       
+    }
+  componentDidMount(){
+   this.getChatMessage()
+   console.log(this.state.item)
   
   }
  componentWillUnmount(){
-     client.close();
+  
  }
-//   setConnection =()=>{
-//       console.log(`${wampServer}/chat/test`)
-//       let socket = new WebSocket(`${wampServer}/messages/test`);
-//       socket.onopen = (e)=>{
-//           socket.send("hello server")
-//       }
-//   }
+
     showMessage =()=>{
         this.setState({showRecordMessage:true})
         setTimeout(()=>{
@@ -141,12 +128,37 @@ startRecording =async()=>{
 }
 stopRecording =async()=>{
     try{
+         var audio_chunks = [];
         console.log('Stopping recording..');
         await this.state.audio.stopAndUnloadAsync();
         const uri = this.state.audio.getURI();
         console.log('Recording stopped and stored at', uri);
         this.setState({ recording: false })
         this.setState({ audio: undefined })
+       
+      
+        let filename = uri.split('/').pop();
+        let match = /\.(\w+)$/.exec(filename);
+ 
+        var type = match ? `audio/${match[1]}` : `audio`;
+        let selectedFile ={
+            uri,
+            type,
+            name:filename
+        }
+        console.log(selectedFile)
+        var sendData = {
+         
+            bodyType: 'formData',
+            thread: this.state.item.groupPk,
+            sender: this.props.user.id,
+            msgType: 'voice',
+            attachment:selectedFile,
+            
+        }
+       console.log(sendData,"kkk")
+        var data = await HttpsClient.post(url + '/api/prescription/chats/', sendData)
+        console.log(data)
         const source = { uri: uri }
         const initialStatus ={}
         const onPlaybackStatusUpdate = null
@@ -162,16 +174,79 @@ stopRecording =async()=>{
              console.log(err)
     }
    
-}
+    }   
+    openCamera = async () => {
+        let result = await ImagePicker.launchCameraAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: false,
+          aspect: [4, 3],
+          quality: 1,
+        });
+        if(result.cancelled == true){
+          return
+        }
+
+        let filename = result.uri.split('/').pop();
+        let match = /\.(\w+)$/.exec(filename);
+        let type = match ? `image/${match[1]}` : `image`;
+  
+        const photo = {
+            uri: result.uri,
+            type: result.type,
+            name: result.name
+        };
+        this.setState({ selectedFile: photo, selectedType: 'image' })
+
+
+    }
+    getPhotosFromGallery = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.All,
+          allowsEditing: false,
+          aspect: [4, 3],
+          quality: 1,
+        });
+        if(result.cancelled == true){
+          return
+        }
+        let filename = result.uri.split('/').pop();
+        let match = /\.(\w+)$/.exec(filename);
+        var type = match ? `image/${match[1]}` : `image`;
+    
+        const photo = {
+            uri: result.uri,
+            type: result.type,
+            name: filename
+        };
+        this.setState({ selectedFile: photo, selectedType: 'image' })
+    }
 sendMessage =async()=>{
-    client.send(JSON.stringify({
-       
-            type:'text',
-            data:this.state.message,
-        
-    }))
-    console.log("sent")
+    var sendData = {
+        message: this.state.message,
+        bodyType: 'formData',
+        thread: this.state.item.groupPk,
+        sender: this.props.user.id,
+        msgType: 'text'
+
+    }
+    if (this.state.selectedFile != null) {
+        sendData.attachment = this.state.selectedFile
+        if (this.state.selectedType != null) {
+            sendData.msgType = this.state.selectedType
+        }
+    }
+    var data = await HttpsClient.post(url + '/api/prescription/chats/', sendData)
+   
 }
+    modalAttach = (event) => {
+        this.setState({ attachModal: !this.state.attachModal });
+        if (event == 'gallery') this.getPhotosFromGallery();
+        if (event == 'camera') {
+            this.setState({ isCameraVisible: true });
+            return this.openCamera()
+        }
+
+    };
   render() {
       const{ item }=this.state
     return (
@@ -202,7 +277,7 @@ sendMessage =async()=>{
             </View>
             <FlatList 
               style={{marginTop:20}}
-              data={data}
+              data={this.state.Messages}
               keyExtractor={(item,index)=>index.toString()}
               renderItem={({item,index})=>{
                   if(item.pk!=this.state.pk){
@@ -345,7 +420,7 @@ const mapStateToProps = (state) => {
 
     return {
         theme: state.selectedTheme,
-
+        user:state.selectedUser
     }
 }
 export default connect(mapStateToProps, { selectTheme })(ChatScreen);

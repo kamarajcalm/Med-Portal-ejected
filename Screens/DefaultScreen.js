@@ -32,7 +32,7 @@ const url = settings.url;
       //  )
          const login = await AsyncStorage.getItem("login")
         
-          
+         
          if (login) {
               const data = await HttpsClient.get(`${url}/api/HR/users/?mode=mySelf&format=json`);
               console.log(data)
@@ -67,7 +67,7 @@ const url = settings.url;
                     })
                   )
                 }
-                if (data.data[0].profile.occupation == "Doctor" || data.data[0].profile.occupation == "ClinicRecoptionist") {
+                if (data.data[0].profile.occupation == "Doctor" || data.data[0].profile.occupation == "ClinicRecoptionist" || data.data[0].profile.occupation == "Customer") {
                   return this.props.navigation.dispatch(
                     CommonActions.reset({
                       index: 0,
@@ -87,6 +87,8 @@ const url = settings.url;
                 return this.props.navigation.navigate('Login')
               }
               
+         }else{
+           return this.props.navigation.navigate('Login')
          }
      }
   componentDidMount(){

@@ -9,6 +9,7 @@ import authAxios from '../api/authAxios';
 const fontFamily = settings.fontFamily;
 const themeColor = settings.themeColor;
 const url =settings.url;
+const date =new Date()
 import { Entypo } from '@expo/vector-icons';
 import { Linking } from 'react-native';
 import { Feather } from '@expo/vector-icons';
@@ -29,6 +30,7 @@ class ClinicDetails extends Component {
             deleteDocorIndex:null,
             deleteReceptionIndex:null,
             deleteReceptionist:null,
+            showAll:false
         };
     }
     getReceptionList =async()=>{
@@ -113,7 +115,8 @@ class ClinicDetails extends Component {
                         
                             </TouchableOpacity>
                         </View>
-
+                    
+                        
                        <ScrollView style={{flex:1,}}>
                                 {/* image */}
                            <View style={{height:height*0.2,width}}>
@@ -122,7 +125,7 @@ class ClinicDetails extends Component {
                                     source={{ uri: this.state.item.displayPicture||"https://t2conline.com/wp-content/uploads/2019/04/thumbnail_Minor_Injury_Walk_In_Clinic1.jpg"}}
                                 />
                            </View>
-                            
+                      
                               {/* Details */}
                               <View style={{flexDirection:"row",marginHorizontal:20,marginTop:10}}>
                                   <View style={{alignItems:"center",justifyContent:"center"}}>
@@ -144,28 +147,77 @@ class ClinicDetails extends Component {
                                 </View>
                              
                             </View>
-                            <View style={{ marginHorizontal: 20, marginTop: 10 ,flexDirection:"row",alignItems:"center",justifyContent:"space-between"}}>
-                                <View style={{flexDirection:"row",alignItems:"center",justifyContent:"center"}}>
-                                    <View style={{justifyContent:"center",alignItems:"center"}}>
-                                        <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>OpeningTime:</Text>
-
-                                    </View>
-                                    <View style={{ alignItems: "center", justifyContent: "center" ,marginTop:3,marginLeft:5}}>
-                                        <Text>{this.state?.item?.startingtime}</Text>
-                                    </View>
-                                    
+                            <View style={{ marginHorizontal: 20, marginTop: 10,flexDirection:'row',alignItems:'center',justifyContent:"space-between"}}>
+                                <View>
+                                    <Text style={[styles.text,{fontWeight:"bold",fontSize:18}]}>OpeningTime:</Text>
                                 </View>
-                                <View style={{flexDirection:'row',alignItems:"center",justifyContent:"center"}}>
-                                    <View style={{ alignItems: "center", justifyContent: "center" }}>
-                                        <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>ClosingTime:</Text>
-
-                                    </View>
-                                    <View style={{ alignItems: "center", justifyContent: "center", marginTop: 3, marginLeft: 5}}>
-                                        <Text>{this.state?.item?.closingtime}</Text>
-                                    </View>
-                                    
+                                <View>
+                                    <Text style={[styles.text,{fontWeight:"bold",fontSize:18}]}>ClosingTime:</Text>
                                 </View>
                             </View>
+                            <View style={{ marginHorizontal: 20, marginTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: "space-between" }}>
+                                <View>
+                                    <View style={{ alignSelf: "flex-start" }}>
+                                        <Text style={[styles.text, { fontWeight: "bold", fontSize: 18, color: "gray" }]}>Today:</Text>
+                                    </View>
+
+                                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>{this.state.item.working_hours[date.getDay()][0]}</Text>
+                                </View>
+                                <View>
+                                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>{this.state.item.working_hours[date.getDay()][1]}</Text>
+                                </View>
+                               
+                            </View>
+                            <View style={{alignItems:"center",justifyContent:"center"}}>
+                                <TouchableOpacity
+                                  onPress={()=>{this.setState({showAll:!this.state.showAll})}}
+                                >
+                                    <Text>{this.state.showAll?"showLess":"showAll"}</Text>
+                                </TouchableOpacity>
+                            </View>
+                           {this.state.showAll&&
+                                    this.state.item.working_hours.map((i)=>{
+                                     let day= ""
+                                     if(i[2]=="0"){
+                                         day ="Sun"
+                                     }else if(i[2]=="1"){
+                                         day ="Mon"
+                                     } else if (i[2] == "2") {
+                                         day = "Tue"
+                                     } else if (i[2] == "3") {
+                                         day = "Wed"
+                                     } else if (i[2] == "4") {
+                                         day = "Thu"
+                                     } else if (i[2] == "5") {
+                                         day = "Fri"
+                                     } else if (i[2] == "6") {
+                                         day = "Sat"
+                                     }else{
+                                         day ==""
+                                     }
+                                        
+                                        return(
+                                            <View style={{ marginHorizontal: 20, marginTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: "space-between" }}>
+                                                <View>
+                                                    <View style={{alignSelf:"flex-start"}}>
+                                                        <Text style={[styles.text, { fontWeight: "bold", fontSize: 18,color:"gray" }]}>{day}:</Text>
+                                                    </View>
+                                                    
+                                                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>{i[0]}</Text>
+                                                </View>
+                                                <View>
+                                                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>{i[1]}</Text>
+                                                </View>
+                                            </View>
+                                        )
+                                    })
+                           }
+                                   
+                            
+                             
+                               
+                           
+                         
                             <View style={{ flexDirection: "row", marginHorizontal: 20, marginTop: 10 }}>
                                 <View style={{ alignItems: "center", justifyContent: "center" }}>
                                     <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Mobile:</Text>

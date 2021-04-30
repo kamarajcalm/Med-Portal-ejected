@@ -6,7 +6,7 @@ import Modal from 'react-native-modal';
 import { Ionicons, Entypo, AntDesign, FontAwesome, MaterialCommunityIcons, MaterialIcons, FontAwesome5} from '@expo/vector-icons';
 const { height } = Dimensions.get("window");
 const { width } = Dimensions.get("window");
-
+const url =settings.url
 const themeColor = settings.themeColor;
 const fontFamily = settings.fontFamily;
 import { connect } from 'react-redux';
@@ -14,6 +14,7 @@ import { selectTheme } from '../actions';
 import { NavigationContainer, CommonActions } from '@react-navigation/native';
 import openMap ,{createOpenLink} from 'react-native-open-maps';
 import * as Linking from 'expo-linking';
+import HttpsClient from '../api/HttpsClient';
 class ProfileView extends Component {
     constructor(props) {
         let item = props.route.params.item
@@ -29,7 +30,16 @@ class ProfileView extends Component {
     }
    
     componentDidMount() {
+        console.log(this.state.item.workingclinics,"cccc")
         // this.request()
+    }
+    chatClinic = async(item)=>{
+        let api = `${url}/api/prescription/personalChat/?contact=${item.clinicpk}&customer=${this.props.user.id}`
+
+      let data = await HttpsClient.get(api)
+     if(data.type =="success"){
+         this.props.navigation.navigate('Chat',{item:data.data})
+     }
     }
     render() {
         return (
@@ -105,7 +115,9 @@ class ProfileView extends Component {
                                                         
                                                 </View>
                                                    <View style={{flex:0.5,alignItems:"center",justifyContent:"space-around"}}>
-                                                       <TouchableOpacity style={{alignItems:'center',justifyContent:'center'}}>
+                                                       <TouchableOpacity style={{alignItems:'center',justifyContent:'center'}}
+                                                        onPress ={()=>{this.chatClinic(item)}}
+                                                       >
                                                             <MaterialIcons name="chat" size={24} color="black" />
                                                             <Text>with clinic</Text>
                                                        </TouchableOpacity>
@@ -170,7 +182,7 @@ const mapStateToProps = (state) => {
 
     return {
         theme: state.selectedTheme,
-
+        user:state.selectedUser
     }
 }
 export default connect(mapStateToProps, { selectTheme })(ProfileView)
