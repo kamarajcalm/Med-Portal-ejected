@@ -11,9 +11,10 @@ import { FontAwesome } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
 import * as Animatable from 'react-native-animatable';
 import * as ImagePicker from 'expo-image-picker';
-
+import Modal from 'react-native-modal';
 import wamp from 'wamp.js2';
 import HttpsClient from '../api/HttpsClient';
+import moment from 'moment';
 const fontFamily = settings.fontFamily;
 const themeColor = settings.themeColor;
 const wampServer = settings.wampServer;
@@ -29,15 +30,24 @@ class ChatScreen extends Component {
         audio:null,
         showRecordMessage:false,
         recording:false,
-        Messages:[]
+        Messages:[],
+        chatType:""
     };
   }
 
     messageHandler = (args) => {
         var details = args[0]
-        console.log(details, 'dfijd');
-        
-        
+        // console.log(details, 'socket');
+        if (details.thread == this.state.item.groupPk){
+            if (details.attachment){
+                details.attachment =`${url}${details.attachment}`
+            }
+       
+            let list = this.state.Messages
+            list.push(details)
+         
+            this.setState({Messages:list})
+        }
     }
     _pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -61,14 +71,18 @@ class ChatScreen extends Component {
     // console.log(sendd,"hhh"),
     // client.send(sendd)
     };
-    getChatMessage =()=>{
-      
+    getChatMessage =async()=>{
+        let api =`${url }/api/prescription/chats/?thread=${this.state.item.groupPk}`
+        const data = await HttpsClient.get(api)
+        if(data.type =="success"){
+            this.setState({Messages:data.data})
+        }
         this.setConnection()
     }
-    setConnection = (task) => {
+    setConnection = () => {
 
         var connection = new wamp.Connection({ url: wampServer, realm: 'default' });
-      
+        // console.log(this.state.item.uid, "jhu")
         if (connection != null ) {
             connection.onopen = (session, details) => {
                 session.subscribe(this.state.item.uid, this.messageHandler).then(
@@ -80,14 +94,29 @@ class ChatScreen extends Component {
             connection.open();
             
    
-        } else if (task == "close"){
-            connection.close()
-        }
+        } 
        
     }
+    validateChat =()=>{
+        console.log(this.props.user.profile.occupation,"ooo")
+        //   TWO CHATS 1.doctor&patient && 2clinic&pateint
+        if (this.props.user.profile.occupation=="Customer"){
+         if (this.state.item.clinictitle) {
+             return this.setState({ chatType: "clinic&pateint" })
+         }
+         if (this.state.item.doctortitle) {
+             return this.setState({ chatType: "doctor&pateint" })
+         }
+        } else if (this.props.user.profile.occupation == "ClinicRecoptionist"){
+         return this.setState({ chatType: "clinic&pateint" })
+     }
+        
+    }
   componentDidMount(){
+    
+      this.validateChat()
    this.getChatMessage()
-   console.log(this.state.item)
+
   
   }
  componentWillUnmount(){
@@ -128,18 +157,15 @@ startRecording =async()=>{
 }
 stopRecording =async()=>{
     try{
-         var audio_chunks = [];
+      
         console.log('Stopping recording..');
         await this.state.audio.stopAndUnloadAsync();
         const uri = this.state.audio.getURI();
-        console.log('Recording stopped and stored at', uri);
+        console.log('Recording stopped and stored at',uri);
         this.setState({ recording: false })
         this.setState({ audio: undefined })
-       
-      
         let filename = uri.split('/').pop();
         let match = /\.(\w+)$/.exec(filename);
- 
         var type = match ? `audio/${match[1]}` : `audio`;
         let selectedFile ={
             uri,
@@ -156,9 +182,10 @@ stopRecording =async()=>{
             attachment:selectedFile,
             
         }
-       console.log(sendData,"kkk")
+    //    console.log(sendData,"kkk")
+      
         var data = await HttpsClient.post(url + '/api/prescription/chats/', sendData)
-        console.log(data)
+        // console.log(data)
         const source = { uri: uri }
         const initialStatus ={}
         const onPlaybackStatusUpdate = null
@@ -175,59 +202,38 @@ stopRecording =async()=>{
     }
    
     }   
-    openCamera = async () => {
-        let result = await ImagePicker.launchCameraAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: false,
-          aspect: [4, 3],
-          quality: 1,
-        });
-        if(result.cancelled == true){
-          return
-        }
 
-        let filename = result.uri.split('/').pop();
-        let match = /\.(\w+)$/.exec(filename);
-        let type = match ? `image/${match[1]}` : `image`;
-  
-        const photo = {
-            uri: result.uri,
-            type: result.type,
-            name: result.name
-        };
-        this.setState({ selectedFile: photo, selectedType: 'image' })
-
-
-    }
-    getPhotosFromGallery = async () => {
+    _pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.All,
-          allowsEditing: false,
-          aspect: [4, 3],
-          quality: 1,
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsMultipleSelection: true
         });
-        if(result.cancelled == true){
-          return
+        if (result.cancelled == true) {
+            return
         }
         let filename = result.uri.split('/').pop();
         let match = /\.(\w+)$/.exec(filename);
         var type = match ? `image/${match[1]}` : `image`;
-    
         const photo = {
             uri: result.uri,
-            type: result.type,
-            name: filename
+            type: type,
+            name: filename,
         };
+
+        this.setState({ openImageModal: false })
         this.setState({ selectedFile: photo, selectedType: 'image' })
-    }
+    };
 sendMessage =async()=>{
     var sendData = {
         message: this.state.message,
         bodyType: 'formData',
-        thread: this.state.item.groupPk,
         sender: this.props.user.id,
         msgType: 'text'
-
+    }
+    console.log(this.state.chatType,"chayyyy")
+    if (this.state.chatType == "clinic&pateint"){
+        console.log("jjjj")
+        sendData.clinicThread= this.state.item.groupPk
     }
     if (this.state.selectedFile != null) {
         sendData.attachment = this.state.selectedFile
@@ -235,20 +241,90 @@ sendMessage =async()=>{
             sendData.msgType = this.state.selectedType
         }
     }
-    var data = await HttpsClient.post(url + '/api/prescription/chats/', sendData)
+    console.log(sendData,"oooo")
+    let api = `${url}/api/prescription/chats/`
+ 
+    var data = await HttpsClient.post(api,sendData)
+    // console.log(data,"pooo")
+    // console.log(data,sendData,api)
+    if(data.type =="success"){
+        this.setState({ message: "", selectedFile: null, selectedType:null})
+    }
    
 }
-    modalAttach = (event) => {
-        this.setState({ attachModal: !this.state.attachModal });
-        if (event == 'gallery') this.getPhotosFromGallery();
+    modalAttach = async (event) => {
+        if (event == 'gallery') return this._pickImage();
         if (event == 'camera') {
-            this.setState({ isCameraVisible: true });
-            return this.openCamera()
+            this.handlePhoto()
+        }
+    }
+    handlePhoto = async () => {
+        let picture = await ImagePicker.launchCameraAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            quality: 0.1,
+        });
+        if (picture.cancelled == true) {
+            return
         }
 
-    };
+        let filename = picture.uri.split('/').pop();
+        let match = /\.(\w+)$/.exec(filename);
+        let type = match ? `image/${match[1]}` : `image`;
+        this.setState({ openImageModal: false })
+        const photo = {
+            uri: picture.uri,
+            type: type,
+            name: filename,
+        };
+       
+        this.setState({ selectedFile: photo, selectedType: 'image' })
+    }
+    renderModal = () => {
+        return (
+            <Modal
+                isVisible={this.state.openImageModal}
+                hasBackdrop={true}
+                style={[styles.modalView1, { position: 'absolute', bottom: -20, left: 0, }]}
+                onBackdropPress={() => { this.setState({ openImageModal: false }); }} useNativeDriver={true} onRequestClose={() => { this.setState({ openImageModal: false }); }} >
+                <View style={{ paddingVertical: width * 0.01, }}>
+                    <View style={{
+                        flexDirection: 'row', height: width * 0.25, justifyContent: 'space-between',
+                        borderWidth: 0, backgroundColor: 'transparent', borderRadius: 0, paddingTop: width * 0.05
+                    }}>
+                        <TouchableOpacity
+                            style={{
+                                alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', paddingHorizontal: 4,
+                                paddingVertical: 6, borderWidth: 0, borderRadius: 0
+                            }}
+                            onPress={() => { this.modalAttach('gallery') }}>
+                            <FontAwesome
+                                name="folder"
+                                size={width * 0.16}
+                                style={{
+                                    marginRight: 5, color: themeColor,
+                                    textAlign: 'center', marginLeft: width * 0.1
+                                }} />
+                            <Text style={{ fontSize: 16, color: themeColor, textAlign: 'center', marginLeft: width * 0.1 }}>Gallery</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={{ alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', paddingHorizontal: 4, paddingVertical: 6, borderWidth: 0, borderRadius: 0, }}
+                            onPress={() => { this.modalAttach('camera') }}>
+                            <FontAwesome name="camera" size={width * 0.14} style={{ marginRight: 5, color: themeColor, textAlign: 'center', marginRight: width * 0.1 }} />
+                            <Text style={{ fontSize: 16, color: themeColor, textAlign: 'center', marginRight: width * 0.1 }}>camera</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+        )
+    }
   render() {
+      
       const{ item }=this.state
+      let chatTitle =""
+      if (this.props.user.profile.occupation =="Customer"){
+          chatTitle =this.state.item.clinictitle||this.state.item.doctortitle
+      }
+//  console.log(this.props.user)
     return (
           <>
             <SafeAreaView style={styles.topSafeArea} />
@@ -270,43 +346,103 @@ sendMessage =async()=>{
                         />
                  
                       
-                    <Text style={[styles.text, { color: '#fff', marginLeft: 20, fontWeight: 'bold' ,fontSize:20}]}>{item?.name}</Text>
+                    <Text style={[styles.text, { color: '#fff', marginLeft: 20, fontWeight: 'bold' ,fontSize:20}]}>{chatTitle}</Text>
                 </View>
                 <View style={{ flex: 0.2 }}>
                 </View>
             </View>
-            <FlatList 
+            <FlatList
+              contentContainerStyle={{paddingBottom:20}} 
+              onContentSizeChange={() => { this.flatRef.scrollToEnd({ animated: true }) }}
               style={{marginTop:20}}
               data={this.state.Messages}
+              ref={ref => this.flatRef = ref}
               keyExtractor={(item,index)=>index.toString()}
               renderItem={({item,index})=>{
-                  if(item.pk!=this.state.pk){
-                      return (
-                          <View style={{ alignSelf: "flex-start", backgroundColor:'#eeee', padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10,marginLeft:20,maxWidth:width*0.6}}>
-                              <Text style={[styles.text]}>{item.message}</Text>
-                              <View style={styles.leftArrow}></View>
+                 
+               
+                        //   if non -sender
+                  if (item.senderPk.toString()!=this.props.user.id.toString()){
+                      if (item.msgType =="text"){
+                          return (
+                              <View style={{ alignSelf: "flex-start", backgroundColor: '#eeee', padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
+                                  
+                                  <Text style={[styles.text]}>{item.message}</Text>
+                                  <View style={{ alignSelf: "flex-end" }}>
+                                      <Text style={[styles.text, { color: "#fff", fontSize: 8 }]}>11:40 am</Text>
+                                  </View>
+                                  <View style={styles.leftArrow}></View>
 
-                              <View style={styles.leftArrowOverlap}></View>
-                          </View>
-                      )
+                                  <View style={styles.leftArrowOverlap}></View>
+                              </View>
+                          )
+                      }
+                      if (item.msgType == "image"){
+                       
+                         return(
+                             <View style={{ alignSelf: "flex-start", backgroundColor: '#eeee', padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
+                                 <Image
+                                     source={{ uri: item.attachment }}
+                                     style={{ height: height * 0.15, width: width * 0.4, resizeMode: "contain" }}
+                                 />
+
+                                 <Text style={[styles.text]}>{item.message}</Text>
+                                 <View style={{ alignSelf: "flex-end" }}>
+                                     <Text style={[styles.text, { color: "#fff", fontSize: 8 }]}>{moment(item?.created).format("hh:mm a")}</Text>
+                                 </View>
+                                 <View style={styles.leftArrow}></View>
+
+                                 <View style={styles.leftArrowOverlap}></View>
+                             </View>
+                         )
+                      
+                      }
+                     
                   }
+                    //    if sender
+                  if (item.msgType == "text") {
                   return(
                       <View style={{ alignSelf: 'flex-end', backgroundColor: themeColor, padding: 10, borderRadius: 20, marginRight: 20, marginTop: 10, maxWidth: width * 0.6}}>
                           <Text style={[styles.text,{color:"#fff"}]}>{item.message}</Text>
+                          <View style={{alignSelf:"flex-end"}}>
+                              <Text style={[styles.text, { color: "#fff", fontSize: 8 }]}>{moment(item?.created).format("hh:mm a")}</Text>
+                          </View>
                           <View style={styles.rightArrow}></View>
 
                           <View style={styles.rightArrowOverlap}></View>
                       </View>
                   )
+                  }
+                  if (item.msgType == "image") {
+                       
+                      return (
+                          <View style={{ alignSelf: 'flex-end', backgroundColor: themeColor, padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
+                              <Image
+                                  source={{ uri: item.attachment }}
+                                  style={{ height: height * 0.15, width: width * 0.4, resizeMode: "contain" }}
+                              />
+
+                              <Text style={[styles.text, { color: "#fff" }]}>{item.message}</Text>
+                              <View style={{ alignSelf: "flex-end" }}>
+                                  <Text style={[styles.text, { color: "#fff", fontSize: 8 }]}>{moment(item?.created).format("hh:mm a")}</Text>
+                              </View>
+                              <View style={styles.rightArrow}></View>
+
+                              <View style={styles.rightArrowOverlap}></View>
+                          </View>
+                      )
+
+                  }
               }}
             />
-            <View style={{flexDirection:'row'}}> 
-                <View style={{ backgroundColor: "#fafafa",minHeight: height * 0.05, maxHeight: height * 0.2, borderRadius: 15,flex:1,marginLeft:20,marginBottom:10 ,flexDirection:"row"}}>
-                    <View style={{ flex:0.8 }}>
+            <View style={{flexDirection:'row',alignItems:"center",justifyContent:"center",minHeight:height*0.07,elevation:5,backgroundColor:"#ffff"}}> 
+                <View style={{ backgroundColor: "#fafafa",minHeight: height * 0.05, maxHeight: height * 0.2, borderRadius: 15,flex:1,marginLeft:20,flexDirection:"row",alignItems:"center",justifyContent:"center"}}>
+                    <View style={{ flex:0.8 ,alignItems:"center",justifyContent:"center"}}>
                         {!this.state.recording?
                             <TextInput
+                                value={this.state.message}
                                 multiline={true}
-                                style={{ width: "100%", minHeight: height * 0.05, maxHeight: height * 0.2, paddingLeft: 5 }}
+                                style={{ width: "100%", minHeight: height * 0.05, maxHeight: height * 0.2, paddingLeft: 5 ,alignSelf:"center"}}
                                 selectionColor={themeColor}
                                 placeholder="Write a message...."
                                 onChangeText={(text) => {
@@ -321,7 +457,7 @@ sendMessage =async()=>{
                       
                     </View>
                     <TouchableOpacity style={{ flex: 0.2,alignItems:'center',justifyContent:"center"}}
-                      onPress={()=>{this._pickImage()}}
+                      onPress={()=>{this.setState({openImageModal:true})}}
                     >
                         <Entypo name="attachment" size={24} color={themeColor} />
                     </TouchableOpacity>
@@ -352,7 +488,19 @@ sendMessage =async()=>{
                 
                
             </View>
-          
+          {this.state.selectedType=="image"&&<View style={{position:"absolute",height:height*0.07,bottom:60,backgroundColor:"#fafafa",left:20,width:width*0.2,borderRadius:10}}>
+                    <TouchableOpacity style={{alignSelf:"flex-end",marginTop:-15,marginRight:-10}}
+                      onPress={()=>{this.setState({selectedFile:null,selectedType:null})}}
+                    >
+                            <Entypo name="circle-with-cross" size={24} color="red" />
+                    </TouchableOpacity>   
+                        
+               <Image 
+                 source={{uri:this.state.selectedFile.uri}}
+                 style={{height:50,width:50}}
+               />
+            </View>}
+                    {this.renderModal()}
       </View>
             </SafeAreaView>
         </>
@@ -415,6 +563,14 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "#fff"
     },
+    modalView1: {
+        backgroundColor: '#fff',
+        marginHorizontal: 0,
+        borderTopLeftRadius: 5,
+        borderTopRightRadius: 5,
+        justifyContent: 'flex-end',
+        width: width
+    }
 })
 const mapStateToProps = (state) => {
 

@@ -58,7 +58,7 @@ class ProfileEdit extends Component {
             name: filename,
         };
         this.setState({ openImageModal: false })
-        this.setState({ image: photo, changedImage: true })
+        this.setState({ selectedFile: photo, selectedType: 'image' })
     };
     modalAttach = async (event) => {
         if (event == 'gallery') return this._pickImage();
@@ -112,7 +112,7 @@ class ProfileEdit extends Component {
                                     marginRight: 5, color: themeColor,
                                     textAlign: 'center', marginLeft: width * 0.1
                                 }} />
-                            <Text style={{ fontSize: 16, color: themeColor, textAlign: 'center', marginLeft: width * 0.1 }}>Gallary</Text>
+                            <Text style={{ fontSize: 16, color: themeColor, textAlign: 'center', marginLeft: width * 0.1 }}>Gallery</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={{ alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', paddingHorizontal: 4, paddingVertical: 6, borderWidth: 0, borderRadius: 0, }}

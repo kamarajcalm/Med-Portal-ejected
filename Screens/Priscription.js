@@ -291,13 +291,10 @@ class Priscription extends React.Component {
                     {/* HEADERS */}
                     <View style={{ height: height * 0.1, backgroundColor: themeColor, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, flexDirection: "row" }}>
                         <View style={{ flex: 0.5, alignItems: 'center', justifyContent: "center" }}>
-                            {this.state.isDoctor&&<View style={{flexDirection:"row"}}>
-                                <Text style={{ color: '#fff', fontFamily: "openSans", marginLeft: 20 }}>Welcome {this.state.user.first_name},</Text>
-
-                                </View>}
+                  
                             {!this.state.isDoctor&&<Text style={{ color: '#fff', fontFamily: "openSans", marginLeft: 20 ,fontSize:30,fontWeight:"bold"}}>Priscription</Text>}
                         </View>
-                       {this.state.isDoctor&&<TouchableOpacity style={{ flex: 0.5, alignItems: "center", justifyContent: 'center' ,flexDirection:'row'}}
+                       {this.state.isDoctor&&<TouchableOpacity style={{ flex:1, alignItems: "center", justifyContent: 'center' ,flexDirection:'row'}}
                           onPress={()=>{this.setState({showModal:true})}}
                         >
                             <Text style={{ color: '#fff', fontFamily: "openSans", marginLeft: 20 }}>{this.props?.clinic?.name}</Text>

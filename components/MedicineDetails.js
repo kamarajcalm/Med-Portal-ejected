@@ -209,16 +209,7 @@ export default class MedicineDetails extends Component {
                 </View>
                
             </View>
-            <View style={{ flexDirection: 'row' ,height:height*0.05,alignItems:"center",justifyContent:"center",marginTop:5}}>
-                <Text>Total Qty</Text>
-                <TextInput
-                    value ={this.state.qty}
-                    onChangeText={(text) => { this.changeQty(text) }}
-                    selectionColor={themeColor}
-                    keyboardType="numeric"
-                    style={{ height: "80%", width: 50, backgroundColor: '#eee', borderRadius: 5, marginLeft: 5, paddingLeft: 5 }}
-                />
-            </View>
+          
          <TouchableOpacity
                 onPress={() => { this.props.changeFunction("delete",item,index)}}
            style={{position:"absolute",top:10,right: 10,}}

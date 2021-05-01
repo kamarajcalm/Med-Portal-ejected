@@ -142,7 +142,7 @@ class AddPrescription extends Component {
                     <Ionicons name="chevron-back-circle" size={30} color="#fff" />
                 </TouchableOpacity>
                 <View style={{flex:0.5,alignItems:"center",justifyContent:"center"}}>
-                    <Text style={[styles.text,{ color: '#fff',marginLeft: 20 }]}>Add Prescription</Text>
+                    <Text style={[styles.text,{ color: '#fff',marginLeft: 20 ,fontWeight:"bold",fontSize:20}]}> Prescription</Text>
                 </View>
                  <View style={{flex:0.2}}>
                 </View>       

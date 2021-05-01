@@ -34,9 +34,11 @@ class ProfileView extends Component {
         // this.request()
     }
     chatClinic = async(item)=>{
-        let api = `${url}/api/prescription/personalChat/?contact=${item.clinicpk}&customer=${this.props.user.id}`
+        let api = `${url}/api/prescription/createClinicChat/?clinic=${item.clinicpk}&customer=${this.props.user.id}`
 
       let data = await HttpsClient.get(api)
+      
+  
      if(data.type =="success"){
          this.props.navigation.navigate('Chat',{item:data.data})
      }
@@ -56,7 +58,7 @@ class ProfileView extends Component {
                                 <Ionicons name="chevron-back-circle" size={30} color="#fff" />
                             </TouchableOpacity>
                             <View style={{ flex: 0.6, alignItems: 'center', justifyContent: "center" }}>
-                                <Text style={[styles.text, { color: "#fff" }]}>Profile</Text>
+                                <Text style={[styles.text, { color: "#fff" ,fontSize:20,fontWeight:"bold"}]}>Profile</Text>
                             </View>
                             <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
                                

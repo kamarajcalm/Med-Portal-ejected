@@ -381,16 +381,7 @@ class CreateDoctors extends Component {
                                         style={{ width: width * 0.8, height: height * 0.05, borderRadius: 15, backgroundColor: "#eeee", margin: 10, paddingLeft: 10 }}
                                     />
                                 </View>
-                                <View>
-                                    <Text style={styles.text}>No of clinics handling</Text>
-                                    <TextInput
-                                        value={this.state.NoOfClinics}
-                                        onChangeText={(NoOfClinics) => { this.setState({ NoOfClinics }) }}
-                                        keyboardType="numeric"
-                                        selectionColor={themeColor}
-                                        style={{ width: width * 0.8, height: height * 0.05, borderRadius: 15, backgroundColor: "#eeee", margin: 10, paddingLeft: 10 }}
-                                    />
-                                </View>
+                              
                            
                                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                                     <TouchableOpacity style={{ width: width * 0.4, height: height * 0.05, borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: themeColor }}

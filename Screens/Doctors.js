@@ -96,7 +96,7 @@ const fontFamily =settings.fontFamily;
             >
                  <AntDesign name="search1" size={24} color={themeColor} />
                  <View style={{alignItems:"center",justifyContent:"center"}}>
-                    <Text style={[styles.text]}>Search Doctor by name or place</Text>
+                    <Text style={[styles.text,{fontSize:12}]}>doctor, clinic, specialization or health issues</Text>
                  </View>
                  
             </TouchableOpacity>

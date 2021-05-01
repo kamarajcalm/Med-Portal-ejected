@@ -151,7 +151,7 @@ componentDidMount(){
             <View style={{ height: height * 0.1, backgroundColor: themeColor, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, justifyContent: "center", flexDirection: "row" }}>
               
               <View style={{ flex: 0.5, alignItems: 'center', justifyContent: "center" }}>
-                <Text style={[styles.text, { color: "#fff" }]}>Profile</Text>
+                <Text style={[styles.text, { color: "#fff" ,fontSize:25,fontWeight:"bold"}]}>Profile</Text>
               </View>
               <TouchableOpacity style={{ flex: 0.5, marginLeft: 20, alignItems: "center", justifyContent: 'center' ,flexDirection:"row"}}
                 onPress={() => { this.setState({showModal:true})}}

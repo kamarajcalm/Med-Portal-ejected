@@ -364,16 +364,11 @@ class Appointments extends Component {
                         <StatusBar backgroundColor={themeColor} />
                               {/* HEADERS */}
                         <View style={{ height: height * 0.1, backgroundColor: themeColor, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, flexDirection: 'row', alignItems: "center" }}>
-                            <View style={{ flex: 0.2, alignItems: "center", justifyContent: 'center' }}
-
-                            >
-
-                            </View>
+                    
                             <View style={{ flex: 0.6, alignItems: "center", justifyContent: "center" }}>
-                                <Text style={[styles.text, { color: '#fff', marginLeft: 20, fontWeight: 'bold' ,fontSize:18}]}>Appoinments</Text>
+                                <Text style={[styles.text, { color: '#fff', marginLeft: 20, fontWeight: 'bold' ,fontSize:25}]}>Appoinments</Text>
                             </View>
-                            <View style={{ flex: 0.2 }}>
-                            </View>
+                           
                         </View>
                         <TabView
                             style={{ backgroundColor: "#ffffff" }}
