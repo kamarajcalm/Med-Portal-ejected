@@ -122,6 +122,20 @@ class ChatScreen extends Component {
  componentWillUnmount(){
   
  }
+    playAudio =async(uri)=>{
+        const source = { uri: uri }
+        const initialStatus = {}
+        const onPlaybackStatusUpdate = null
+       
+        const { sound } = await Audio.Sound.createAsync(
+            source,
+            initialStatus,
+            onPlaybackStatusUpdate,
+            
+        );
+        console.log('Playing Sound');
+        await sound.playAsync();
+    }
 
     showMessage =()=>{
         this.setState({showRecordMessage:true})
@@ -176,27 +190,20 @@ stopRecording =async()=>{
         var sendData = {
          
             bodyType: 'formData',
-            thread: this.state.item.groupPk,
             sender: this.props.user.id,
             msgType: 'voice',
             attachment:selectedFile,
             
         }
+        if (this.state.chatType == "clinic&pateint") {
+            console.log("jjjj")
+            sendData.clinicThread = this.state.item.groupPk
+        }
     //    console.log(sendData,"kkk")
       
         var data = await HttpsClient.post(url + '/api/prescription/chats/', sendData)
-        // console.log(data)
-        const source = { uri: uri }
-        const initialStatus ={}
-        const onPlaybackStatusUpdate = null
-        const { sound } = await Audio.Sound.createAsync(
-            source,
-            initialStatus,
-            onPlaybackStatusUpdate,
-            downloadFirst = true
-        );
-        console.log('Playing Sound');
-        await sound.playAsync();
+        console.log(data)
+   
     }catch(err){
              console.log(err)
     }
@@ -369,7 +376,7 @@ sendMessage =async()=>{
                                   
                                   <Text style={[styles.text]}>{item.message}</Text>
                                   <View style={{ alignSelf: "flex-end" }}>
-                                      <Text style={[styles.text, { color: "#fff", fontSize: 8 }]}>11:40 am</Text>
+                                      <Text style={[styles.text, { color: "#1f1f1f", fontSize: 8 }]}>{moment(item.created).format('hh:mm a')}</Text>
                                   </View>
                                   <View style={styles.leftArrow}></View>
 
@@ -397,8 +404,24 @@ sendMessage =async()=>{
                          )
                       
                       }
+                      if (item.msgType == "voice") {
+                          return (
+                              <View style={{ alignSelf: "flex-start", backgroundColor: '#eeee', padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
+                                  <Text>voice</Text>
+                                  <View style={{ alignSelf: "flex-end" }}>
+                                      <Text style={[styles.text, { color: "#1f1f1f", fontSize: 8 }]}>{moment(item?.created).format("hh:mm a")}</Text>
+                                  </View>
+                                  <View style={styles.leftArrow}></View>
+
+                                  <View style={styles.leftArrowOverlap}></View>
+                              </View>
+                          )
+
+
+                      }
                      
                   }
+             
                     //    if sender
                   if (item.msgType == "text") {
                   return(
@@ -418,6 +441,7 @@ sendMessage =async()=>{
                       return (
                           <View style={{ alignSelf: 'flex-end', backgroundColor: themeColor, padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
                               <Image
+                                  resizeMethod="scale"
                                   source={{ uri: item.attachment }}
                                   style={{ height: height * 0.15, width: width * 0.4, resizeMode: "contain" }}
                               />
@@ -431,6 +455,26 @@ sendMessage =async()=>{
                               <View style={styles.rightArrowOverlap}></View>
                           </View>
                       )
+
+                  }
+                  if (item.msgType == "voice") {
+                      
+                      return (
+                          <View style={{ alignSelf: "flex-end", backgroundColor: themeColor, padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
+                              <TouchableOpacity 
+                                  onPress={() => { this.playAudio(item.attachment)}}
+                              >
+                                  <Text style={[styles.text,{color:"#fff"}]}>Play</Text>
+                              </TouchableOpacity>
+                              <View style={{ alignSelf: "flex-end" }}>
+                                  <Text style={[styles.text, { color: "#fff", fontSize: 8 }]}>{moment(item?.created).format("hh:mm a")}</Text>
+                              </View>
+                              <View style={styles.rightArrow}></View>
+
+                              <View style={styles.rightArrowOverlap}></View>
+                          </View>
+                      )
+
 
                   }
               }}
