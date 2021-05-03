@@ -16,6 +16,7 @@ import { NavigationContainer, CommonActions } from '@react-navigation/native';
 import DoctorProfile from './DoctorProfile';
 import HttpsClient from '../api/HttpsClient';
 import ReceptionistsProfile from './ReceptionistsProfile';
+import PatientProfile from './PatientProfile';
 const DATA =["clinic 1","clinic 2","clinic3","clinic4"]
  class Profile extends Component {
   constructor(props) {
@@ -102,15 +103,15 @@ componentDidMount(){
                <Text style={[styles.text, { fontWeight: "bold", fontSize: 20 }]}>100</Text>
              </View>
              <TouchableOpacity style={{ alignItems: "center", justifyContent: "center" }}>
-               <Text style={[styles.text]}>Priscription balance</Text>
-               <View style={{ flexDirection: "row" }}>
-                 <Entypo name="wallet" size={24} color={themeColor} />
-                 <Text style={[styles.text, { fontWeight: "bold", fontSize: 20 }]}>250</Text>
+               <Text style={[styles.text]}>Priscription Valid Till</Text>
+               <View style={{ flexDirection: "row" ,marginTop:5}}>
+                 <Feather name="calendar" size={24} color={"gray"} />
+                 <Text style={[styles.text, { color:themeColor, fontSize: 20 }]}>11-10-2091</Text>
                </View>
 
              </TouchableOpacity>
            </View>
-           <DoctorProfile ClinicSelect={() => { this.ClinicSelect() }} />
+           <DoctorProfile ClinicSelect={() => { this.ClinicSelect() }} clinics ={this.state.clinics} />
          </>
        )
      }
@@ -123,10 +124,10 @@ componentDidMount(){
                <Text style={[styles.text, { fontWeight: "bold", fontSize: 20 }]}>100</Text>
              </View>
              <TouchableOpacity style={{ alignItems: "center", justifyContent: "center" }}>
-               <Text style={[styles.text]}>Priscription balance</Text>
-               <View style={{ flexDirection: "row" }}>
-                 <Entypo name="wallet" size={24} color={themeColor} />
-                 <Text style={[styles.text, { fontWeight: "bold", fontSize: 20 }]}>250</Text>
+               <Text style={[styles.text]}>Priscription Valid Till</Text>
+               <View style={{ flexDirection: "row", marginTop: 5 }}>
+                 <Feather name="calendar" size={24} color={"gray"} />
+                 <Text style={[styles.text, { color: themeColor, fontSize: 20 }]}>11-10-2091</Text>
                </View>
 
              </TouchableOpacity>
@@ -134,6 +135,14 @@ componentDidMount(){
            <ReceptionistsProfile />
          </>
        )
+     }
+     if(this.state.isPatient){
+       return(
+         <>
+           <PatientProfile />
+         </>
+       )
+    
      }
     
    }
@@ -163,27 +172,28 @@ componentDidMount(){
 
 
             <View style={{flex:1}}>
-                 <View style={{height:height*0.12,alignItems:"center",justifyContent:'center',flexDirection:"row"}}>
+                 <View style={{alignItems:"center",justifyContent:'center',flexDirection:"row",}}>
                   <View>
-                  <View style={{ alignItems: "center", justifyContent: "center" }}>
+                  <View style={{ alignItems: "center", justifyContent: "center" ,marginTop:20,flexDirection:"row",marginLeft:10}}>
                     <Image
                       source={{ uri: this.props.user.profile.displayPicture || "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
                       style={{ height: 60, width: 60, borderRadius: 30 }}
                     />
+                    <TouchableOpacity style={{}}
+                      onPress={() => { this.props.navigation.navigate('ProfileEdit') }}
+                    >
+                      <Entypo name="edit" size={20} color={themeColor} />
+                    </TouchableOpacity>
                   </View>
-                  <View style={{alignItems:'center',justifyContent:"center"}}>
-                    <Text style={[styles.text]}>{this.props.user.first_name}</Text>
+                  <View style={{alignItems:'center',justifyContent:"center",marginTop:20}}>
+                    <Text style={[styles.text,{fontWeight:"bold",fontSize:18}]}>{this.props.user.first_name}</Text>
                   </View>
                   </View>
                         
 
                    
                     
-                <TouchableOpacity style={{}}
-                  onPress={() => { this.props.navigation.navigate('ProfileEdit') }}
-                >
-                  <Entypo name="edit" size={20} color={themeColor} />
-                </TouchableOpacity>
+            
                
                  </View>
                                {/* STATISTICS */}
@@ -195,6 +205,7 @@ componentDidMount(){
                          {/* Modal */}
                   <View>
                     <Modal
+                       statusBarTranslucent={true}
                        deviceHeight ={screenHeight}
                          animationIn="slideInUp"
                          animationOut="slideOutDown"
@@ -222,6 +233,7 @@ componentDidMount(){
                         </View>
                       </Modal>
               <Modal
+                statusBarTranslucent={true}
                 deviceHeight ={screenHeight}
                 animationIn="slideInUp"
                 animationOut="slideOutDown"

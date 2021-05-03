@@ -354,6 +354,9 @@ sendMessage =async()=>{
       if (this.props.user.profile.occupation == "Doctor") {
           chatTitle = this.state.item.doctortitle
       }
+      if (this.props.user.profile.occupation == "ClinicRecoptionist") {
+          chatTitle = this.state.item.clinictitle
+      }
 //  console.log(this.props.user)
     return (
           <>

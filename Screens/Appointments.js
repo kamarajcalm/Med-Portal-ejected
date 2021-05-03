@@ -238,11 +238,13 @@ class Appointments extends Component {
               keyExtractor ={(item,index)=>index.toString()}
               renderItem ={({item,index})=>{
              
-                     if (this.props.user.profile.occupation != "Doctor") {
-                    let dp =null
-                    if (item.doctordetails.dp){
-                        dp = `${url}${item.doctordetails.dp}`
-                    }
+            if (this.props.user.profile.occupation == "Customer") {
+              
+                            let dp =null
+                            if (item.doctordetails.dp){
+                                dp = `${url}${item.doctordetails.dp}`
+                            }
+               
                 return(
                     <TouchableOpacity
                         onPress={() => { this.viewAppoinments(item) }}
@@ -407,7 +409,7 @@ class Appointments extends Component {
                 data={this.state.appoinments2}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item, index }) => {
-                    if (this.props.user.profile.occupation != "Doctor") {
+                    if (this.props.user.profile.occupation == "Customer") {
                         let dp = null
                         if (item.doctordetails.dp) {
                             dp = `${url}${item.doctordetails.dp}`

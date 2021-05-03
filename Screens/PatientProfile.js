@@ -12,7 +12,7 @@ import { connect } from 'react-redux';
 import { selectTheme, selectClinic } from '../actions';
 import { NavigationContainer, CommonActions } from '@react-navigation/native';
 
-class ReceptionistsProfile extends Component {
+class PatientProfile extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -28,7 +28,7 @@ class ReceptionistsProfile extends Component {
     render() {
         return (
             <ScrollView style={{}}
-                contentContainerStyle={{ paddingBottom: 90 }}
+                contentContainerStyle={{ paddingBottom: 90 ,marginTop:20}}
             >
                 <View style={{ marginHorizontal: 10 }}>
 
@@ -49,10 +49,22 @@ class ReceptionistsProfile extends Component {
 
                         >
                             <View style={{ flex: 0.5, justifyContent: "center" }}>
-                                <Text style={[styles.text, { fontWeight: "bold", color: "#fff", marginLeft: 10 }]}>Qualification:</Text>
+                                <Text style={[styles.text, { fontWeight: "bold", color: "#fff", marginLeft: 10 }]}>height:</Text>
                             </View>
                             <View style={{ flex: 0.5, alignItems: 'flex-end', marginRight: 10, justifyContent: "center" }}>
-                                <Text style={[styles.text, { color: "#fff" }]}>{this.props.user.profile.qualification}</Text>
+                                <Text style={[styles.text, { color: "#fff" }]}>{this.props.user.profile?.height}</Text>
+                            </View>
+
+
+                        </View>
+                        <View style={{ flexDirection: "row", minHeight: height * 0.05, borderBottomColor: "#fff", borderBottomWidth: 0.185 }}
+
+                        >
+                            <View style={{ flex: 0.5, justifyContent: "center" }}>
+                                <Text style={[styles.text, { fontWeight: "bold", color: "#fff", marginLeft: 10 }]}>Weight:</Text>
+                            </View>
+                            <View style={{ flex: 0.5, alignItems: 'flex-end', marginRight: 10, justifyContent: "center" }}>
+                                <Text style={[styles.text, { color: "#fff" }]}>{this.props.user.profile?.weight}</Text>
                             </View>
 
 
@@ -69,10 +81,26 @@ class ReceptionistsProfile extends Component {
 
 
                         </View>
+                        <View style={{ flexDirection: "row", minHeight: height * 0.05, borderBottomColor: "#fff", borderBottomWidth: 0.185 }}
+
+                        >
+                            <View style={{ flex: 0.5, justifyContent: "center" }}>
+                                <Text style={[styles.text, { fontWeight: "bold", color: "#fff", marginLeft: 10 }]}>Blood Group:</Text>
+                            </View>
+                            <View style={{ flex: 0.5, alignItems: 'flex-end', marginRight: 10, justifyContent: "center" }}>
+                                <Text style={[styles.text, { color: "#fff" }]}>{this.props.user.profile?.bloodGroup}</Text>
+                            </View>
+
+
+                        </View>
                     </View>
 
                 </View>
-
+                 <View style={{margin:10}}>
+                    <View style={{ marginVertical: 10 }}>
+                        <Text style={[styles.text, { fontWeight: "bold", }]}>Medical Conditions</Text>
+                    </View>
+                 </View>
                 <View style={{ margin: 10 }}>
                     <View style={{ marginVertical: 10 }}>
                         <Text style={[styles.text, { fontWeight: "bold", }]}>Address</Text>
@@ -136,47 +164,7 @@ class ReceptionistsProfile extends Component {
 
                 </View>
 
-                <View style={{ margin: 10 }}>
-                    <View style={{ marginVertical: 10 }}>
-                        <Text style={[styles.text, { fontWeight: "bold", }]}>Clinic List</Text>
-                    </View>
-
-                    <FlatList
-                        data={this.props.clinics}
-                        keyExtractor={(item, index) => index.toString()}
-                        renderItem={({ item, index }) => {
-                            console.log(item)
-                            return (
-                                <View style={{ backgroundColor: "gray", borderRadius: 10 }}>
-                                    <TouchableOpacity style={{ flexDirection: "row", minHeight: height * 0.05, borderBottomColor: "#fff", borderBottomWidth: 0.185 }}
-                                        onPress={() => { this.props.ClinicSelect() }}
-                                    >
-                                        <View style={{ flex: 0.5, justifyContent: "center" }}>
-                                            <Text style={[styles.text, { fontWeight: "bold", color: "#fff", marginLeft: 10 }]}>{item.name}</Text>
-                                        </View>
-                                        <View style={{ flex: 0.5, alignItems: 'flex-end', marginRight: 10, justifyContent: "center" }}>
-                                            <AntDesign name="rightcircleo" size={24} color="#fff" />
-                                        </View>
-
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={{ flexDirection: "row", minHeight: height * 0.05, }}
-                                        onPress={() => { this.props.ClinicSelect() }}
-                                    >
-                                        <View style={{ flex: 0.5, justifyContent: "center" }}>
-                                            <Text style={[styles.text, { fontWeight: "bold", color: "#fff", marginLeft: 10 }]}>Change Clinic</Text>
-                                        </View>
-                                        <View style={{ flex: 0.5, alignItems: 'flex-end', marginRight: 10, justifyContent: "center" }}>
-                                            <AntDesign name="rightcircleo" size={24} color="#fff" />
-                                        </View>
-
-                                    </TouchableOpacity>
-                                </View>
-
-                            )
-                        }}
-                    />
-
-                </View>
+         
 
             </ScrollView>
         );
@@ -204,4 +192,4 @@ const mapStateToProps = (state) => {
         clinic: state.selectedClinic
     }
 }
-export default connect(mapStateToProps, { selectTheme, selectClinic })(ReceptionistsProfile)
+export default connect(mapStateToProps, { selectTheme, selectClinic })(PatientProfile)

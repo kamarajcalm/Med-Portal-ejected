@@ -138,7 +138,8 @@ if(type=="clinic"){
       doctortitle: item.title||"doctor"
     }
   }
- 
+
+
   this.props.navigation.navigate('ChatScreen', { item: itemArrange })
 }
    renderScene = SceneMap({
@@ -191,7 +192,7 @@ if(type=="clinic"){
             renderItem={({ item, index }) => {
               return (
                 <TouchableOpacity style={{ height: height * 0.1, backgroundColor: "#fafafa", marginTop: 1, flexDirection: 'row' }}
-                  onPress={() => { this.navigate(item, "doctor") }}
+                  onPress={() => { this.navigate(item, "clinic") }}
                 >
                   <View style={{ flex: 0.3, alignItems: "center", justifyContent: "center" }}>
                     <Image
