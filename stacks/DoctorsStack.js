@@ -20,7 +20,7 @@ export default class DoctorsStack extends Component {
             <Stack.Screen name="Doctors" component={Doctors} options={{ headerShown: false }} />
             <Stack.Screen name="SearchDoctors" component={SearchDoctors} options={{ headerShown: false }} />
             <Stack.Screen name="ProfileView" component={ProfileView} options={{ headerShown: false }} />
-            <Stack.Screen name="Chat" component={ChatScreen} options={{ headerShown: false }} />
+           
         <Stack.Screen name="MakeAppoinment" component={MakeAppoinment} options={{ headerShown: false }} />
         </Stack.Navigator>
     );

@@ -71,8 +71,9 @@ class ChatScreen extends Component {
     // console.log(sendd,"hhh"),
     // client.send(sendd)
     };
-    getChatMessage =async()=>{
-        let api =`${url }/api/prescription/chats/?thread=${this.state.item.groupPk}`
+    getChatMessage =async(type)=>{
+        let api =`${url }/api/prescription/chats/?${type}=${this.state.item.groupPk}`
+        console.log(api)
         const data = await HttpsClient.get(api)
         if(data.type =="success"){
             this.setState({Messages:data.data})
@@ -98,24 +99,37 @@ class ChatScreen extends Component {
        
     }
     validateChat =()=>{
-        console.log(this.props.user.profile.occupation,"ooo")
+        console.log(this.props.user.profile.occupation,"ooo",this.state.item,"iii")
         //   TWO CHATS 1.doctor&patient && 2clinic&pateint
         if (this.props.user.profile.occupation=="Customer"){
          if (this.state.item.clinictitle) {
-             return this.setState({ chatType: "clinic&pateint" })
+             return this.setState({ chatType: "clinic&pateint" },()=>{
+                 this.getChatMessage("clinicThread")
+             })
          }
          if (this.state.item.doctortitle) {
-             return this.setState({ chatType: "doctor&pateint" })
+            
+             return this.setState({ chatType: "doctor&pateint" },()=>{
+                 this.getChatMessage('doctorThread')
+             }
+             
+             )
          }
         } else if (this.props.user.profile.occupation == "ClinicRecoptionist"){
-         return this.setState({ chatType: "clinic&pateint" })
-     }
+         return this.setState({ chatType: "clinic&pateint" },()=>{
+             this.getChatMessage("clinicThread")
+         })
+        } else if (this.props.user.profile.occupation == "Doctor"){
+            return this.setState({ chatType: "doctor&pateint" }, () => {
+                this.getChatMessage("doctorThread")
+            })
+        }
         
     }
   componentDidMount(){
     
       this.validateChat()
-   this.getChatMessage()
+  
 
   
   }
@@ -196,8 +210,10 @@ stopRecording =async()=>{
             
         }
         if (this.state.chatType == "clinic&pateint") {
-            console.log("jjjj")
             sendData.clinicThread = this.state.item.groupPk
+        }
+        if (this.state.chatType == "doctor&pateint") { 
+            sendData.doctorThread = this.state.item.groupPk
         }
     //    console.log(sendData,"kkk")
       
@@ -241,6 +257,10 @@ sendMessage =async()=>{
     if (this.state.chatType == "clinic&pateint"){
         console.log("jjjj")
         sendData.clinicThread= this.state.item.groupPk
+    }
+    if (this.state.chatType == "doctor&pateint") {
+     
+        sendData.doctorThread = this.state.item.groupPk
     }
     if (this.state.selectedFile != null) {
         sendData.attachment = this.state.selectedFile
@@ -331,6 +351,9 @@ sendMessage =async()=>{
       if (this.props.user.profile.occupation =="Customer"){
           chatTitle =this.state.item.clinictitle||this.state.item.doctortitle
       }
+      if (this.props.user.profile.occupation == "Doctor") {
+          chatTitle = this.state.item.doctortitle
+      }
 //  console.log(this.props.user)
     return (
           <>
@@ -344,7 +367,7 @@ sendMessage =async()=>{
                 >
                     <Ionicons name="chevron-back-circle" size={30} color="#fff" />
                 </TouchableOpacity>
-                <View style={{ flex: 0.5, alignItems: "center", justifyContent: "center",flexDirection:"row" }}>
+                <View style={{ flex: 0.8,flexDirection:"row" }}>
                   
                         <Image
                             source={{ uri: "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
@@ -352,11 +375,12 @@ sendMessage =async()=>{
                             
                         />
                  
-                      
-                    <Text style={[styles.text, { color: '#fff', marginLeft: 20, fontWeight: 'bold' ,fontSize:20}]}>{chatTitle}</Text>
+                      <View style={{alignItems:"center",justifyContent:"center"}}>
+                                <Text style={[styles.text, { color: '#fff', marginLeft: 20, fontWeight: 'bold', fontSize: 20 }]}>{chatTitle}</Text>
+
+                      </View>
                 </View>
-                <View style={{ flex: 0.2 }}>
-                </View>
+             
             </View>
             <FlatList
               contentContainerStyle={{paddingBottom:20}} 
@@ -407,13 +431,20 @@ sendMessage =async()=>{
                       if (item.msgType == "voice") {
                           return (
                               <View style={{ alignSelf: "flex-start", backgroundColor: '#eeee', padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
+                                 <TouchableOpacity
+                                      onPress={() => { this.playAudio(item.attachment) }}
+                                 >
+
+                                
                                   <Text>voice</Text>
                                   <View style={{ alignSelf: "flex-end" }}>
                                       <Text style={[styles.text, { color: "#1f1f1f", fontSize: 8 }]}>{moment(item?.created).format("hh:mm a")}</Text>
                                   </View>
+                                  </TouchableOpacity>
                                   <View style={styles.leftArrow}></View>
 
                                   <View style={styles.leftArrowOverlap}></View>
+                           
                               </View>
                           )
 

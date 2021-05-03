@@ -7,6 +7,7 @@ const { height, width } = Dimensions.get("window");
 import { Ionicons } from '@expo/vector-icons';
 const fontFamily = settings.fontFamily;
 const themeColor = settings.themeColor;
+const screenHeight =Dimensions.get("screen").height;
 import Modal from 'react-native-modal';
 import DateTimePicker from '@react-native-community/datetimepicker';
 const initialLayout = { width: Dimensions.get('window').width };
@@ -19,7 +20,7 @@ const url = settings.url
 class Appointments extends Component {
     constructor(props) {
         const routes = [
-            { key: 'New Appoinments', title: 'New Appoinments' },
+            { key: 'NewAppoinments', title: 'New Appoinments' },
             { key: 'Completed', title: 'Completed'},
 
         ];
@@ -33,7 +34,8 @@ class Appointments extends Component {
             show: false,
             appoinments:[],
             selectedAppointment:null,
-            selectedIndex:null
+            selectedIndex:null,
+            appoinments2:[]
         };
     }
     getAppointments2 = async () => {
@@ -53,21 +55,21 @@ class Appointments extends Component {
         if (data.type == "success") {
             let appoinments = this.state.appoinments
 
-            this.setState({ appoinments: data.data })
+            this.setState({ appoinments2: data.data })
         }
     }
     getAppointments =async()=>{
         let api =""
         if (this.props.user.profile.occupation == "Doctor") {
-            api = `${url}/api/prescription/appointments/?doctor=${this.props.user.id}&status=Pending&status=Accepted`
+            api = `${url}/api/prescription/appointments/?doctor=${this.props.user.id}&pending=true&accepted=true`
         } else if (this.props.user.profile.occupation == "ClinicRecoptionist"){
-            api = `${url}/api/prescription/appointments/?clinic=${this.props.user.profile.recopinistclinics[0].clinicpk}&status=Pending&status=Accepted`
+            api = `${url}/api/prescription/appointments/?clinic=${this.props.user.profile.recopinistclinics[0].clinicpk}&pending=true&accepted=true`
         }
         else{
-            api = `${url}/api/prescription/appointments/?requesteduser=${this.props.user.id}`
+            api = `${url}/api/prescription/appointments/?requesteduser=${this.props.user.id}&pending=true&accepted=true`
         }
-   
-        const data =await HttpsClient.get(api)
+        console.log(api)
+        const data =await HttpsClient.get(api,"lll")
         console.log(data)
         if(data.type =="success"){
             let appoinments= this.state.appoinments
@@ -101,10 +103,12 @@ class Appointments extends Component {
     }
     componentDidMount() {
         
-      this.getAppointments()
+      this.getAppointments();
+      this.getAppointments2();
         this._unsubscribe = this.props.navigation.addListener('focus', () => {
             
-                this.getAppointments()
+                this.getAppointments();
+                this.getAppointments2();
             
 
         });
@@ -160,6 +164,7 @@ class Appointments extends Component {
             duplicate.splice(this.state.selectedIndex,1)
             Toast.show("Completed SuccessFully")
             this.setState({ modal: false, appoinments: duplicate })
+            this.getAppointments2();
         } else {
             Toast.show("Try again")
             this.setState({ modal: false })
@@ -177,23 +182,84 @@ class Appointments extends Component {
         }
 
     }
-    renderScene = (routes) => {
-
-        return(<FlatList 
-            data ={this.state.appoinments}
-            keyExtractor ={(item,index)=>index.toString()}
-            renderItem ={({item,index})=>{
-
-                
-                if (this.props.user.profile.occupation !="Doctor"){
+    validateInformation =(item)=>{
+        if (item.status =="Pending"){
+            return(
+                <View >
+                    <View style={{flexDirection:"row",marginTop:5}}>
+                        <Text style={[styles.text, { color: "gray" }]}>Requseted date:</Text>
+                        <Text style={[styles.text, ]}>{item.requesteddate}</Text>
+                    </View>
+                    <View style={{flexDirection:'row',marginTop:5}}>
+                        <Text style={[styles.text, { color: "gray" }]}>Requseted Time:</Text>
+                        <Text style={[styles.text, ]}>{item.requestedtime}</Text>
+                    </View>
+                </View>
+            )
+        }
+        if (item.status == "Accepted") {
+            return (
+                <View >
+                    <View style={{ flexDirection: "row", marginTop: 5 }}>
+                        <Text style={[styles.text, { color: "gray" }]}>Accepted date:</Text>
+                        <Text style={[styles.text,]}>{item.accepteddate}</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', marginTop: 5 }}>
+                        <Text style={[styles.text, { color: "gray" }]}>Accepted Time:</Text>
+                        <Text style={[styles.text,]}>{item.acceptedtime}</Text>
+                    </View>
+                </View>
+            )
+        }
+    }
+    viewAppoinments =(item)=>{
+        if(this.props.user.profile.occupation =="Customer"){
+            this.props.navigation.navigate('ViewAppoinment',{item})
+        }
+    }
+    validateColor =(status)=>{
+        if(status =="Completed"){
+            return "green"
+        }
+        if (status == "Accepted") {
+            return "green"
+        }
+        if (status == "Pending") {
+            return "orange"
+        }
+        if (status == "Rejected") {
+            return "red"
+        }
+    }
+    FirstRoute =()=>{
+        return(
+            <FlatList 
+              data={this.state.appoinments}
+              keyExtractor ={(item,index)=>index.toString()}
+              renderItem ={({item,index})=>{
+             
+                     if (this.props.user.profile.occupation != "Doctor") {
+                    let dp =null
+                    if (item.doctordetails.dp){
+                        dp = `${url}${item.doctordetails.dp}`
+                    }
                 return(
-                    <View
-                        style={{
+                    <TouchableOpacity
+                        onPress={() => { this.viewAppoinments(item) }}
+                      style={{
                             marginTop: 10,
                             minHeight: height * 0.1,
                             backgroundColor: "#eee",
                             marginHorizontal: 10,
                             borderRadius: 10,
+                      }}
+                    >
+
+                 
+                    <View
+              
+                        style={{
+                           
                             flexDirection: "row"
                         }}
 
@@ -202,7 +268,7 @@ class Appointments extends Component {
                             onPress={() => { this.props.navigation.navigate('ProfileView') }}
                         >
                             <Image
-                                source={{ uri: item.doctordetails.dp||"https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
+                                source={{ uri: dp||"https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
                                 style={{ height: 60, width: 60, borderRadius: 30 }}
                             />
                         </TouchableOpacity>
@@ -216,22 +282,47 @@ class Appointments extends Component {
                         <View style={{ flex: 0.4, flexDirection: "row", alignItems: "center", justifyContent: 'center' }}>
                             <View style={{ alignItems: 'center', justifyContent: "center" }}>
                                 <Text style={[styles.text]}>Status:</Text>
-                                <Text style={[styles.text]}>{item.status}</Text>
+                                <Text style={[styles.text,{color:this.validateColor(item.status)}]}>{item.status}</Text>
                             </View>
-                     
-                        </View>
-                    </View>
 
+                        </View>
+
+                    </View>
+                        <View style={{
+                            margin: 10,
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexDirection: "row"
+                        }}>
+                            <View style={{ flex: 0.5 }}>
+                                       
+                            </View>
+                            <View style={{ flex: 0.5 }}>
+                                {
+                                    this.validateInformation(item)
+                                }
+                            </View>
+
+
+                        </View>
+                    </TouchableOpacity>
                 )
                 }else{
                     return(
-                        <View
-                            style={{
+                        <View 
+                         style={{
                                 marginTop: 10,
                                 minHeight: height * 0.1,
                                 backgroundColor: "#eee",
                                 marginHorizontal: 10,
                                 borderRadius: 10,
+                         }}
+                        >
+
+                 
+                        <View
+                            style={{
+                               
                                 flexDirection: "row"
                             }}
 
@@ -249,32 +340,28 @@ class Appointments extends Component {
                                 <Text style={[styles.text]}>{item.patientname.mobile}</Text>
                             </View>
 
-                       
+
 
                             <View style={{ flex: 0.4, flexDirection: "row", alignItems: "center", justifyContent: 'center' }}>
                                    {/* this */}
-                                {item.status != "Completed"  ? 
-                                
-                                
+                              
+
+
                                 <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
-                                    
+
                                     {item.status =="Pending"?<TouchableOpacity style={{ height: height * 0.05, width: "80%", borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: "#32CD32" }}
                                         onPress={() => { this.setState({ modal: true, selectedAppointment:item,selectedIndex:index})}}
                         >
                             <Text style={[styles.text, { color: "#fff" }]}>Accept</Text>
-                                    </TouchableOpacity> : <TouchableOpacity style={{ height: height * 0.05, width: "70%", borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: "#32CD32"  }}
+                                    </TouchableOpacity> : <TouchableOpacity style={{ height: height * 0.05, width: "70%", borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: "orange"  }}
                                             onPress={() => { this.setState({  selectedAppointment: item, selectedIndex: index },()=>{
                                                 this.completeAppointment()
                                             }) }}
                                     >
                                         <Text style={[styles.text, { color: "#fff" }]}>finish</Text>
                                     </TouchableOpacity>}
-                                </View> :
-                                // or
-                                <View style={{ alignItems: 'center', justifyContent: "center" }}>
-                                    <Text style={[styles.text]}>Status:</Text>
-                                    <Text style={[styles.text]}>{item.status}</Text>
-                                </View>}
+                                </View> 
+                              
                                 {item.status != "Completed" && <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
                                     <TouchableOpacity style={{ height: height * 0.05, width: "80%", borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: "#B22222" }}
                                         onPress={() => {
@@ -287,28 +374,264 @@ class Appointments extends Component {
                         </TouchableOpacity>
                     </View>}
                             </View>
+                            
+                        </View>
+                        <View style ={{
+                            margin:10,
+                            alignItems:"center",
+                            justifyContent:"center",
+                            flexDirection:"row"
+                        }}>
+                            <View style={{flex:0.5}}>
+
+                            </View>
+                            <View style={{flex:0.5}}>
+                                    {
+                                        this.validateInformation(item)
+                                    }
+                            </View>
+                       
+                        
+                        </View>
                         </View>
                     )
                 }
-            }}
-        />
-               
+                 
+              }} 
+            />
         )
     }
+    SecondRoute =()=>{
+        return(
+            <FlatList
+                data={this.state.appoinments2}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item, index }) => {
+                    if (this.props.user.profile.occupation != "Doctor") {
+                        let dp = null
+                        if (item.doctordetails.dp) {
+                            dp = `${url}${item.doctordetails.dp}`
+                        }
+                        return (
+                            <TouchableOpacity
+                                style={{
+                                    marginTop: 10,
+                                    minHeight: height * 0.1,
+                                    backgroundColor: "#eee",
+                                    marginHorizontal: 10,
+                                    borderRadius: 10,
+                                    flexDirection: "row"
+                                }}
+
+                            >
+                                <TouchableOpacity style={{ flex: 0.2, alignItems: "center", justifyContent: 'center' }}
+                                    onPress={() => { this.props.navigation.navigate('ProfileView') }}
+                                >
+                                    <Image
+                                        source={{ uri: dp || "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
+                                        style={{ height: 60, width: 60, borderRadius: 30 }}
+                                    />
+                                </TouchableOpacity>
+                                <View style={{ flex: 0.4, justifyContent: "space-around", alignItems: "center", }}>
+                                    <Text style={[styles.text]}>{item.doctordetails.name}</Text>
+                                    <Text style={[styles.text]}>{item.clinicname}</Text>
+                                </View>
+
+                                {/* TABS */}
+
+                                <View style={{ flex: 0.4, flexDirection: "row", alignItems: "center", justifyContent: 'center' }}>
+                                    <View style={{ alignItems: 'center', justifyContent: "center" }}>
+                                        <Text style={[styles.text]}>Status:</Text>
+                                        <Text style={[styles.text, { color: this.validateColor(item.status) }]}>{item.status}</Text>
+                                    </View>
+
+                                </View>
+                            </TouchableOpacity>
+
+                        )
+                    } else {
+                        return (
+                            <View
+                                style={{
+                                    marginTop: 10,
+                                    minHeight: height * 0.1,
+                                    backgroundColor: "#eee",
+                                    marginHorizontal: 10,
+                                    borderRadius: 10,
+                                    flexDirection: "row"
+                                }}
+
+                            >
+                                <TouchableOpacity style={{ flex: 0.2, alignItems: "center", justifyContent: 'center' }}
+                                    onPress={() => { this.props.navigation.navigate('ProfileView') }}
+                                >
+                                    <Image
+                                        source={{ uri: item.patientname.dp || "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
+                                        style={{ height: 60, width: 60, borderRadius: 30 }}
+                                    />
+                                </TouchableOpacity>
+                                <View style={{ flex: 0.4, justifyContent: "space-around", alignItems: "center", }}>
+                                    <Text style={[styles.text]}>{item.patientname.name}</Text>
+                                    <Text style={[styles.text]}>{item.patientname.mobile}</Text>
+                                </View>
+
+
+
+                                <View style={{ flex: 0.4, flexDirection: "row", alignItems: "center", justifyContent: 'center' }}>
+                                   
+                                <View style={{ alignItems: 'center', justifyContent: "center" }}>
+                                        <Text style={[styles.text]}>Status:</Text>
+                                        <Text style={[styles.text]}>{item.status}</Text>
+                                    </View>
+                                </View>
+                            </View>
+                        )
+                    }
+                }}
+            />
+        )
+       
+    }
+    renderScene = SceneMap({
+        NewAppoinments: this.FirstRoute,
+        Completed: this.SecondRoute,
+    });
+    // renderScene = (routes) => {
+
+    //     return(<FlatList 
+    //         data ={this.state.appoinments}
+    //         keyExtractor ={(item,index)=>index.toString()}
+    //         renderItem ={({item,index})=>{
+
+                
+    //             if (this.props.user.profile.occupation !="Doctor"){
+    //                 let dp =null
+    //                 if (item.doctordetails.dp){
+    //                     dp = `${url}${item.doctordetails.dp}`
+    //                 }
+    //             return(
+    //                 <View
+    //                     style={{
+    //                         marginTop: 10,
+    //                         minHeight: height * 0.1,
+    //                         backgroundColor: "#eee",
+    //                         marginHorizontal: 10,
+    //                         borderRadius: 10,
+    //                         flexDirection: "row"
+    //                     }}
+
+    //                 >
+    //                     <TouchableOpacity style={{ flex: 0.2, alignItems: "center", justifyContent: 'center' }}
+    //                         onPress={() => { this.props.navigation.navigate('ProfileView') }}
+    //                     >
+    //                         <Image
+    //                             source={{ uri: dp||"https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
+    //                             style={{ height: 60, width: 60, borderRadius: 30 }}
+    //                         />
+    //                     </TouchableOpacity>
+    //                     <View style={{ flex: 0.4, justifyContent: "space-around", alignItems: "center", }}>
+    //                         <Text style={[styles.text]}>{item.doctordetails.name}</Text>
+    //                         <Text style={[styles.text]}>{item.clinicname}</Text>
+    //                     </View>
+
+    //                     {/* TABS */}
+
+    //                     <View style={{ flex: 0.4, flexDirection: "row", alignItems: "center", justifyContent: 'center' }}>
+    //                         <View style={{ alignItems: 'center', justifyContent: "center" }}>
+    //                             <Text style={[styles.text]}>Status:</Text>
+    //                             <Text style={[styles.text]}>{item.status}</Text>
+    //                         </View>
+                     
+    //                     </View>
+    //                 </View>
+
+    //             )
+    //             }else{
+    //                 return(
+    //                     <View
+    //                         style={{
+    //                             marginTop: 10,
+    //                             minHeight: height * 0.1,
+    //                             backgroundColor: "#eee",
+    //                             marginHorizontal: 10,
+    //                             borderRadius: 10,
+    //                             flexDirection: "row"
+    //                         }}
+
+    //                     >
+    //                         <TouchableOpacity style={{ flex: 0.2, alignItems: "center", justifyContent: 'center' }}
+    //                             onPress={() => { this.props.navigation.navigate('ProfileView') }}
+    //                         >
+    //                             <Image
+    //                                 source={{ uri: item.patientname.dp || "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
+    //                                 style={{ height: 60, width: 60, borderRadius: 30 }}
+    //                             />
+    //                         </TouchableOpacity>
+    //                         <View style={{ flex: 0.4, justifyContent: "space-around", alignItems: "center", }}>
+    //                             <Text style={[styles.text]}>{item.patientname.name}</Text>
+    //                             <Text style={[styles.text]}>{item.patientname.mobile}</Text>
+    //                         </View>
+
+                       
+
+    //                         <View style={{ flex: 0.4, flexDirection: "row", alignItems: "center", justifyContent: 'center' }}>
+    //                                {/* this */}
+    //                             {item.status != "Completed"  ? 
+                                
+                                
+    //                             <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
+                                    
+    //                                 {item.status =="Pending"?<TouchableOpacity style={{ height: height * 0.05, width: "80%", borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: "#32CD32" }}
+    //                                     onPress={() => { this.setState({ modal: true, selectedAppointment:item,selectedIndex:index})}}
+    //                     >
+    //                         <Text style={[styles.text, { color: "#fff" }]}>Accept</Text>
+    //                                 </TouchableOpacity> : <TouchableOpacity style={{ height: height * 0.05, width: "70%", borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: "#32CD32"  }}
+    //                                         onPress={() => { this.setState({  selectedAppointment: item, selectedIndex: index },()=>{
+    //                                             this.completeAppointment()
+    //                                         }) }}
+    //                                 >
+    //                                     <Text style={[styles.text, { color: "#fff" }]}>finish</Text>
+    //                                 </TouchableOpacity>}
+    //                             </View> :
+    //                             // or
+    //                             <View style={{ alignItems: 'center', justifyContent: "center" }}>
+    //                                 <Text style={[styles.text]}>Status:</Text>
+    //                                 <Text style={[styles.text]}>{item.status}</Text>
+    //                             </View>}
+    //                             {item.status != "Completed" && <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
+    //                                 <TouchableOpacity style={{ height: height * 0.05, width: "80%", borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: "#B22222" }}
+    //                                     onPress={() => {
+    //                                         this.setState({ selectedAppointment: item, selectedIndex: index }, () => {
+    //                                             this.RejectAppointment()
+    //                                         })
+    //                                     }}
+    //                     >
+    //                         <Text style={[styles.text, { color: "#fff" }]}>Reject</Text>
+    //                     </TouchableOpacity>
+    //                 </View>}
+    //                         </View>
+    //                     </View>
+    //                 )
+    //             }
+    //         }}
+    //     />
+               
+    //     )
+    // }
     indexChange = async (index,) => {
-           if(index == 0){
-             this.getAppointments()
-           }
-           if(index == 1){
-               this.getAppointments2()
-           }
+        //    if(index == 0){
+        //      this.getAppointments()
+        //    }
+        //    if(index == 1){
+        //        this.getAppointments2()
+        //    }
             this.setState({ index })
         
     }
     Modal =()=>{
         return(
             <Modal 
-            
+                deviceHeight={screenHeight}
               isVisible={this.state.modal}
               onBackdropPress={()=>{this.setState({modal:false})}}
             >

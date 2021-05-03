@@ -38,8 +38,9 @@ const url = settings.url;
      }
      SearchMedicines =async(query)=>{
       let api= `${url}/api/prescription/medicines/?name=${query}`
-      console.log
+   
       const data = await HttpsClient.get(api);
+      console.log(data,"kjkjkk")
         if(data.type=="success"){
              this.setState({medicines:data.data})
         }

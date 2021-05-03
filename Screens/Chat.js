@@ -98,7 +98,7 @@ componentDidMount(){
          renderItem={({ item, index }) => {
            return (
              <TouchableOpacity style={{ height: height * 0.1, backgroundColor: "#fafafa", marginTop: 1, flexDirection: 'row' }}
-               onPress={() => { this.navigate(item, "clinic") }}
+               onPress={() => { this.navigate(item, "doctor") }}
              >
                <View style={{ flex: 0.3, alignItems: "center", justifyContent: "center" }}>
                  <Image
@@ -135,9 +135,10 @@ if(type=="clinic"){
     itemArrange = {
       groupPk: item.threadpk,
       uid: item.uid,
-      doctortitle: item.title
+      doctortitle: item.title||"doctor"
     }
   }
+ 
   this.props.navigation.navigate('ChatScreen', { item: itemArrange })
 }
    renderScene = SceneMap({
@@ -213,6 +214,42 @@ if(type=="clinic"){
             }}
           />
         )
+     }
+     if (this.props.user.profile.occupation == "Doctor"){
+       return(
+         <FlatList
+           contentContainerStyle={{ paddingBottom: 90 }}
+
+           data={this.state.chats}
+
+           keyExtractor={(item, index) => index.toString()}
+
+           renderItem={({ item, index }) => {
+             return (
+               <TouchableOpacity style={{ height: height * 0.1, backgroundColor: "#fafafa", marginTop: 1, flexDirection: 'row' }}
+                 onPress={() => { this.navigate(item, "doctor") }}
+               >
+                 <View style={{ flex: 0.3, alignItems: "center", justifyContent: "center" }}>
+                   <Image
+                     source={{
+                       uri: item.dp || "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"
+                     }}
+                     style={{ height: 60, width: 60, borderRadius: 30, }}
+                   />
+                 </View>
+                 <View style={{ flex: 0.7, }}>
+                   <View style={{ flex: 0.4, justifyContent: "center" }}>
+                     <Text style={[styles.text, { fontWeight: 'bold', fontSize: 16 }]}>{item.title}</Text>
+                   </View>
+                   <View style={{ flex: 0.6, }}>
+                     <Text style={[styles.text]}>{item.lastmsg}</Text>
+                   </View>
+                 </View>
+               </TouchableOpacity>
+             )
+           }}
+         />
+       )
      }
    }
   render() {

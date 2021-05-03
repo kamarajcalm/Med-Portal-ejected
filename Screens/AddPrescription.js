@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Dimensions, TextInput, TouchableOpacity, Image, SafeAreaView, ToastAndroid, Modal, Pressable, ActivityIndicator} from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TextInput, TouchableOpacity, Image, SafeAreaView, ToastAndroid, Pressable, ActivityIndicator} from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { connect } from 'react-redux';
 import { selectTheme } from '../actions';
@@ -9,7 +9,9 @@ import { Ionicons } from '@expo/vector-icons';
 const { height ,width} = Dimensions.get("window");
 const fontFamily =settings.fontFamily;
 const themeColor=settings.themeColor;
-const url =settings.url
+const url =settings.url;
+const screenHeight =Dimensions.get('screen').height
+import Modal from 'react-native-modal';
 import { AntDesign } from '@expo/vector-icons';
 import MedicineDetails from '../components/MedicineDetails';
 import HttpsClient from '../api/HttpsClient';
@@ -226,10 +228,8 @@ class AddPrescription extends Component {
                 </View>
                         <View style={styles.centeredView}>
                             <Modal
-                                animationType="fade"
-                                transparent={true}
-                                visible={loading}
-                              
+                             isVisible={loading}
+                             deviceHeight ={screenHeight}
                             >
                                 <View style={styles.centeredView}>
                                     <View style={styles.modalView}>
