@@ -76,6 +76,7 @@ const HttpsClient = {
            'Referer': url,
         }
       }
+      console.log(sendData,"popppp")
       await fetch(url,{
         method:'POST',
         headers: headers,

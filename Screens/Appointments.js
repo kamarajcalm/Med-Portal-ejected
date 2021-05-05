@@ -14,14 +14,14 @@ const initialLayout = { width: Dimensions.get('window').width };
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import moment from 'moment';
 import HttpsClient from '../api/HttpsClient';
-import { FontAwesome, FontAwesome5} from '@expo/vector-icons';
+import { FontAwesome, FontAwesome5, Octicons} from '@expo/vector-icons';
 import Toast from 'react-native-simple-toast';
 const url = settings.url
 class Appointments extends Component {
     constructor(props) {
         const routes = [
             { key: 'NewAppoinments', title: 'New Appoinments' },
-            { key: 'Completed', title: 'Completed'},
+            { key: 'Completed', title: 'All Appoinments'},
 
         ];
         super(props);
@@ -35,19 +35,20 @@ class Appointments extends Component {
             appoinments:[],
             selectedAppointment:null,
             selectedIndex:null,
-            appoinments2:[]
+            appoinments2:[],
+            today:"jhj"
         };
     }
     getAppointments2 = async () => {
         let api = ""
         if (this.props.user.profile.occupation == "Doctor") {
-            api = `${url}/api/prescription/appointments/?doctor=${this.props.user.id}&status=Completed`
+            api = `${url}/api/prescription/appointments/?doctor=${this.props.user.id}`
         } else if (this.props.user.profile.occupation == "ClinicRecoptionist") {
-            api = `${url}/api/prescription/appointments/?clinic=${this.props.user.profile.recopinistclinics[0].clinicpk}&status=Completed`
+            api = `${url}/api/prescription/appointments/?clinic=${this.props.user.profile.recopinistclinics[0].clinicpk}`
         }
         
         else {
-            api = `${url}/api/prescription/appointments/?requesteduser=${this.props.user.id}&status=Completed`
+            api = `${url}/api/prescription/appointments/?requesteduser=${this.props.user.id}`
         }
 
         const data = await HttpsClient.get(api)
@@ -185,13 +186,13 @@ class Appointments extends Component {
     validateInformation =(item)=>{
         if (item.status =="Pending"){
             return(
-                <View >
+                <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-around"}}>
                     <View style={{flexDirection:"row",marginTop:5}}>
                         <Text style={[styles.text, { color: "gray" }]}>Requseted date:</Text>
                         <Text style={[styles.text, ]}>{item.requesteddate}</Text>
                     </View>
                     <View style={{flexDirection:'row',marginTop:5}}>
-                        <Text style={[styles.text, { color: "gray" }]}>Requseted Time:</Text>
+                        <Text style={[styles.text, { color: "gray" }]}> Time:</Text>
                         <Text style={[styles.text, ]}>{item.requestedtime}</Text>
                     </View>
                 </View>
@@ -199,13 +200,13 @@ class Appointments extends Component {
         }
         if (item.status == "Accepted") {
             return (
-                <View >
+                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-around" }}>
                     <View style={{ flexDirection: "row", marginTop: 5 }}>
                         <Text style={[styles.text, { color: "gray" }]}>Accepted date:</Text>
                         <Text style={[styles.text,]}>{item.accepteddate}</Text>
                     </View>
                     <View style={{ flexDirection: 'row', marginTop: 5 }}>
-                        <Text style={[styles.text, { color: "gray" }]}>Accepted Time:</Text>
+                        <Text style={[styles.text, { color: "gray" }]}> Time:</Text>
                         <Text style={[styles.text,]}>{item.acceptedtime}</Text>
                     </View>
                 </View>
@@ -214,8 +215,9 @@ class Appointments extends Component {
     }
     viewAppoinments =(item)=>{
         if(this.props.user.profile.occupation =="Customer"){
-            this.props.navigation.navigate('ViewAppoinment',{item})
+           return   this.props.navigation.navigate('ViewAppoinment',{item})
         }
+        return this.props.navigation.navigate('ViewAppoinmentDoctors',{item})
     }
     validateColor =(status)=>{
         if(status =="Completed"){
@@ -296,10 +298,8 @@ class Appointments extends Component {
                             justifyContent: "center",
                             flexDirection: "row"
                         }}>
-                            <View style={{ flex: 0.5 }}>
-                                       
-                            </View>
-                            <View style={{ flex: 0.5 }}>
+                           
+                            <View style={{ flex: 1 }}>
                                 {
                                     this.validateInformation(item)
                                 }
@@ -311,7 +311,8 @@ class Appointments extends Component {
                 )
                 }else{
                     return(
-                        <View 
+                        <TouchableOpacity
+                            onPress={() => { this.viewAppoinments(item)}}
                          style={{
                                 marginTop: 10,
                                 minHeight: height * 0.1,
@@ -352,11 +353,13 @@ class Appointments extends Component {
                                 <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
 
                                     {item.status =="Pending"?<TouchableOpacity style={{ height: height * 0.05, width: "80%", borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: "#32CD32" }}
-                                        onPress={() => { this.setState({ modal: true, selectedAppointment:item,selectedIndex:index})}}
+                                            onPress={() => { this.setState({ modal: true, selectedAppointment: item, selectedIndex: index, today: item.requesteddate, time: item.requestedtime})}}
                         >
                             <Text style={[styles.text, { color: "#fff" }]}>Accept</Text>
                                     </TouchableOpacity> : <TouchableOpacity style={{ height: height * 0.05, width: "70%", borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: "orange"  }}
-                                            onPress={() => { this.setState({  selectedAppointment: item, selectedIndex: index },()=>{
+                                                onPress={() => {
+                                                  
+                                                    this.setState({ selectedAppointment: item, selectedIndex: index, },()=>{
                                                 this.completeAppointment()
                                             }) }}
                                     >
@@ -384,10 +387,8 @@ class Appointments extends Component {
                             justifyContent:"center",
                             flexDirection:"row"
                         }}>
-                            <View style={{flex:0.5}}>
-
-                            </View>
-                            <View style={{flex:0.5}}>
+                        
+                            <View style={{flex:1}}>
                                     {
                                         this.validateInformation(item)
                                     }
@@ -395,13 +396,25 @@ class Appointments extends Component {
                        
                         
                         </View>
-                        </View>
+                        </TouchableOpacity>
                     )
                 }
                  
               }} 
             />
         )
+    }
+    validateStatus =(status)=>{
+        if (status == "Completed"){
+            return "green"
+        }
+        if (status == "Rejected") {
+            return "red"
+        }
+        if (status == "Accepted") {
+            return "Yellow"
+        }
+      
     }
     SecondRoute =()=>{
         return(
@@ -482,8 +495,8 @@ class Appointments extends Component {
                                 <View style={{ flex: 0.4, flexDirection: "row", alignItems: "center", justifyContent: 'center' }}>
                                    
                                 <View style={{ alignItems: 'center', justifyContent: "center" }}>
-                                        <Text style={[styles.text]}>Status:</Text>
-                                        <Text style={[styles.text]}>{item.status}</Text>
+                                        
+                                        <Octicons name="primitive-dot" size={24} color={this.validateStatus(item.status)} />
                                     </View>
                                 </View>
                             </View>
@@ -631,6 +644,7 @@ class Appointments extends Component {
         
     }
     Modal =()=>{
+      
         return(
             <Modal 
                 deviceHeight={screenHeight}

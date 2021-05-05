@@ -103,7 +103,7 @@ componentDidMount(){
                <Text style={[styles.text, { fontWeight: "bold", fontSize: 20 }]}>100</Text>
              </View>
              <TouchableOpacity style={{ alignItems: "center", justifyContent: "center" }}>
-               <Text style={[styles.text]}>Priscription Valid Till</Text>
+               <Text style={[styles.text]}>Subscription Valid Till</Text>
                <View style={{ flexDirection: "row" ,marginTop:5}}>
                  <Feather name="calendar" size={24} color={"gray"} />
                  <Text style={[styles.text, { color:themeColor, fontSize: 20 }]}>11-10-2091</Text>

@@ -6,6 +6,7 @@ import { AppearanceProvider } from 'react-native-appearance';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import reducers from './reducers';
+import FlashMessage from "react-native-flash-message";
 export default class App extends React.Component {
   state = {
     fontsLoaded: false,
@@ -32,6 +33,10 @@ export default class App extends React.Component {
         <Provider store={createStore(reducers)}>
           <AppearanceProvider>
             <AppNavigator />
+            <FlashMessage 
+            position="top" 
+            hideStatusBar={false}
+            />
           </AppearanceProvider>
         </Provider>
       );

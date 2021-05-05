@@ -36,13 +36,18 @@ class TabNavigator extends Component {
     }
     getTabBarVisibility = (route) => {
         const routeName = route.state ? route.state.routes[route.state.index].name : ''
+        console.log(routeName, "rrrrrrrrrrrr")
         if (routeName == "addPriscription") {
             return false
         }
         if (routeName == "SearchMedicines") {
             return false
         }
-        console.log(routeName, "kkkk")
+    
+        if (routeName == "showCard") {
+            return false
+        }
+       
         return true
     }
     getTabBarVisibility2 = (route) => {
@@ -56,6 +61,9 @@ class TabNavigator extends Component {
     getTabBarVisibility4 = (route) => {
         const routeName = route.state ? route.state.routes[route.state.index].name : ''
         if (routeName == "ViewAppoinment") {
+            return false
+        }
+        if (routeName == "ViewAppoinmentDoctors") {
             return false
         }
         if (routeName == "Chat") {

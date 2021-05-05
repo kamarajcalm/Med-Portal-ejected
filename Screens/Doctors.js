@@ -8,7 +8,7 @@ import { AntDesign } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import png from '../assets/marker/stethoscope.png'
 import { WebView } from 'react-native-webview';
-import { Svg, Image as ImageSvg } from "react-native-svg";
+
 const { height, width } = Dimensions.get("window");
 const themeColor = settings.themeColor;
 const fontFamily =settings.fontFamily;

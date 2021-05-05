@@ -20,9 +20,11 @@ class DoctorProfile extends Component {
     }
 
     changeClinic=()=>{
-
+       
     }
+  
     componentDidMount(){
+   
         console.log(this.props.user,"popo")
     }
     render() {
@@ -161,7 +163,7 @@ class DoctorProfile extends Component {
                        return(
                            <View style={{ backgroundColor: "gray", borderRadius: 10 }}>
                                <TouchableOpacity style={{ flexDirection: "row", minHeight: height * 0.05,borderBottomColor:"#fff" ,borderBottomWidth:0.185}}
-                                   onPress={() => { this.props.ClinicSelect() }}
+                                   onPress={() => { }}
                                >
                                    <View style={{ flex: 0.5, justifyContent: "center" }}>
                                        <Text style={[styles.text, { fontWeight: "bold", color: "#fff", marginLeft: 10 }]}>{item.name}</Text>
@@ -171,17 +173,7 @@ class DoctorProfile extends Component {
                                    </View>
 
                                </TouchableOpacity>
-                                 <TouchableOpacity style={{  flexDirection: "row", minHeight: height * 0.05, }}
-                        onPress={() => { this.props.ClinicSelect() }}
-                    >
-                        <View style={{ flex: 0.5, justifyContent: "center" }}>
-                            <Text style={[styles.text, { fontWeight: "bold" ,color:"#fff",marginLeft:10}]}>Change Clinic</Text>
-                        </View>
-                        <View style={{ flex: 0.5, alignItems: 'flex-end', marginRight: 10, justifyContent: "center" }}>
-                            <AntDesign name="rightcircleo" size={24} color="#fff" />
-                        </View>
-
-                    </TouchableOpacity>
+          
                            </View>
                         
                        )
@@ -189,7 +181,61 @@ class DoctorProfile extends Component {
                   />
                   
               </View>
-              
+                <View style={{ margin: 10}}>
+                    <View style={{ marginVertical: 10 }}>
+                        <Text style={[styles.text, { fontWeight: "bold", }]}>Patient Details</Text>
+                    </View>
+                    <View style={{ backgroundColor: "gray", borderRadius: 10, elevation: 5 }}>
+                        <View style={{ flexDirection: "row", minHeight: height * 0.05, borderBottomColor: "#fff", borderBottomWidth: 0.185 }}
+
+                        >
+                            <View style={{ flex: 0.5, justifyContent: "center" }}>
+                                <Text style={[styles.text, { fontWeight: "bold", color: "#fff", marginLeft: 10 }]}>This Week:</Text>
+                            </View>
+                            <View style={{ flex: 0.5, alignItems: 'flex-end', marginRight: 10, justifyContent: "center" }}>
+                                <Text style={[styles.text, { color: "#fff" }]}>10</Text>
+                            </View>
+
+
+                        </View>
+                        <View style={{ flexDirection: "row", minHeight: height * 0.05, borderBottomColor: "#fff", borderBottomWidth: 0.185 }}
+
+                        >
+                            <View style={{ flex: 0.5, justifyContent: "center" }}>
+                                <Text style={[styles.text, { fontWeight: "bold", color: "#fff", marginLeft: 10 }]}>This Month:</Text>
+                            </View>
+                            <View style={{ flex: 0.5, alignItems: 'flex-end', marginRight: 10, justifyContent: "center" }}>
+                                <Text style={[styles.text, { color: "#fff" }]}>50</Text>
+                            </View>
+
+
+                        </View>
+                        <View style={{ flexDirection: "row", minHeight: height * 0.05, borderBottomColor: "#fff", borderBottomWidth: 0.185 }}
+
+                        >
+                            <View style={{ flex: 0.5, justifyContent: "center" }}>
+                                <Text style={[styles.text, { fontWeight: "bold", color: "#fff", marginLeft: 10 }]}>This Year:</Text>
+                            </View>
+                            <View style={{ flex: 0.5, alignItems: 'flex-end', marginRight: 10, justifyContent: "center" }}>
+                                <Text style={[styles.text, { color: "#fff" }]}>100</Text>
+                            </View>
+
+
+                        </View>
+                        <View style={{ flexDirection: "row", minHeight: height * 0.05, borderBottomColor: "#fff", borderBottomWidth: 0.185 }}
+
+                        >
+                            <View style={{ flex: 0.5, justifyContent: "center" }}>
+                                <Text style={[styles.text, { fontWeight: "bold", color: "#fff", marginLeft: 10 }]}>Over All:</Text>
+                            </View>
+                            <View style={{ flex: 0.5, alignItems: 'flex-end', marginRight: 10, justifyContent: "center" }}>
+                                <Text style={[styles.text, { color: "#fff" }]}>{this.props.user.totalPatients}</Text>
+                            </View>
+
+
+                        </View>
+                        </View>
+              </View>
             </ScrollView>
         );
     }

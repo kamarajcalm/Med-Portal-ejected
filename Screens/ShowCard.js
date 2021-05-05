@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { View, Text, Dimensions, TouchableOpacity, StyleSheet, SafeAreaView, Image, ScrollView, FlatList } from 'react-native';
+import { View, Text, Dimensions, TouchableOpacity, StyleSheet, SafeAreaView, Image, ScrollView, FlatList, StatusBar} from 'react-native';
 import GestureRecognizer, { swipeDirections } from 'react-native-swipe-gestures';
-import { Ionicons, Entypo, AntDesign } from '@expo/vector-icons';
+import { Ionicons, Entypo, AntDesign, Feather} from '@expo/vector-icons';
 import * as Animatable from 'react-native-animatable';
 import settings from '../AppSettings';
 const fontFamily = settings.fontFamily;
@@ -14,6 +14,9 @@ import { selectTheme } from '../actions';
 import HttpsClient from '../api/HttpsClient';
 import Toast from 'react-native-simple-toast';
 import SimpleToast from 'react-native-simple-toast';
+import { TextInput } from 'react-native-paper';
+import SvgComponent from '../components/SvgComponent';
+
 class ShowCard extends Component {
     constructor(props) {
         super(props);
@@ -59,29 +62,52 @@ class ShowCard extends Component {
             </View>
         )
     }
-
+    requestPdf =async()=>{
+        let api =`${url}/api/prescription/paymentpdf/`
+        let data =await HttpsClient.get(api)
+        console.log(data)
+    }
     renderItem = (item) => {
+        console.log(item,"kkk")
         return (
-            <View style={{ flexDirection: "row", marginTop: 10, alignItems: "center", justifyContent: "space-around" }}>
+            <View style={{ marginTop: 10,flexDirection:"row" }}>
 
-               
-                { item.morning_count!=0&& <View style={{ alignItems: 'center', justifyContent: "center" }}>
-                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>Morning</Text>
+              
+                <View style={{flex:0.7}}>
+                    {item.morning_count != 0 && <View style={{}}>
+                        <View style={{ flexDirection: "row" }}>
+                            <Text style={{ borderColor: "#000", borderRightWidth: 1, width: width * 0.2 }}>Morning </Text>
+                            <Text style={[styles.text, { fontSize: 12, marginLeft: 10 }]}>{item.morning_count} ml {item.after_food ? "afterFood" : "before Food"}</Text>
 
-                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 ,marginTop:5}]}>{item.morning_count} {item.after_food ? " AF" : " BF"}</Text>
-                </View>}
-                {item.afternoon_count!=0&&<View style={{ alignItems: 'center', justifyContent: "center" }}>
-                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>After Noon</Text>
-                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 12, marginTop: 5 }]}>{item.afternoon_count} {item.after_food ? " AF" : " BF"}</Text>
-                </View>}
-                {item.night_count!=0&&<View style={{ alignItems: 'center', justifyContent: "center" }}>
-                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>Night</Text>
-                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 12, marginTop: 5 }]}>{item.night_count} {item.after_food ? " AF" : " BF"}</Text>
-                </View>}
-                <View style={{ alignItems: 'center', justifyContent: "center" }}>
-                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>Qty</Text>
-                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 ,marginTop:5}]}>{item.total_qty} </Text>
+
+                        </View>
+
+                    </View>}
+                    {item.afternoon_count != 0 && <View style={{}}>
+                        <View style={{ flexDirection: "row" }}>
+                            <Text style={{ borderColor: "#000", borderRightWidth: 1, width: width * 0.2 }}>Afternoon </Text>
+                            <Text style={[styles.text, { fontSize: 12, marginLeft: 10 }]}>{item.afternoon_count} ml {item.after_food ? "afterFood" : "before Food"}</Text>
+
+
+
+                        </View>
+
+                    </View>}
+                    {item.night_count != 0 && <View style={{}}>
+                        <View style={{ flexDirection: "row" }}>
+                            <Text style={{ borderColor: "#000", borderRightWidth: 1, width: width * 0.2 }}>Night </Text>
+
+                            <Text style={[styles.text, { fontSize: 12, marginLeft: 10 }]}>{item.night_count} ml {item.after_food ? "afterFood" : "before Food"}</Text>
+
+
+                        </View>
+                    </View>}
+                    <View style={{alignSelf:"flex-end"}}>
+                        <Text>Qty: {item.total_qty}</Text>
+                    </View>
                 </View>
+              
+                
             </View>
         )
     }
@@ -107,6 +133,7 @@ class ShowCard extends Component {
             </View>
         )
     }
+
     render() {
         const { item } = this.state
         let dp = null
@@ -119,8 +146,9 @@ class ShowCard extends Component {
             <>
                 <SafeAreaView style={styles.topSafeArea} />
                 <SafeAreaView style={styles.bottomSafeArea}>
+                    <StatusBar backgroundColor={"#fff"} barStyle={"dark-content"} />
                     {/*Headers  */}
-                    <View style={{ height: height * 0.1, backgroundColor: themeColor, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, justifyContent: "center", flexDirection: "row" }}>
+                    {/* <View style={{ height: height * 0.1, backgroundColor: themeColor, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, justifyContent: "center", flexDirection: "row" }}>
                         <TouchableOpacity style={{ flex: 0.2, marginLeft: 20, alignItems: "center", justifyContent: 'center' }}
                             onPress={() => { this.props.navigation.goBack() }}
                         >
@@ -132,35 +160,85 @@ class ShowCard extends Component {
                         <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
 
                         </View>
+                    </View> */}
+                    <View style={{height:height*0.15,justifyContent:"center",}}>
+                                 
+                           
+                                <View style={{flexDirection:"row"}}>
+                                   
+                                <TouchableOpacity style={{ flex: 0.2, marginLeft: 20, alignItems: "center", justifyContent: 'center' }}
+                                    onPress={() => { this.props.navigation.goBack() }}
+                                >
+                                    <Ionicons name="chevron-back-circle" size={30} color="#000" />
+                                </TouchableOpacity>
+                               
+                                    <Image
+                                        style={{ height: 50, width: 50, resizeMode: "contain",marginLeft:10 }}
+                                        source={require('../assets/icons/34.png')}
+                                    />
+                                    <View style={{alignItems:"center",justifyContent:'center'}}>
+                                        <Text style={[styles.text, { fontSize: 25, fontWeight: "bold", color: "#35a6de", marginLeft: 10 }]}>{item.clinicname || "Clinic Name"}</Text>
+
+                                    </View>
+                                </View>
+                                
+                                <View style={{alignSelf:"flex-start"}}>
+                                    <Text>Address</Text>
+                                </View>
+                             
+                        
+                            
+                            {/* <View style={{ alignSelf: "flex-end", flexDirection: "row" }}>
+                                <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                    <Text style={[styles.text, { color: "gray" }]}>{item.doctordetails.name || "Clinic Name"}</Text>
+
+                                </View>
+                                <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                    <Image
+                                        source={{ uri: dp || "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
+                                        style={{ height: 30, width: 30, borderRadius: 15 }}
+                                    />
+                                </View>
+                            </View> */}
+                   
                     </View>
+                                       
+
+
+
+
+
+
                     {/* DETAILS */}
                     <View >
-                        <View style={{ alignItems: "center", justifyContent: "center", marginTop: 20 }}>
-                            <Text style={[styles.text, { fontSize: 20 }]}>{item.clinicname || "Clinic Name"}</Text>
-                        </View>
-                        <View style={{ alignSelf: "flex-end", flexDirection: "row" }}>
-                            <View style={{ alignItems: "center", justifyContent: "center" }}>
-                                <Text style={[styles.text, { color: "gray" }]}>{item.doctordetails.name || "Clinic Name"}</Text>
-
-                            </View>
-                            <View style={{ alignItems: "center", justifyContent: "center" }}>
-                                <Image
-                                    source={{ uri: dp || "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
-                                    style={{ height: 30, width: 30, borderRadius: 15 }}
-                                />
-                            </View>
-                        </View>
+                       
                         <FlatList
                             data={item.medicines}
                             keyExtractor={(item, index) => index.toString()}
 
                             renderItem={({ item, index }) => {
                                 return (
-                                    <View style={{ margin: 20 }}>
-                                        <View style={{ flexDirection: "row" ,alignItems:"center"}}>
-                                            <Text style={[styles.text, { fontWeight: "bold" }]}>{index + 1}.</Text>
-                                            <Text style={[styles.text, { color: "#000" ,fontWeight:"bold",fontSize:18}]}>  {item.medicinename}</Text>
-                                            <Text style={[styles.text, { color: "gray", fontWeight: "bold" }]}> * {item.days} days</Text>
+                                    <View style={{ padding: 20 ,
+                                        flex: 1,
+                                        borderWidth: 1,
+                                        borderRadius: 1,
+                                        borderStyle: 'dashed',
+                                        borderColor: '#D1D2DE',
+                                        backgroundColor: '#FFFFFF',
+                                    }}>
+                                        <View style={{ flexDirection: "row" ,justifyContent:"space-between"}}>
+                                            <View style={{flexDirection:"row",flex:0.7}}>
+                                                <View style={{flexDirection:"row",alignItems:"center",justifyContent:"center"}}>
+                                                   
+                                                  
+                                                    <Text style={[styles.text, { color: "#000", fontWeight: "bold", fontSize: 18 }]}>{item.medicinename}</Text>
+                                                    <Text style={[styles.text, { color: "gray", fontWeight: "bold" }]}> * {item.days} days</Text>
+                                                    <Text style={[styles.text, { color: "gray", fontWeight: "bold" }]}> </Text>
+                                                </View>
+                                                
+                                            </View>
+                                            
+              
                                         </View>
                                 
                                         {
@@ -172,7 +250,19 @@ class ShowCard extends Component {
                         />
 
                     </View>
-                 
+                   {<View style={{position:'absolute',bottom:150,width,alignItems:"center"}}>
+                        <TouchableOpacity style={{height:height*0.05,width:width*0.4,alignItems:"center",justifyContent:"center",borderRadius:5,backgroundColor:themeColor,flexDirection:'row'}}
+                          onPress={()=>{
+                              this.requestPdf()
+                          }}
+                        >
+                            <Text style={[styles.text,{color:'#fff'}]}>Contact</Text>
+                            <View style={{marginLeft:10}}>
+                                <Feather name="phone" size={24} color="#fff" />
+                            </View>
+                           
+                        </TouchableOpacity>
+                    </View>}
                 </SafeAreaView>
             </>
         );

@@ -25,7 +25,7 @@ import { selectTheme,selectClinic } from '../actions';
 import authAxios from '../api/authAxios';
 import HttpsClient from "../api/HttpsClient";
 import Modal from 'react-native-modal';
-import { Ionicons, Entypo,Feather, MaterialCommunityIcons, FontAwesome } from '@expo/vector-icons';
+import { Ionicons, Entypo, Feather, MaterialCommunityIcons, FontAwesome, FontAwesome5} from '@expo/vector-icons';
 const url =settings.url
 const fontFamily = settings.fontFamily;
 const themeColor =settings.themeColor
@@ -277,6 +277,37 @@ class Priscription extends React.Component {
             this.getPateintPrescription()
         }
     }
+    validateHeaders =()=>{
+        if(this.state.isDoctor){
+            return(<View style={{flex:1,justifyContent:'center'}}>
+                <TouchableOpacity style={{ flexDirection:"row",}}
+                    onPress={() => { this.setState({ showModal: true }) }}
+                >
+                    <Text style={{ color: '#fff', fontFamily: "openSans", marginLeft: 20, fontSize: 25, fontWeight: "bold" }}>{this.props?.clinic?.name}</Text>
+                   <View style={{alignItems:'center',justifyContent:"center",marginLeft:10}}>
+                        <FontAwesome5 name="angle-down" size={24} color="#fff" />
+                   </View>
+                
+                </TouchableOpacity>
+
+            </View>
+                
+             
+                   
+                
+            )
+        }
+
+        return(
+            <>
+                <View style={{ flex: 0.5, alignItems: 'center', justifyContent: "center" }}>
+
+                     <Text style={{ color: '#fff', fontFamily: "openSans", marginLeft: 20, fontSize: 30, fontWeight: "bold" }}>Priscription</Text>
+                </View>
+                
+            </>
+        )
+    }
     render() {
         const y= new Animated.Value(0);
         const onScroll = Animated.event([{nativeEvent:{contentOffset:{y}}}],{
@@ -290,16 +321,9 @@ class Priscription extends React.Component {
                 <StatusBar backgroundColor={themeColor} barStyle={"default"}/>
                     {/* HEADERS */}
                     <View style={{ height: height * 0.1, backgroundColor: themeColor, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, flexDirection: "row" }}>
-                        <View style={{ flex: 0.5, alignItems: 'center', justifyContent: "center" }}>
-                  
-                            {!this.state.isDoctor&&<Text style={{ color: '#fff', fontFamily: "openSans", marginLeft: 20 ,fontSize:30,fontWeight:"bold"}}>Priscription</Text>}
-                        </View>
-                       {this.state.isDoctor&&<TouchableOpacity style={{ flex:1, alignItems: "center", justifyContent: 'center' ,flexDirection:'row'}}
-                          onPress={()=>{this.setState({showModal:true})}}
-                        >
-                            <Text style={{ color: '#fff', fontFamily: "openSans", marginLeft: 20 }}>{this.props?.clinic?.name}</Text>
-                            <AntDesign name="right" size={24} color="#fff" />
-                        </TouchableOpacity>}
+                        {
+                            this.validateHeaders()
+                        }
                     </View>
    {  !this.state.loading?       <View style={{flex:1,backgroundColor:"#f3f3f3f3"}}>
            
@@ -377,7 +401,11 @@ class Priscription extends React.Component {
                         onBackdropPress={() => { this.setState({showModal : false })}}
                     >
                         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                            
                             <View style={{ height: height * 0.3, width: width * 0.9, backgroundColor: "#fff", borderRadius: 20, alignItems: "center", justifyContent: "center" }}>
+                                <View style={{ alignItems: "center", justifyContent: "center",marginTop:10 }}>
+                                    <Text style={[styles.text, { color: "#000", fontWeight: "bold" ,fontSize:16}]}>Select Clinic</Text>
+                                </View>
                                 <FlatList
                                     data={this.state.clinics}
                                     keyExtractor={(item, index) => index.toString()}

@@ -99,7 +99,7 @@ class ChatScreen extends Component {
        
     }
     validateChat =()=>{
-        console.log(this.props.user.profile.occupation,"ooo",this.state.item,"iii")
+        // console.log(this.props.user.profile.occupation,"ooo",this.state.item,"iii")
         //   TWO CHATS 1.doctor&patient && 2clinic&pateint
         if (this.props.user.profile.occupation=="Customer"){
          if (this.state.item.clinictitle) {
@@ -108,7 +108,7 @@ class ChatScreen extends Component {
              })
          }
          if (this.state.item.doctortitle) {
-            
+          
              return this.setState({ chatType: "doctor&pateint" },()=>{
                  this.getChatMessage('doctorThread')
              }
@@ -120,6 +120,7 @@ class ChatScreen extends Component {
              this.getChatMessage("clinicThread")
          })
         } else if (this.props.user.profile.occupation == "Doctor"){
+      
             return this.setState({ chatType: "doctor&pateint" }, () => {
                 this.getChatMessage("doctorThread")
             })
@@ -352,7 +353,8 @@ sendMessage =async()=>{
           chatTitle =this.state.item.clinictitle||this.state.item.doctortitle
       }
       if (this.props.user.profile.occupation == "Doctor") {
-          chatTitle = this.state.item.doctortitle
+
+          chatTitle = this.state.item?.customertitle
       }
       if (this.props.user.profile.occupation == "ClinicRecoptionist") {
           chatTitle = this.state.item.clinictitle

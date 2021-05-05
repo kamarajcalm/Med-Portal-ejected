@@ -17,17 +17,34 @@ import MedicineDetails from '../components/MedicineDetails';
 import HttpsClient from '../api/HttpsClient';
 import Toast from 'react-native-simple-toast';
 import SimpleToast from 'react-native-simple-toast';
+import DropDownPicker from 'react-native-dropdown-picker';
+import FlashMessage, { showMessage, hideMessage } from "react-native-flash-message";
 class AddPrescription extends Component {
   constructor(props) {
+      let sex= [
+          {
+             label:"Male",value:'Male'
+          },
+          {
+              label: "Female", value: 'Female'
+          },
+          {
+              label: "Others", value: 'Others'
+          },
+    ]
     super(props);
     this.state = {
                 medicines:[],
                 mobileNo:"",
                 patientsName:'',
                 onGoingTreatMent:'',
-                healthIssues:'',
+                healthIssues:[],
                 loading: false,
-                doctorFees:""
+                doctorFees:"",
+                sex,
+                healthIssue:"",
+                Age:"",
+                selectedSex:sex[0].value
     };
   }
     changeFunction = (type, value, index)=>{
@@ -35,31 +52,39 @@ class AddPrescription extends Component {
 
         if (type =="delete"){
             duplicate.splice(index,1)
-            this.setState({ medicines:duplicate});
+          return this.setState({ medicines:duplicate});
         }
         if (type =="morning_count"){
             duplicate[index].morning_count =value
-            this.setState({ medicines:duplicate})
+            return   this.setState({ medicines:duplicate})
         }
         if (type == "afternoon_count"){
             duplicate[index].afternoon_count = value
-            this.setState({ medicines: duplicate })
+            return   this.setState({ medicines: duplicate })
         }
         if (type == "night_count") {
             duplicate[index].night_count = value
-            this.setState({ medicines: duplicate })
+            return   this.setState({ medicines: duplicate })
         }
         if (type =="after_food"){
             duplicate[index].after_food = value
-            this.setState({ medicines: duplicate })
+            return   this.setState({ medicines: duplicate })
         }
         if (type == "total_qty") {
             duplicate[index].total_qty = value
-            this.setState({ medicines: duplicate })
+            return   this.setState({ medicines: duplicate })
         }
         if (type == "days") {
             duplicate[index].days = value
-            this.setState({ medicines: duplicate })
+            return  this.setState({ medicines: duplicate })
+        }
+        if (type == "comment") {
+            duplicate[index].comment = value
+            return  this.setState({ medicines: duplicate })
+        }
+        if (type == "variant") {
+            duplicate[index].variant = value
+            return this.setState({ medicines: duplicate })
         }
 }
     backFunction =(medicines)=>{
@@ -72,19 +97,20 @@ class AddPrescription extends Component {
             i.days =0,
             i.medicine =i.id
         })
-        this.setState({ medicines})
+        this.setState({ medicines:this.state.medicines.concat(medicines)})
     }
     addPriscription = async()=>{
+       
         let api =`${url}/api/prescription/addPrescription/`
         
         if(this.state.medicines.length == 0){
             return SimpleToast.show("Please add medicine")
         }
         if (this.state.doctorFees =="") {
-            console.log("hererr")
+           
             return SimpleToast.show("Please fill doctorFees")
         }
-        if (this.state.onGoingTreatMent ="") {
+        if (this.state.onGoingTreatMent =="") {
             return SimpleToast.show("Please fill onGoingTreatMent")
         }
         let sendData ={
@@ -95,10 +121,12 @@ class AddPrescription extends Component {
             usermobile:this.state.mobileNo,
             ongoing_treatment:this.state.onGoingTreatMent,
             doctor_fees:this.state.doctorFees,
-            clinic: this.props.clinic.pk
+            clinic: this.props.clinic.pk,
+            age:this.state.Age,
+            sex:this.state.selectedSex,
 
         }
-      
+
        const post = await HttpsClient.post(api,sendData)
        console.log(post,"kkk")
        if(post.type=="success"){
@@ -126,8 +154,34 @@ class AddPrescription extends Component {
            }
         }
     }
+    showSimpleMessage(content,color, type = "info", props = {}) {
+        const message = {
+            message: content,
+            backgroundColor:color,
+            icon: { icon: "auto", position: "left" },
+            type,
+            ...props,
+        };
+
+        showMessage(message);
+    }
     setModalVisible = (visible) => {
         this.setState({ loading: visible });
+    }
+    pushIssues =(issue)=>{
+        if (this.state.healthIssue!=""){
+            let duplicate = this.state.healthIssues
+            duplicate.push(this.state.healthIssue)
+          return  this.setState({ healthIssues: duplicate, healthIssue: "" })
+        }else{
+            return this.showSimpleMessage("Health issue should not be empty", "#dd7030")
+        }
+        
+    }
+    deleteIssues =(i,index)=>{
+       let duplicate =this.state.healthIssues
+       duplicate.splice(index,1)
+       this.setState({healthIssues:duplicate})
     }
   render() {
       const { loading } = this.state;
@@ -151,7 +205,11 @@ class AddPrescription extends Component {
             </View>
             {/* FORMS */}
 
-            <ScrollView contentContainerStyle={{ marginHorizontal:20}}>
+            <ScrollView 
+             contentContainerStyle={{ marginHorizontal:20}}
+             showsVerticalScrollIndicator={false}
+             keyboardShouldPersistTaps={"handled"}
+            >
                 
                 <View style={{ marginTop: 20 }}>
                     <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>Mobile No</Text>
@@ -173,24 +231,85 @@ class AddPrescription extends Component {
                     />
                 </View>
                         <View style={{ marginTop: 20 }}>
-                            <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>Health issues</Text>
+                            <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>Age</Text>
                             <TextInput
-                                value={this.state.healthIssues}
+                               keyboardType ={"numeric"}
+                                value={this.state.Age}
                                 selectionColor={themeColor}
-                                multiline={true}
-                                onChangeText={(healthIssues) => { this.setState({ healthIssues }) }}
-                                style={{ width: width * 0.9, height: height * 0.15, backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10 ,}}
+                                onChangeText={(Age) => { this.setState({ Age }) }}
+                                style={{ width: width * 0.9, height: height * 0.05, backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10 }}
                             />
                         </View>
+                        <View style={{ marginTop: 20 ,flexDirection:"row"}}>
+                            <View style={{alignItems:"center",justifyContent:"center"}}>
+                                <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>Sex</Text>
+
+                            </View>
+                           
+                             <View style={{marginLeft:10}}>
+                                <DropDownPicker
+                                    items={this.state.sex}
+                                    defaultValue={this.state.sex[0]?.value}
+                                    containerStyle={{ height: 40, width: width * 0.4 }}
+                                    style={{ backgroundColor: '#fafafa' }}
+                                    itemStyle={{
+                                        justifyContent: 'flex-start'
+                                    }}
+                                    dropDownStyle={{ backgroundColor: '#fafafa', width: width * 0.4 }}
+                                    onChangeItem={item => this.setState({
+                                        selectedSex: item.value
+                                    })}
+
+                                />
+                             </View>
+                          
+                        </View>
                         <View style={{ marginTop: 20 }}>
-                            <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>On Going Treatment For</Text>
+                            <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>Health issues</Text>
+                            {
+                                this.state.healthIssues.map((i,index)=>{
+                                      return(
+                                          <View style={{margin:10,flexDirection:"row"}}>
+                                              <View style={{flex:0.7}}>
+                                                  <Text>{index + 1}. {i}</Text>
+                                              </View>
+                                              <TouchableOpacity style={{flex:0.3}}
+                                               onPress={()=>{this.deleteIssues(i,index)}}
+                                              
+                                              >
+                                                  <Entypo name="circle-with-cross" size={24} color="red" />
+                                              </TouchableOpacity>
+
+                                          </View>
+                                      )
+                                })
+                            }
+                            <View style={{flexDirection:'row',alignItems:"center",justifyContent:"space-around"}}>
+                                <TextInput
+                                    value ={this.state.healthIssue}
+                                    selectionColor={themeColor}
+                                    multiline={true}
+                                    onChangeText={(healthIssue) => { this.setState({ healthIssue}) }}
+                                    style={{ width: width * 0.6, height: height * 0.07, backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10, }}
+                                />
+                                <TouchableOpacity 
+                                  style={{height:height*0.05,alignItems:"center",justifyContent:'center',width:width*0.2,borderRadius:10,backgroundColor:themeColor,marginTop:10}}
+                                  onPress={()=>{this.pushIssues()}}
+                               
+                               >
+                                    <Text style={[styles.text,{color:"#fff"}]}>Add</Text>
+                                </TouchableOpacity>
+                            </View>
+                          
+                        </View>
+                        <View style={{ marginTop: 20 }}>
+                            <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>Reason for this Visit</Text>
                             <TextInput
                                 value ={this.state.onGoingTreatMent}
                                 onChangeText={(onGoingTreatMent) => { this.setState({onGoingTreatMent}) }}
                                 selectionColor={themeColor}
                                 multiline={true}
-                               
-                                style={{ width: width * 0.9, height: height * 0.15, backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10 }}
+                                style={{ width: width * 0.9, height: height * 0.15, backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10, textAlignVertical:"top"}}
                             />
                         </View>
               
@@ -223,7 +342,7 @@ class AddPrescription extends Component {
                     <TouchableOpacity style={{height:height*0.06,alignItems:"center",justifyContent:'center',backgroundColor:themeColor,width:width*0.3,borderRadius:15}}
                       onPress={()=>{this.addPriscription()}}
                     >
-                           <Text style={[styles.text,{color:"#fff"}]}>ADD</Text>
+                           <Text style={[styles.text,{color:"#fff"}]}>CREATE</Text>
                     </TouchableOpacity>
                 </View>
                         <View style={styles.centeredView}>
@@ -241,7 +360,7 @@ class AddPrescription extends Component {
                         
                         </View>
             </ScrollView>
-                   
+                  
         </View>
      </SafeAreaView>
        </>

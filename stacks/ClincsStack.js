@@ -7,6 +7,7 @@ import ClinicDetails from '../AdminScreens/ClinicDetails';
 import SearchDoctors from '../AdminScreens/SearchDoctors';
 import CreateReceptionist from '../AdminScreens/CreateReceptionist';
 import AddDoctor from '../AdminScreens/AddDoctor';
+import UpdateTimings from '../AdminScreens/UpdateTimings';
 const Stack = createStackNavigator();
 export default class ClincsStack extends Component {
     constructor(props) {
@@ -24,6 +25,7 @@ export default class ClincsStack extends Component {
                 <Stack.Screen name="SearchDoctors" component={SearchDoctors} options={{ headerShown: false }} />
                 <Stack.Screen name="CreateReceptionist" component={CreateReceptionist} options={{ headerShown: false }} />
                 <Stack.Screen name="AddDoctor" component={AddDoctor} options={{ headerShown: false }} />
+                <Stack.Screen name="UpdateTimings" component={UpdateTimings} options={{ headerShown: false }} />
             </Stack.Navigator>
         );
     }

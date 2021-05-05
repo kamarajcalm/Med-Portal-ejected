@@ -15,10 +15,11 @@ import HttpsClient from '../api/HttpsClient';
 import SimpleToast from 'react-native-simple-toast';
 import { FontAwesome } from '@expo/vector-icons';
 import MedicineItems from './MedicineItems';
+import DropDownPicker from 'react-native-dropdown-picker';
 class AddItem extends Component {
     constructor(props) {
         let item =props.route.params.item
-       
+        
         let medicines = props.route.params.item.subData||[]
         console.log(item,"hhh")
         super(props);
@@ -41,10 +42,47 @@ class AddItem extends Component {
             selectedItem: "",
             selectedIndex: "",
             showModal2: false,
-            addQuantity:""
+            addQuantity:"",
+            types: [
+                {
+                    label: "Liquid", value: "Liquid"
+                },
+                {
+                    label: "Tablet", value: "Tablet"
+                },
+                {
+                    label: "Capsules", value: "Capsules"
+                },
+                {
+                    label: "Cream", value: "Cream"
+                },
+                {
+                    label: "Others", value: "Others"
+                }
+            ],
+            selectedType:null,
+            medicineVariants:[],
+            variant:"",
+            boxes:"",
+            stripesPerBoxes:"",
+            medicineQty:"",
         };
     }
     addMedicine = async()=>{
+
+        
+        if (this.state.qty ==""){
+            
+            if (this.state.stripesPerBoxes == "") {
+                return SimpleToast.show("please enter no of stripes per boxes")
+            }
+            if(this.state.medicineQty ==""){
+                return SimpleToast.show("please enter no of medicine per stripe")
+            }
+        }
+        if(this.state.boxes ==""&&this.state.stripesPerBoxes ==""&&this.state.medicineQty ==""){
+             return SimpleToast.show("please enter  Qty")
+        }
         let api = `${url}/api/prescription/addInventory/`
         let sendData ={
             medicine: this.state?.medicine?.id,
@@ -55,16 +93,31 @@ class AddItem extends Component {
             quantity:this.state.qty,
             title:this.state.MedicineTitle,
             medicineFound:this.state.medicineFound,
-            
+            medtype:this.state.selectedType,
+            variants:this.state.medicineVariants,
+            number_of_boxes: Number(this.state.boxes),
+            number_of_strips: Number(this.state.stripesPerBoxes),
+            number_of_medicines: Number(this.state.medicineQty),
+             quantity:this.state.qty
         }
-       
-        
+    
         let post = await  HttpsClient.post(api,sendData)
-       
+        console.log(sendData,post)
        if(post.type =="success"){
           this.getMedicines()
            SimpleToast.show("added succesfully")
-           this.setState({showModal:false})
+           this.setState({
+               showModal:false,
+               shopprice:"",
+               maxretailprice:'',
+               qty:'',
+               MedicineTitle:"",
+               medicineFound:null,
+               medicineVariants:[],
+               boxes:"",
+               stripesPerBoxes:"",
+               medicineQty:""
+            })
        }else{
            SimpleToast.show("Try again")
        }
@@ -76,7 +129,14 @@ class AddItem extends Component {
     backFunction = (medicine) => {
         console.log(medicine,"iii")
         const { maxretailprice, marketprice,} = medicine
-        this.setState({ medicine, MedicineTitle: medicine.title, maxretailprice, marketprice, medicineFound:true})
+        this.setState({
+             medicine, 
+             MedicineTitle: medicine.title, 
+             maxretailprice, marketprice, 
+             medicineFound: true, 
+             selectedType:medicine.type
+            
+            })
     }
     getMedicines =async()=>{
         let api = `${url}/api/prescription/maincategory/${this.state.item.id}/`
@@ -112,7 +172,18 @@ class AddItem extends Component {
           SimpleToast.show("Try again")
       }
     }
+    addVariants =()=>{
+        let duplicate =this.state.medicineVariants
+        duplicate.push(this.state.variant)
+        this.setState({medicineVariants:duplicate})
+    }
+    removeVariants =(i,index)=>{
+        let duplicate = this.state.medicineVariants
+        duplicate.splice(index,1)
+        this.setState({ medicineVariants: duplicate })
+    }
     render() {
+       
         return (
             <>
                 <SafeAreaView style={styles.topSafeArea} />
@@ -132,7 +203,7 @@ class AddItem extends Component {
                     </View>
                      <FlatList 
                        data ={this.state.medicines}
-                       contentContainerStyle  ={{alignItems:"center",justifyContent:'space-around'}}
+                       contentContainerStyle  ={{alignItems:"center",justifyContent:'space-around',paddingBottom:90}}
                        keyExtractor ={(item,index)=>index.toString()}
                        numColumns ={2}
                  
@@ -168,11 +239,11 @@ class AddItem extends Component {
                     style={{ alignItems: "center", justifyContent: "center" }}
                     visible={this.state.showModal}
                     onDismiss={() => { this.setState({ showModal: false }) }}
-                    contentContainerStyle={{ height: height * 0.4, alignItems: 'center', justifyContent: "center", backgroundColor: "#fff", borderRadius: 15, width: width * 0.85 }}
+                    contentContainerStyle={{ height: height * 0.6, alignItems: 'center', justifyContent: "center", backgroundColor: "#fff", borderRadius: 15, width: width * 0.85 }}
                     dismissable={true}
                 >
                     <ScrollView 
-                      contentContainerStyle ={{padding: 20,}}
+                      contentContainerStyle ={{paddingBottom:40}}
                      showsVerticalScrollIndicator ={false}
                     >
                         <View style={{flexDirection:"row"}}>
@@ -226,17 +297,107 @@ class AddItem extends Component {
                             />
                         </View>
                         <View>
-                            <Text>Qty</Text>
+                            <Text>Type</Text>
+                            <View
+                                style={{ marginTop: 20 }}
+                            >
+                                <DropDownPicker
+
+                                    items={this.state.types}
+                                    defaultValue={this.state.types[0]?.value}
+                                    containerStyle={{ height: 40 }}
+                                    style={{ backgroundColor: '#fafafa' }}
+                                    itemStyle={{
+                                        justifyContent: 'flex-start'
+                                    }}
+                                    dropDownStyle={{ backgroundColor: '#fafafa' }}
+                                    onChangeItem={item => this.setState({
+                                        selectedType: item.value
+                                    })}
+                                />
+                            </View>
+
+                        </View>
+                        <View>
+                            <Text>No of boxes</Text>
                             <TextInput
                             keyboardType ={"numeric"}
-                                value={this.state.qty.toString()}
+                                value={this.state.boxes.toString()}
                                 style={{ marginTop: 20, width: width * 0.7, height: height * 0.05, backgroundColor: "#fafafa", paddingLeft: 15, }}
-                                onChangeText={(text) => { this.setState({ qty: text }) }}
+                                onChangeText={(text) => { this.setState({ boxes: text }) }}
                                 selectionColor={themeColor}
                             />
                         </View>
+                        <View>
+                            <Text>No of Stripes per boxes</Text>
+                            <TextInput
+                                keyboardType={"numeric"}
+                                value={this.state.stripesPerBoxes.toString()}
+                                style={{ marginTop: 20, width: width * 0.7, height: height * 0.05, backgroundColor: "#fafafa", paddingLeft: 15, }}
+                                onChangeText={(text) => { this.setState({ stripesPerBoxes: text }) }}
+                                selectionColor={themeColor}
+                            />
+                        </View>
+                       <View>
+                            <Text>No of Medicine per stripe</Text>
+                            <TextInput
+                                keyboardType={"numeric"}
+                                value={this.state.medicineQty.toString()}
+                                style={{ marginTop: 20, width: width * 0.7, height: height * 0.05, backgroundColor: "#fafafa", paddingLeft: 15, }}
+                                onChangeText={(text) => { this.setState({ medicineQty: text }) }}
+                                selectionColor={themeColor}
+                            />
+                        </View>
+                      {this.state.medicineQty==""&&this.state.boxes==""&&this.state.stripesPerBoxes==""&&
+                      <View>
+                           <Text>Qty</Text>
+                            <TextInput
+                                keyboardType={"numeric"}
+                                value={this.state.qty.toString()}
+                                style={{ marginTop: 20, width: width * 0.7, height: height * 0.05, backgroundColor: "#fafafa", paddingLeft: 15, }}
+                                onChangeText={(text) => { this.setState({ qty: text })}}
+                                selectionColor={themeColor}
+                            />
+                        </View>}
+                        <View>
+                            <Text style={[styles.text,{marginTop:5}]}>Enter Variants</Text>
+                            <View style={{flexDirection:"row"}}>
+                                {
+                                    this.state.medicineVariants.map((i,index) => {
+                                        return (
+                                            <View style={{ flexDirection: "row", marginTop: 5 }}>
+                                                <Text>
+                                                    {i}
+                                                </Text>
+                                                <TouchableOpacity 
+                                                 onPress={()=>{this.removeVariants(i,index)}}
+                                                >
+                                                    <Entypo name="circle-with-cross" size={24} color="red" />
+                                                </TouchableOpacity>
+                                            </View>
+                                        )
+                                    })
+                                }
+                            </View>
+                     
+                            <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-around"}}>
+                                <TextInput
+                                
+                                    value={this.state.variant.toString()}
+                                    style={{ marginTop: 20, width: width * 0.4, height: height * 0.05, backgroundColor: "#fafafa", paddingLeft: 15, }}
+                                    onChangeText={(text) => { this.setState({ variant: text }) }}
+                                    selectionColor={themeColor}
+                                />
+                                <TouchableOpacity style={{width:width*0.25,height:height*0.05,alignItems:"center",justifyContent:"center",backgroundColor:themeColor,borderRadius:5,marginTop:20}}
+                                  onPress={()=>{this.addVariants()}}
+                                >
+                                    <Text style={[styles.text,{color:"#fff"}]}>Add</Text>
+                                </TouchableOpacity>
+                            </View>
+                          
+                        </View>
                         <View style={{ alignItems: "center", justifyContent: 'center' }}>
-                            <TouchableOpacity style={[styles.button, { marginTop: 20 }]}
+                            <TouchableOpacity style={[styles.button, { marginTop: 90 }]}
                                 onPress={() => { this.addMedicine() }}
                             >
                                 <Text style={[styles.text, { color: "#fff" }]}>Add</Text>
@@ -263,6 +424,7 @@ class AddItem extends Component {
                             selectionColor={themeColor}
                         />
                     </View>
+                  
                     <View style={{ alignItems: "center", justifyContent: 'center' }}>
                         <TouchableOpacity style={[styles.button, { marginTop: 20 }]}
                             onPress={() => { this.AddItem() }}
