@@ -102,7 +102,12 @@ componentDidMount(){
                <Text style={[styles.text]}>Total patients</Text>
                <Text style={[styles.text, { fontWeight: "bold", fontSize: 20 }]}>100</Text>
              </View>
-             <TouchableOpacity style={{ alignItems: "center", justifyContent: "center" }}>
+             <TouchableOpacity style={{ alignItems: "center", justifyContent: "center" }}
+              onPress={()=>{
+                this.props.navigation.navigate('PaymentPage')
+              }}
+             
+             >
                <Text style={[styles.text]}>Subscription Valid Till</Text>
                <View style={{ flexDirection: "row" ,marginTop:5}}>
                  <Feather name="calendar" size={24} color={"gray"} />
@@ -111,7 +116,7 @@ componentDidMount(){
 
              </TouchableOpacity>
            </View>
-           <DoctorProfile ClinicSelect={() => { this.ClinicSelect() }} clinics ={this.state.clinics} />
+           <DoctorProfile ClinicSelect={() => { this.ClinicSelect() }} clinics ={this.state.clinics} navigation={this.props.navigation}/>
          </>
        )
      }

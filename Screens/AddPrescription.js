@@ -19,6 +19,8 @@ import Toast from 'react-native-simple-toast';
 import SimpleToast from 'react-native-simple-toast';
 import DropDownPicker from 'react-native-dropdown-picker';
 import FlashMessage, { showMessage, hideMessage } from "react-native-flash-message";
+import DateTimePicker from '@react-native-community/datetimepicker';
+import moment from 'moment';
 class AddPrescription extends Component {
   constructor(props) {
       let sex= [
@@ -34,6 +36,8 @@ class AddPrescription extends Component {
     ]
     super(props);
     this.state = {
+                mode: 'date',
+                date: new Date(),
                 medicines:[],
                 mobileNo:"",
                 patientsName:'',
@@ -44,7 +48,9 @@ class AddPrescription extends Component {
                 sex,
                 healthIssue:"",
                 Age:"",
-                selectedSex:sex[0].value
+                selectedSex:sex[0].value,
+                nextVisit:null,
+              show1:false
     };
   }
     changeFunction = (type, value, index)=>{
@@ -79,7 +85,7 @@ class AddPrescription extends Component {
             return  this.setState({ medicines: duplicate })
         }
         if (type == "comment") {
-            duplicate[index].comment = value
+            duplicate[index].command = value
             return  this.setState({ medicines: duplicate })
         }
         if (type == "variant") {
@@ -99,10 +105,8 @@ class AddPrescription extends Component {
         })
         this.setState({ medicines:this.state.medicines.concat(medicines)})
     }
-    addPriscription = async()=>{
-       
+ addPriscription = async()=>{
         let api =`${url}/api/prescription/addPrescription/`
-        
         if(this.state.medicines.length == 0){
             return SimpleToast.show("Please add medicine")
         }
@@ -113,6 +117,16 @@ class AddPrescription extends Component {
         if (this.state.onGoingTreatMent =="") {
             return SimpleToast.show("Please fill onGoingTreatMent")
         }
+        this.state.medicines.forEach((i)=>{
+            try{
+                i.total_qty = i.days * (i.morning_count + i.afternoon_count + i.night_count)
+            }
+            catch (e){
+                console.log(e)
+            }
+            
+        })
+        
         let sendData ={
             doctor: this.props.user.id,
             medicines:this.state.medicines,
@@ -126,9 +140,8 @@ class AddPrescription extends Component {
             sex:this.state.selectedSex,
 
         }
-
        const post = await HttpsClient.post(api,sendData)
-       console.log(post,"kkk")
+ 
        if(post.type=="success"){
            Toast.show("Added SuccessFully")
            setTimeout(()=>{
@@ -139,6 +152,12 @@ class AddPrescription extends Component {
        }
        
     }
+    onChange1 = (selectedDate) => {
+        if (selectedDate.type == "set") {
+        let nextVisit =  moment(new Date(selectedDate.nativeEvent.timestamp)).format('YYYY/MM/DD')
+        this.setState({ nextVisit,show1:false})
+        }
+    }
     searchUser = async(mobileNo)=>{
         let api = `${url}/api/profile/userss/?search=${mobileNo}&role=Customer`
         this.setState({mobileNo})
@@ -148,7 +167,8 @@ class AddPrescription extends Component {
            console.log(data)
            if(data.type =="success"){
                if (data.data[0]?.mobile == mobileNo){
-                   this.setState({ patientsName: data.data[0].name, health_issues: data.data[0].health_issues})
+                  
+                   this.setState({ patientsName: data.data[0].name,healthIssues: data.data[0].health_issues})
                }
              this.setState({loading:false})
            }
@@ -185,6 +205,7 @@ class AddPrescription extends Component {
     }
   render() {
       const { loading } = this.state;
+   
     return (
         <>
             <SafeAreaView style={styles.topSafeArea} />
@@ -267,9 +288,11 @@ class AddPrescription extends Component {
                         <View style={{ marginTop: 20 }}>
                             <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>Health issues</Text>
                             {
-                                this.state.healthIssues.map((i,index)=>{
+                                this.state?.healthIssues?.map((i,index)=>{
                                       return(
-                                          <View style={{margin:10,flexDirection:"row"}}>
+                                          <View style={{margin:10,flexDirection:"row"}}
+                                           key={index}
+                                          >
                                               <View style={{flex:0.7}}>
                                                   <Text>{index + 1}. {i}</Text>
                                               </View>
@@ -338,6 +361,24 @@ class AddPrescription extends Component {
                                 style={{ width: width * 0.9, height: height * 0.05, backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10 }}
                             />
                         </View>
+                        <View style={{ marginTop: 20 ,flexDirection:"row",flex:1}}>
+                            <View style={{flex:0.5,}}>
+                             
+                                    <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 ,}}>Next Visit</Text>
+
+                                
+                            </View>
+                            <View style={{flex:0.5,alignItems:"center"}}>
+                                 <TouchableOpacity 
+                                   onPress ={()=>{this.setState({show1:true})}}
+                                 >
+                                    <AntDesign name="calendar" size={24} color="black" />
+                                 </TouchableOpacity>
+                               
+                                <Text style={[styles.text]}>{this.state.nextVisit}</Text>
+                            </View>
+                           
+                        </View>
                 <View style={{height:height*0.15,alignItems:"center",justifyContent:'center'}}>
                     <TouchableOpacity style={{height:height*0.06,alignItems:"center",justifyContent:'center',backgroundColor:themeColor,width:width*0.3,borderRadius:15}}
                       onPress={()=>{this.addPriscription()}}
@@ -360,7 +401,16 @@ class AddPrescription extends Component {
                         
                         </View>
             </ScrollView>
-                  
+                    {this.state.show1 && (
+                        <DateTimePicker
+                            testID="TimePicker1"
+                            value={this.state.date}
+                            mode={this.state.mode}
+                            is24Hour={false}
+                            display="default"
+                            onChange={(time) => { this.onChange1(time) }}
+                        />
+                    )}
         </View>
      </SafeAreaView>
        </>

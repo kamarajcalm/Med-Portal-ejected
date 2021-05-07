@@ -163,7 +163,7 @@ class DoctorProfile extends Component {
                        return(
                            <View style={{ backgroundColor: "gray", borderRadius: 10 }}>
                                <TouchableOpacity style={{ flexDirection: "row", minHeight: height * 0.05,borderBottomColor:"#fff" ,borderBottomWidth:0.185}}
-                                   onPress={() => { }}
+                                   onPress={() => { this.props.navigation.navigate('ViewClinicDetails',{item}) }}
                                >
                                    <View style={{ flex: 0.5, justifyContent: "center" }}>
                                        <Text style={[styles.text, { fontWeight: "bold", color: "#fff", marginLeft: 10 }]}>{item.name}</Text>

@@ -57,8 +57,21 @@ class AddItem extends Component {
                     label: "Cream", value: "Cream"
                 },
                 {
+                    label: "Injections", value: "Injections"
+                },
+                {
+                    label: "Drops", value: "Drops"
+                },
+                {
+                    label: "Inhalers", value: "Inhalers"
+                },
+                {
+                    label: "Suppositories", value: "Suppositories"
+                },
+                {
                     label: "Others", value: "Others"
-                }
+                },
+               
             ],
             selectedType:null,
             medicineVariants:[],

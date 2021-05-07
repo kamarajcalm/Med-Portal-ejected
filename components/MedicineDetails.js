@@ -67,7 +67,7 @@ export default class MedicineDetails extends Component {
       }
     
                         // if tablets
-      if (item.type =="Tablet"){
+      if (item.type == "Tablet" || item.type =="Drops"){
          return (
         <View
             key={index}
@@ -87,7 +87,7 @@ export default class MedicineDetails extends Component {
                          <Text style={[styles.text,{}]}> {item.type}</Text>
                 </View>
                
-               <View style={{flexDirection:"row"}}>
+               {/* <View style={{flexDirection:"row"}}>
                              <View style={{alignItems:"center",justifyContent:"center"}}>
                                 <Text style={{ marginRight: 10 }}>Variant</Text>
                              </View>
@@ -109,7 +109,7 @@ export default class MedicineDetails extends Component {
 
                              />
                          
-               </View>
+               </View> */}
             </View>
             <View style={{marginHorizontal:10,flexDirection:"row",alignItems:"center",justifyContent:"space-between"}}>
            
@@ -245,8 +245,8 @@ export default class MedicineDetails extends Component {
               
                 </View>
             </View>
-            
-            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-around", flex: 0.2 }}>
+            <>
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-around", flex: 0.2 }}>
                 <View style={{flexDirection:"row"}}>
                     <Text style={[styles.text, { fontWeight: 'bold' }]}>After food</Text>
 
@@ -272,6 +272,7 @@ export default class MedicineDetails extends Component {
                 </View>
                     
             </View>
+            </>
                  <View style={{margin:10}}>
                      <Text>Comments:</Text>
                      <TextInput
@@ -306,29 +307,7 @@ export default class MedicineDetails extends Component {
                           <Text style={[styles.text, {}]}> {item.type}</Text>
                       </View>
 
-                      <View style={{ flexDirection: "row" }}>
-                          <View style={{ alignItems: "center", justifyContent: "center" }}>
-                              <Text style={{ marginRight: 10 }}>Variant</Text>
-                          </View>
-
-                          <DropDownPicker
-                              items={variants}
-                              placeholder="select"
-                              containerStyle={{ height: 40, width: width * 0.25 }}
-                              style={{ backgroundColor: '#fafafa' }}
-                              itemStyle={{
-                                  justifyContent: 'flex-start'
-                              }}
-                              dropDownStyle={{ backgroundColor: '#fafafa', width: width * 0.25 }}
-                              onChangeItem={item => this.setState({
-                                  selectedVariant: item.value
-                              }, () => {
-                                  this.changeVariant(item.value)
-                              })}
-
-                          />
-
-                      </View>
+                   
                   </View>
                   <View style={{ flex: 0.6, alignItems: 'center', justifyContent: "space-around",flexDirection:"row"}}>
                       <TouchableOpacity style={{ height: height * 0.03, width: width * 0.2, backgroundColor: this.state.morning ? themeColor : "gray", alignItems: "center", justifyContent: 'center', borderRadius: 10 }}
@@ -393,7 +372,7 @@ export default class MedicineDetails extends Component {
                               selectionColor={themeColor}
                               style={{ height: 30, width: 50, backgroundColor: '#eee', borderRadius: 5, marginLeft: 5, paddingLeft: 5 }}
                               value={this.state.days}
-                              onChangeText={(text) => { this.setState({ days: text }) }}
+                              onChangeText={(text) => { this.changeDays(text) }}
                           />
                       </View>
                   </View>
@@ -433,7 +412,7 @@ export default class MedicineDetails extends Component {
                           <Text style={[styles.text, {}]}> {item.type}</Text>
                       </View>
 
-                      <View style={{ flexDirection: "row" }}>
+                      {/* <View style={{ flexDirection: "row" }}>
                           <View style={{ alignItems: "center", justifyContent: "center" }}>
                               <Text style={{ marginRight: 10 }}>Variant</Text>
                           </View>
@@ -455,7 +434,7 @@ export default class MedicineDetails extends Component {
 
                           />
 
-                      </View>
+                      </View> */}
                   </View>
                   <View style={{ flex: 0.6, alignItems: 'center', justifyContent: "space-around", flexDirection: "row" }}>
                       <TouchableOpacity style={{ height: height * 0.03, width: width * 0.2, backgroundColor: this.state.morning ? themeColor : "gray", alignItems: "center", justifyContent: 'center', borderRadius: 10 }}
@@ -504,7 +483,7 @@ export default class MedicineDetails extends Component {
                               selectionColor={themeColor}
                               style={{ height: 30, width: 50, backgroundColor: '#eee', borderRadius: 5, marginLeft: 5, paddingLeft: 5 }}
                               value={this.state.days}
-                              onChangeText={(text) => { this.setState({ days: text }) }}
+                              onChangeText={(text) => { this.changeDays(text) }}
                           />
                       </View>
                   </View>
@@ -529,13 +508,73 @@ export default class MedicineDetails extends Component {
           )
 
       }
-      if (item.type =="Others"){
+      if (item.type == "Injections") {
+          return (
+              <View
+                  key={index}
+                  style={[styles.card3, {flex:1}]}
+              >
+                  <View style={{ alignItems: 'center', justifyContent: "center",flex:0.2 }}>
+                      <Text style={[styles.text, { fontWeight: "bold", fontSize: 20 }]}>{item.title}</Text>
+                  </View>
+                  <View style={{ flexDirection: "row", marginHorizontal: 10, alignItems: "center",flex:0.2}}>
+                      <View style={{ flexDirection: "row" }}>
+                          <Text style={[styles.text]}>Category :</Text>
+                          <Text style={[styles.text, {}]}> {item.type}</Text>
+                      </View>
+
+                    
+                  </View>
+               
+                  <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-around" ,flex:0.2}}>
+
+
+                      <View style={{ flexDirection: "row" ,alignItems:"center",justifyContent:"center"}}>
+                          <View style={{ alignItems: 'center', justifyContent: "center" }}>
+                              <Text>Enter Qty</Text>
+                          </View>
+
+                          <TextInput
+                              keyboardType={"numeric"}
+                              selectionColor={themeColor}
+                              style={{ height: 30, width: 50, backgroundColor: '#eee', borderRadius: 5, marginLeft: 5, paddingLeft: 5 }}
+                              value={this.state.qty}
+                              onChangeText={(text) => { this.changeQty(text) }}
+                          />
+                      </View>
+                  </View>
+                  <View style={{ margin: 10 ,flex:0.6,}}>
+                      <Text>Comments:</Text>
+                      <View style={{flex:1,alignItems:"center",justifyContent:"center"}}>
+                          <TextInput
+                              selectionColor={themeColor}
+                              multiline={true}
+                              onChangeText={(comment) => { this.changeComment(comment) }}
+                              style={{ height: "70%", width: "100%", backgroundColor: "#eee", borderRadius: 10,  textAlignVertical: "top", padding: 5 }}
+                              value={this.state.comment}
+                          />
+                      </View>
+                     
+                  </View>
+                  <TouchableOpacity
+                      onPress={() => { this.props.changeFunction("delete", item, index) }}
+                      style={{ position: "absolute", top: 10, right: 10, }}
+                  >
+                      <Entypo name="circle-with-cross" size={24} color="red" />
+                  </TouchableOpacity>
+
+              </View>
+          )
+
+      }
+    
+      if (item.type == "Others" || item.type == "Suppositories" || item.type =="Inhalers"){
           return(
               <View 
                   key={index}
                   style={[styles.card2,styles.elevation]}
               >
-                  <View style={{ flex: 0.4, margin:20 }}>
+                  <View style={{  margin:20 }}>
                       <Text style={[styles.text, { fontWeight: "bold", fontSize: 20 }]}>{item.title}</Text>
                   </View>
                   <View style={{ flexDirection: "row",alignItems:"center",justifyContent:"center",marginTop:10 }}>
@@ -548,7 +587,7 @@ export default class MedicineDetails extends Component {
                           selectionColor={themeColor}
                           style={{ height: 30, width: 50, backgroundColor: '#eee', borderRadius: 5, marginLeft: 5, paddingLeft: 5 }}
                           value={this.state.qty}
-                          onChangeText={(text) => { this.setState({ qty: text }) }}
+                          onChangeText={(text) => { this.changeQty(text) }}
                       />
                   </View>
                   <View style={{ margin: 10 }}>
@@ -600,6 +639,14 @@ const styles = StyleSheet.create({
       
     },
     card2: {
+        backgroundColor: "#fff",
+        elevation: 6,
+        margin: 10,
+        height: height * 0.25,
+        borderRadius: 10,
+
+    },
+       card3: {
         backgroundColor: "#fff",
         elevation: 6,
         margin: 10,

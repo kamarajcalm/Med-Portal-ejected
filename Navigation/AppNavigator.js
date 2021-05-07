@@ -24,6 +24,8 @@ import ProfileEdit from '../Screens/ProfileEdit';
 import AdminTab from './AdminTab';
 import DefaultScreen from '../Screens/DefaultScreen';
 import MediacalTab from './MediacalTab';
+import ViewClinicDetails from '../Screens/ViewClinicDetails';
+import PaymentPage from '../Screens/PaymentPage';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -82,6 +84,9 @@ export default class AppNavigator extends Component {
                     <Stack.Screen name="ProfileEdit" component={ProfileEdit} options={{ headerShown: false }} />
                     <Stack.Screen name="AdminTab" component={AdminTab} options={{ headerShown: false }} />
                     <Stack.Screen name="MedicalTab" component={MediacalTab} options={{ headerShown: false }} />
+                    <Stack.Screen name="ViewClinicDetails" component={ViewClinicDetails} options={{ headerShown: false }} />
+                    <Stack.Screen name="PaymentPage" component={PaymentPage} options={{ headerShown: false }} />
+
                  </Stack.Navigator>
                 
             </NavigationContainer>

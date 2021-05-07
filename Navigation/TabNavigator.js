@@ -87,7 +87,7 @@ class TabNavigator extends Component {
      
         return true
     }
- 
+  
 
     render() {
         return (
