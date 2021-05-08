@@ -101,8 +101,8 @@ const url = settings.url;
             <SafeAreaView style={styles.topSafeArea} />
             <SafeAreaView style={styles.bottomSafeArea}>
                 <StatusBar backgroundColor={themeColor} />
-                <View style={{flex:1,alignItems:"center",justifyContent:'center'}}>
-                     <ActivityIndicator color={themeColor} size="large"/>
+                <View style={{flex:1,alignItems:"center",justifyContent:'center',backgroundColor:themeColor}}>
+                     <ActivityIndicator color={"#fff"} size="large"/>
                 </View>
             </SafeAreaView>
             </>

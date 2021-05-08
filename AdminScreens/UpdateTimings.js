@@ -107,7 +107,7 @@ class UpdateTimings extends Component {
         let post =  await HttpsClient.post(api,sendData)
         if(post.type =="success"){
 
-              return props.navigation.dispatch(
+              return this.props.navigation.dispatch(
                 CommonActions.reset({
                     index: 0,
                     routes: [

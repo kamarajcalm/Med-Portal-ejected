@@ -98,7 +98,7 @@ class PatientProfile extends Component {
                 </View>
                  <View style={{margin:10}}>
                     <View style={{ marginVertical: 10 }}>
-                        <Text style={[styles.text, { fontWeight: "bold", }]}>Medical Conditions</Text>
+                        <Text style={[styles.text, { fontWeight: "bold", }]}>Health Issues</Text>
                     </View>
                  </View>
                 <View style={{ margin: 10 }}>

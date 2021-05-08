@@ -20,8 +20,8 @@ const url = settings.url
 class Appointments extends Component {
     constructor(props) {
         const routes = [
-            { key: 'NewAppoinments', title: 'New Appoinments' },
-            { key: 'Completed', title: 'All Appoinments'},
+            { key: 'NewAppointments', title: 'New Appointments' },
+            { key: 'Completed', title: 'All Appointments'},
 
         ];
         super(props);
@@ -32,10 +32,10 @@ class Appointments extends Component {
             mode: 'time',
             date: new Date(),
             show: false,
-            appoinments:[],
+            Appointments:[],
             selectedAppointment:null,
             selectedIndex:null,
-            appoinments2:[],
+            Appointments2:[],
             today:"jhj"
         };
     }
@@ -54,9 +54,9 @@ class Appointments extends Component {
         const data = await HttpsClient.get(api)
         console.log(data)
         if (data.type == "success") {
-            let appoinments = this.state.appoinments
+            let Appointments = this.state.Appointments
 
-            this.setState({ appoinments2: data.data })
+            this.setState({ Appointments2: data.data })
         }
     }
     getAppointments =async()=>{
@@ -73,9 +73,9 @@ class Appointments extends Component {
         const data =await HttpsClient.get(api,"lll")
         console.log(data)
         if(data.type =="success"){
-            let appoinments= this.state.appoinments
+            let Appointments= this.state.Appointments
 
-            this.setState({ appoinments:data.data})
+            this.setState({ Appointments:data.data})
         }
     }
     onChange = (selectedDate) => {
@@ -117,7 +117,7 @@ class Appointments extends Component {
     componentWillUnmount(){
         this._unsubscribe();
     }
-    acceptAppoinment =async()=>{
+    acceptAppointment =async()=>{
         let api = `${url}/api/prescription/appointments/${this.state.selectedAppointment.id}/`
         let sendData ={
             accepteddate:this.state.today,
@@ -127,10 +127,10 @@ class Appointments extends Component {
         console.log(sendData)
       let post = await HttpsClient.patch(api,sendData)
       if(post.type =="success"){
-          let duplicate = this.state.appoinments
+          let duplicate = this.state.Appointments
           duplicate[this.state.selectedIndex]=post.data
           Toast.show("Accepted SuccessFully")
-          this.setState({ modal:false,appoinments:duplicate})
+          this.setState({ modal:false,Appointments:duplicate})
       }else{
           Toast.show("Try again")
           this.setState({ modal: false })
@@ -144,10 +144,10 @@ class Appointments extends Component {
         console.log(sendData)
         let post = await HttpsClient.patch(api, sendData)
         if (post.type == "success") {
-            let duplicate = this.state.appoinments
+            let duplicate = this.state.Appointments
             duplicate.splice(this.state.selectedIndex, 1)
             Toast.show("Rejected SuccessFully")
-            this.setState({ modal: false, appoinments: duplicate })
+            this.setState({ modal: false, Appointments: duplicate })
         } else {
             Toast.show("Try again")
             this.setState({ modal: false })
@@ -161,10 +161,10 @@ class Appointments extends Component {
         console.log(sendData)
         let post = await HttpsClient.patch(api, sendData)
         if (post.type == "success") {
-            let duplicate = this.state.appoinments
+            let duplicate = this.state.Appointments
             duplicate.splice(this.state.selectedIndex,1)
             Toast.show("Completed SuccessFully")
-            this.setState({ modal: false, appoinments: duplicate })
+            this.setState({ modal: false, Appointments: duplicate })
             this.getAppointments2();
         } else {
             Toast.show("Try again")
@@ -213,11 +213,11 @@ class Appointments extends Component {
             )
         }
     }
-    viewAppoinments =(item)=>{
+    viewAppointments =(item)=>{
         if(this.props.user.profile.occupation =="Customer"){
-           return   this.props.navigation.navigate('ViewAppoinment',{item})
+           return   this.props.navigation.navigate('ViewAppointment',{item})
         }
-        return this.props.navigation.navigate('ViewAppoinmentDoctors',{item})
+        return this.props.navigation.navigate('ViewAppointmentDoctors',{item})
     }
     validateColor =(status)=>{
         if(status =="Completed"){
@@ -236,7 +236,7 @@ class Appointments extends Component {
     FirstRoute =()=>{
         return(
             <FlatList 
-              data={this.state.appoinments}
+              data={this.state.Appointments}
               keyExtractor ={(item,index)=>index.toString()}
               renderItem ={({item,index})=>{
              
@@ -249,7 +249,7 @@ class Appointments extends Component {
                
                 return(
                     <TouchableOpacity
-                        onPress={() => { this.viewAppoinments(item) }}
+                        onPress={() => { this.viewAppointments(item) }}
                       style={{
                             marginTop: 10,
                             minHeight: height * 0.1,
@@ -312,7 +312,7 @@ class Appointments extends Component {
                 }else{
                     return(
                         <TouchableOpacity
-                            onPress={() => { this.viewAppoinments(item)}}
+                            onPress={() => { this.viewAppointments(item)}}
                          style={{
                                 marginTop: 10,
                                 minHeight: height * 0.1,
@@ -419,7 +419,7 @@ class Appointments extends Component {
     SecondRoute =()=>{
         return(
             <FlatList
-                data={this.state.appoinments2}
+                data={this.state.Appointments2}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item, index }) => {
                     if (this.props.user.profile.occupation == "Customer") {
@@ -508,13 +508,13 @@ class Appointments extends Component {
        
     }
     renderScene = SceneMap({
-        NewAppoinments: this.FirstRoute,
+        NewAppointments: this.FirstRoute,
         Completed: this.SecondRoute,
     });
     // renderScene = (routes) => {
 
     //     return(<FlatList 
-    //         data ={this.state.appoinments}
+    //         data ={this.state.Appointments}
     //         keyExtractor ={(item,index)=>index.toString()}
     //         renderItem ={({item,index})=>{
 
@@ -682,7 +682,7 @@ class Appointments extends Component {
                         </View>
                         <View>
                             <TouchableOpacity style={{backgroundColor:themeColor,height:height*0.05,width:width*0.4,alignItems:'center',justifyContent:"center",borderRadius:10,marginTop:30}}
-                              onPress ={()=>{this.acceptAppoinment()}}
+                              onPress ={()=>{this.acceptAppointment()}}
                             >
                                 <Text style={[styles.text,{color:"#fff"}]}>Accept</Text>
                             </TouchableOpacity>
@@ -705,7 +705,7 @@ class Appointments extends Component {
                         <View style={{ height: height * 0.1, backgroundColor: themeColor, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, flexDirection: 'row', alignItems: "center" }}>
                     
                             <View style={{ flex: 0.6, alignItems: "center", justifyContent: "center" }}>
-                                <Text style={[styles.text, { color: '#fff', marginLeft: 20, fontWeight: 'bold' ,fontSize:25}]}>Appoinments</Text>
+                                <Text style={[styles.text, { color: '#fff', marginLeft: 20, fontWeight: 'bold' ,fontSize:25}]}>Appointments</Text>
                             </View>
                            
                         </View>
@@ -730,7 +730,7 @@ class Appointments extends Component {
                             }
 
                         />
-                         {/* Appoinments */}
+                         {/* Appointments */}
                         {this.Modal()}
                         {this.state.show && (
                             <DateTimePicker

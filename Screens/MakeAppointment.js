@@ -18,7 +18,7 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 import Toast from 'react-native-simple-toast';
-class MakeAppoinment extends Component {
+class MakeAppointment extends Component {
     constructor(props) {
   
         let item = props.route.params.item
@@ -88,7 +88,7 @@ class MakeAppoinment extends Component {
         }
 
     }
-    requestAppoinment = async()=>{
+    requestAppointment = async()=>{
         let api =`${url}/api/prescription/addAppointment/`
         let sendData ={
             clinic: this.state.selectedClinic.pk,
@@ -122,7 +122,7 @@ class MakeAppoinment extends Component {
                                 <Ionicons name="chevron-back-circle" size={30} color="#fff" />
                             </TouchableOpacity>
                             <View style={{ flex: 0.6, alignItems: 'center', justifyContent: "center" }}>
-                                <Text style={[styles.text, { color: "#fff" }]}>Make Appoinment</Text>
+                                <Text style={[styles.text, { color: "#fff" }]}>Make Appointment</Text>
                             </View>
                             <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
 
@@ -204,9 +204,9 @@ class MakeAppoinment extends Component {
                         </View>
 
                         <TouchableOpacity style={{ height: height * 0.07, position: 'absolute', width: width * 0.7, backgroundColor: themeColor, bottom: 30, left: 60, borderRadius: 20, alignItems: "center", justifyContent: "center", flexDirection: "row" }}
-                            onPress={() => { this.requestAppoinment() }}
+                            onPress={() => { this.requestAppointment() }}
                         >
-                            <Text style={[styles.text, { color: "#fff" }]}>Request Appoinment</Text>
+                            <Text style={[styles.text, { color: "#fff" }]}>Request Appointment</Text>
                          
 
                         </TouchableOpacity>
@@ -239,4 +239,4 @@ const mapStateToProps = (state) => {
         user:state.selectedUser,
     }
 }
-export default connect(mapStateToProps, { selectTheme })(MakeAppoinment)
+export default connect(mapStateToProps, { selectTheme })(MakeAppointment)

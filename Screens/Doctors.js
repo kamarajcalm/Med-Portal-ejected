@@ -8,23 +8,35 @@ import { AntDesign } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import png from '../assets/marker/stethoscope.png'
 import { WebView } from 'react-native-webview';
+import HttpsClient from '../api/HttpsClient';
 
 const { height, width } = Dimensions.get("window");
 const themeColor = settings.themeColor;
 const fontFamily =settings.fontFamily;
-
+const url =settings.url
  class Doctors extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      location:null
+      location:null,
+      markers:[]
     };
   }
-   getMarkers =()=>{
-       
+   getMarkers =async(lat,long)=>{
+         const api =`${url}/api/prescription/nearestClinic/`
+          let sendData ={
+            lat:lat.toString(),
+            long: long.toString(),
+            all:"true"
+          }
+         const data =await HttpsClient.post(api,sendData)
+        if(data.type=="success"){
+         
+          this.setState({ markers: data.data.clinics})
+        }
    }
    getLocation =async()=>{
-     let { status } = await Location.requestPermissionsAsync()
+     let { status } = await Location.requestForegroundPermissionsAsync()
      if (status !== 'granted') {
        console.warn('Permission to access location was denied');
        return;
@@ -42,7 +54,7 @@ const fontFamily =settings.fontFamily;
  }
   render() {
     const {location} =this.state
-    console.log(location?.latitude,"kkkk")
+   console.log(this.state.ma)
     return (
         <>
         
@@ -55,35 +67,54 @@ const fontFamily =settings.fontFamily;
                region={this.state?.location}
      
             >
-             <Marker
-                coordinate={{ latitude: location?.latitude, longitude: location?.longitude }}
-                >
-                <MapView.Callout 
-                tooltip={true}
-                  onPress={()=>{console.log("pressed")}}
-                >
-                   <View style={{height:height*0.2,backgroundColor:"#fff",width:width*0.4,alignItems:"center",justifyContent:"center"}}>
-                      <Text style={{height:60}}>
-                      <Image
-                        source={{
-                          uri: "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"
-                        }}
-                        style={{ width: 40, height: 40, resizeMode: "cover" }}
-                      />
-                      </Text>
-                    
-                      <Text style={[styles.text]}>Doctor Name</Text>
-                      <Text style={[styles.text,{color:"gray"}]}>Specialization</Text>
-            
-                     
-              
-                  
-                 
-                   </View>
-                  
-                </MapView.Callout>
+              {this.state.markers.length>0&&
+                this.state.markers.map((item,index)=>{
+                     let dp =null
+                  if (item.displayPicture){
+                    dp = `${url}${item.displayPicture}`
+             
+                  }
+                    return(
+                      <Marker
+                      style={{height:100}}
+                         key={index}
+                        coordinate={{ latitude: Number(item?.lat), longitude: Number(item?.long,)  }}
+                        image={require('../assets/marker/custommarker.png')}
+                      >
+                        <MapView.Callout
+                          tooltip={true}
+                          onPress={() => { this.props.navigation.navigate('ViewClinic',{item}) }}
+                        >
+                          <View style={{ height: height * 0.2, backgroundColor: "#fff", width: width * 0.4, alignItems: "center",  }}>
+                            <Text style={{ height: 80 }}>
+                              <Image
+                                source={{
+                                  uri: dp
+                                }}
+                                style={{ width: 60, height: 60, resizeMode: "cover" }}
+                              />
+                            </Text>
+                             <View style={{alignItems:'center',justifyContent:'center'}}>
+                              <Text style={[styles.text]}>{item.title}</Text>
+                             </View>
+                            <View style={{alignItems:'center',justifyContent:"center"}}>
+                              <Text style={[styles.text, { color: "gray" }]}>{item.type}</Text>
+                            </View>
+                          
 
-                </Marker>
+
+
+
+
+                          </View>
+
+                        </MapView.Callout>
+
+                      </Marker>
+                    )
+                })
+            }
+             
                 
             </MapView>:<View>
                  <ActivityIndicator size ="large" color ={themeColor} />

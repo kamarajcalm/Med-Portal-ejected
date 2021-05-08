@@ -183,7 +183,7 @@ class DoctorProfile extends Component {
               </View>
                 <View style={{ margin: 10}}>
                     <View style={{ marginVertical: 10 }}>
-                        <Text style={[styles.text, { fontWeight: "bold", }]}>Patient Details</Text>
+                        <Text style={[styles.text, { fontWeight: "bold", }]}>Patient Attended</Text>
                     </View>
                     <View style={{ backgroundColor: "gray", borderRadius: 10, elevation: 5 }}>
                         <View style={{ flexDirection: "row", minHeight: height * 0.05, borderBottomColor: "#fff", borderBottomWidth: 0.185 }}

@@ -479,7 +479,6 @@ const styles = StyleSheet.create({
 
 })
 const mapStateToProps = (state) => {
-
     return {
         theme: state.selectedTheme,
         user: state.selectedUser,

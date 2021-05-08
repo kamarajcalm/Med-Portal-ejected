@@ -28,28 +28,28 @@ UNSAFE_componentWillReceiveProps(){
     }
 }
     icon = (label, isFocused) => {
-        if (label == "priscription") {
+        if (label == "Prescription") {
             return (
                 <MaterialCommunityIcons name="cards" size={24} color={isFocused?"#fff":"gray"} />
             )
         }
-        if (label == "Appoinments") {
+        if (label == "Appointments") {
             return (
                 <MaterialCommunityIcons name="timetable" size={24} color={isFocused ? "#fff" : "gray"} />
                
             )
         }
-        if (label == "doctor") {
+        if (label == "Search") {
             return (
                 <Fontisto name="doctor" size={24} color={isFocused ? "#fff" : "gray"} />
             )
         }
-        if (label == "chat") {
+        if (label == "Chat") {
             return (
                 <Ionicons name="chatbubble-ellipses" size={24} color={isFocused ? "#fff" : "gray"} />
             )
         }
-        if (label == "profile") {
+        if (label == "Profile") {
             return (
                 <Ionicons name="md-person-circle" size={24} color={isFocused ? "#fff" : "gray"}/>
             )
@@ -107,7 +107,7 @@ UNSAFE_componentWillReceiveProps(){
                             target: route.key,
                         });
                     };
-                     if(label == 'Appoinments'){
+                     if(label == 'Appointments'){
                          
                          if(this.state.user=="doctor"){
                             
@@ -134,7 +134,7 @@ UNSAFE_componentWillReceiveProps(){
                          }
                      
                      }
-                    if (label != 'Appoinments'){
+                    if (label != 'Appointments'){
                         return (
                             <TouchableOpacity
 

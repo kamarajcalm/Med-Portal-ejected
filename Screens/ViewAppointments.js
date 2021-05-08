@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import { View, Text, Dimensions, TouchableOpacity, StyleSheet, TextInput, FlatList, Image, SafeAreaView } from 'react-native';
+import { View, Text, Dimensions, TouchableOpacity, StyleSheet, TextInput, FlatList, Image, SafeAreaView, Linking} from 'react-native';
 import { Ionicons, Entypo, AntDesign, FontAwesome5} from '@expo/vector-icons';
 import { connect } from 'react-redux';
 import { selectTheme } from '../actions';
@@ -10,10 +10,9 @@ import Medicine from '../components/Medicine';
 import HttpsClient from '../api/HttpsClient';
 const { height, width } = Dimensions.get("window");
 const fontFamily = settings.fontFamily;
-import * as Linking from 'expo-linking';
 const themeColor = settings.themeColor;
 const url = settings.url;
-class ViewAppoinments extends Component {
+class ViewAppointments extends Component {
     constructor(props) {
         super(props);
         let item =this.props.route.params.item
@@ -81,7 +80,7 @@ class ViewAppoinments extends Component {
                             <Ionicons name="chevron-back-circle" size={30} color="#fff" />
                         </TouchableOpacity>
                         <View style={{ flex: 0.7, }}>
-                            <Text style={[styles.text,{color:"#fff"}]}> Appoinment Details</Text>
+                            <Text style={[styles.text,{color:"#fff"}]}> Appointment Details</Text>
                         </View>
 
                     </View>
@@ -102,10 +101,10 @@ class ViewAppoinments extends Component {
                            
                             </View>
                       </View>
-                        {/* Appoinment Details */}
+                        {/* Appointment Details */}
                         <View style={{margin:20}}>
                             <View style={{flexDirection:"row"}}>
-                                <Text style={[styles.text]}>Appoinment Status:</Text>
+                                <Text style={[styles.text]}>Appointment Status:</Text>
                                 <Text style={[styles.text, { marginLeft: 10, color: this.validateColor(this.state.item.status)}]}>{this.state.item.status}</Text>
                             </View>
                             <View style={{ flexDirection: "row",marginTop:20 }}>
@@ -174,4 +173,4 @@ const mapStateToProps = (state) => {
         user:state.selectedUser
     }
 }
-export default connect(mapStateToProps, { selectTheme })(ViewAppoinments);
+export default connect(mapStateToProps, { selectTheme })(ViewAppointments);

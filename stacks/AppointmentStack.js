@@ -5,9 +5,9 @@ import Profile from '../Screens/Profile';
 import ProfileEdit from '../Screens/ProfileEdit';
 import Appointments from '../Screens/Appointments';
 import ProfileView from '../Screens/ProfileView';
-import ViewAppoinments from '../Screens/ViewAppoinments';
+import ViewAppointments from '../Screens/ViewAppointments';
 import ChatScreen from '../Screens/ChatScreen';
-import ViewAppoinmentDoctors from '../Screens/ViewAppoinmentDoctors';
+import ViewAppointmentDoctors from '../Screens/ViewAppointmentDoctors';
 const Stack = createStackNavigator();
 export default class AppointmentStack extends Component {
     constructor(props) {
@@ -19,10 +19,10 @@ export default class AppointmentStack extends Component {
     render() {
         return (
             <Stack.Navigator>
-                <Stack.Screen name="Appoinments" component={Appointments} options={{ headerShown: false }} />
+                <Stack.Screen name="Appointments" component={Appointments} options={{ headerShown: false }} />
                 <Stack.Screen name="ProfileView" component={ProfileView} options={{ headerShown: false }} />
-                <Stack.Screen name="ViewAppoinment" component={ViewAppoinments} options={{ headerShown: false }} />
-                <Stack.Screen name="ViewAppoinmentDoctors" component={ViewAppoinmentDoctors} options={{ headerShown: false }} />
+                <Stack.Screen name="ViewAppointment" component={ViewAppointments} options={{ headerShown: false }} />
+                <Stack.Screen name="ViewAppointmentDoctors" component={ViewAppointmentDoctors} options={{ headerShown: false }} />
                 <Stack.Screen name="Chat" component={ChatScreen} options={{ headerShown: false }} />
             </Stack.Navigator>
         );

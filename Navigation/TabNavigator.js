@@ -60,15 +60,14 @@ class TabNavigator extends Component {
     }
     getTabBarVisibility4 = (route) => {
         const routeName = route.state ? route.state.routes[route.state.index].name : ''
-        if (routeName == "ViewAppoinment") {
+        if (routeName == "ViewAppointment") {
             return false
         }
-        if (routeName == "ViewAppoinmentDoctors") {
+      
+        if (routeName == "ViewAppointmentDoctors") {
             return false
         }
-        if (routeName == "Chat") {
-            return false
-        }
+      
 
         return true
     }
@@ -80,10 +79,18 @@ class TabNavigator extends Component {
         if (routeName == "ProfileView"){
             return false
         }
-        if (routeName == "MakeAppoinment") {
+        if (routeName == "MakeAppointment") {
             return false
         }
-       
+        if (routeName == "makeAppointmentClinic") {
+            return false
+        }
+        if (routeName == "ViewClinic") {
+            return false
+        }
+        if (routeName == "Chat") {
+            return false
+        }
      
         return true
     }
@@ -96,21 +103,21 @@ class TabNavigator extends Component {
                     tabBar={props => <MyTabBar {...props} />}
                     
                 >
-                    <Tab.Screen name="priscription" component={PriscriptionStack}
+                    <Tab.Screen name="Prescription" component={PriscriptionStack}
                         options={({ route }) => ({
 
                             tabBarVisible: this.getTabBarVisibility(route),
 
                         })}
                     />
-                <Tab.Screen name="Appoinments" component={AppointmentStack}
+                <Tab.Screen name="Appointments" component={AppointmentStack}
                     options={({ route }) => ({
 
                         tabBarVisible: this.getTabBarVisibility4(route),
 
                     })}
                 />
-                    <Tab.Screen name="doctor" component={DoctorsStack}
+                    <Tab.Screen name="Search" component={DoctorsStack}
                         options={({ route }) => ({
 
                             tabBarVisible: this.getTabBarVisibility3(route),
@@ -118,7 +125,7 @@ class TabNavigator extends Component {
                         })}
 
                     />
-                    <Tab.Screen name="chat" component={ChatStack}
+                    <Tab.Screen name="Chat" component={ChatStack}
                         options={({ route }) => ({
 
                             tabBarVisible: this.getTabBarVisibility2(route),
@@ -126,7 +133,7 @@ class TabNavigator extends Component {
                         })}
 
                     />
-                    <Tab.Screen name="profile" component={ProfileStack}
+                    <Tab.Screen name="Profile" component={ProfileStack}
                    
 
                     />

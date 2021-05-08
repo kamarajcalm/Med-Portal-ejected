@@ -66,7 +66,7 @@ class MediacalTab extends Component {
                         }
                         ,
                         tabBarLabel: ({ focused }) => {
-                            return <Text style={{ color: focused ? "#fff" : "gray", fontFamily }}>Priscription</Text>
+                            return <Text style={{ color: focused ? "#fff" : "gray", fontFamily }}>Prescription</Text>
                         }
                     }}
 

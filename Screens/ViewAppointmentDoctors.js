@@ -14,7 +14,7 @@ import { Linking } from 'react-native';
 
 const themeColor = settings.themeColor;
 const url = settings.url;
-class ViewAppoinmentDoctors extends Component {
+class ViewAppointmentDoctors extends Component {
     constructor(props) {
         super(props);
         let item = this.props.route.params.item
@@ -75,7 +75,7 @@ class ViewAppoinmentDoctors extends Component {
                             <Ionicons name="chevron-back-circle" size={30} color="#fff" />
                         </TouchableOpacity>
                         <View style={{ flex: 0.7, }}>
-                            <Text style={[styles.text, { color: "#fff" }]}> Appoinment Details</Text>
+                            <Text style={[styles.text, { color: "#fff" }]}> Appointment Details</Text>
                         </View>
 
                     </View>
@@ -96,10 +96,10 @@ class ViewAppoinmentDoctors extends Component {
 
                             </View>
                         </View>
-                        {/* Appoinment Details */}
+                        {/* Appointment Details */}
                         <View style={{ margin: 20 }}>
                             <View style={{ flexDirection: "row" }}>
-                                <Text style={[styles.text]}>Appoinment Status:</Text>
+                                <Text style={[styles.text]}>Appointment Status:</Text>
                                 <Text style={[styles.text, { marginLeft: 10, color: this.validateColor(this.state.item.status) }]}>{this.state.item.status}</Text>
                             </View>
                             <View style={{ flexDirection: "row", marginTop: 20 }}>
@@ -158,4 +158,4 @@ const mapStateToProps = (state) => {
         user: state.selectedUser
     }
 }
-export default connect(mapStateToProps, { selectTheme })(ViewAppoinmentDoctors);
+export default connect(mapStateToProps, { selectTheme })(ViewAppointmentDoctors);

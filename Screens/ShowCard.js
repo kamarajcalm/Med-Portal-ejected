@@ -39,29 +39,7 @@ class ShowCard extends Component {
         }
     }
 
-    header = () => {
-        return (
-            <View style={{ flexDirection: "row", marginTop: 20, alignItems: "center", justifyContent: "space-between" }}>
 
-                <View style={{ alignItems: 'center', justifyContent: "center" }}>
-                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>AF</Text>
-                </View>
-                <View style={{ alignItems: 'center', justifyContent: "center" }}>
-                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>morning</Text>
-                </View>
-                <View style={{ alignItems: 'center', justifyContent: "center" }}>
-                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>ANoon</Text>
-                </View>
-                <View style={{ alignItems: 'center', justifyContent: "center" }}>
-                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>Night</Text>
-                </View>
-                <View style={{ alignItems: 'center', justifyContent: "center" }}>
-                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>Qty</Text>
-                </View>
-              
-            </View>
-        )
-    }
     requestPdf =async()=>{
         let api =`${url}/api/prescription/paymentpdf/`
         let data =await HttpsClient.get(api)
@@ -279,7 +257,7 @@ class ShowCard extends Component {
                                 <TouchableOpacity style={{ flex: 0.2, marginLeft: 20, alignItems: "center", justifyContent: 'center' }}
                                     onPress={() => { this.props.navigation.goBack() }}
                                 >
-                                <Ionicons name="chevron-back-circle" size={30} color="#35a6de" />
+                                <Ionicons name="chevron-back-circle" size={30} color="#007A7A" />
                                 </TouchableOpacity>
                                
                                     <Image
@@ -287,7 +265,7 @@ class ShowCard extends Component {
                                         source={require('../assets/icons/34.png')}
                                     />
                                     <View style={{alignItems:"center",justifyContent:'center'}}>
-                                <Text style={[styles.text, { fontSize: 25, fontWeight: "bold", color: "#35a6de", marginLeft: 10 }]}>{item?.clinicname?.name|| "Clinic Name"}</Text>
+                                <Text style={[styles.text, { fontSize: 25, fontWeight: "bold", color: "#007A7A", marginLeft: 10 }]}>{item?.clinicname?.name|| "Clinic Name"}</Text>
 
                                     </View>
                                 </View>
@@ -369,7 +347,7 @@ class ShowCard extends Component {
                         />
 
                     </View>
-                   {<View style={{position:'absolute',bottom:150,width,alignItems:"center"}}>
+                   {<View style={{position:'absolute',bottom:50,width,alignItems:"center"}}>
                         <TouchableOpacity style={{height:height*0.05,width:width*0.4,alignItems:"center",justifyContent:"center",borderRadius:5,backgroundColor:themeColor,flexDirection:'row'}}
                           onPress={()=>{
                               this.requestPdf()

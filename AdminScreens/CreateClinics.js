@@ -194,7 +194,7 @@ class CreateClinics extends Component {
         this.setState({ image: photo, changedImage: true })
     }
     getLocation = async () => {
-        let { status } = await Location.requestPermissionsAsync()
+        let { status } = await Location.requestForegroundPermissionsAsync()
         if (status !== 'granted') {
             console.warn('Permission to access location was denied');
             return;

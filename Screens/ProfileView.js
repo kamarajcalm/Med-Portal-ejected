@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StatusBar, Dimensions, Image, StyleSheet, TouchableOpacity, AsyncStorage, SafeAreaView, ScrollView } from 'react-native';
+import { View, Text, StatusBar, Dimensions, Image, StyleSheet, TouchableOpacity, AsyncStorage, SafeAreaView, ScrollView, Linking} from 'react-native';
 import settings from '../AppSettings';
 import axios from 'axios';
 import Modal from 'react-native-modal';
@@ -12,8 +12,8 @@ const fontFamily = settings.fontFamily;
 import { connect } from 'react-redux';
 import { selectTheme } from '../actions';
 import { NavigationContainer, CommonActions } from '@react-navigation/native';
-import openMap ,{createOpenLink} from 'react-native-open-maps';
-import * as Linking from 'expo-linking';
+
+
 import HttpsClient from '../api/HttpsClient';
 class ProfileView extends Component {
     constructor(props) {
@@ -150,9 +150,9 @@ class ProfileView extends Component {
                         </View>
                        
                         <TouchableOpacity style={{ height: height * 0.07, position: 'absolute', width: width * 0.6, backgroundColor: themeColor ,bottom:30,left:70,borderRadius:20,alignItems:"center",justifyContent:"center",flexDirection:"row"}}
-                          onPress ={()=>{this.props.navigation.navigate('MakeAppoinment',{item:this.state.item})}}
+                          onPress ={()=>{this.props.navigation.navigate('MakeAppointment',{item:this.state.item})}}
                         >
-                            <Text style={[styles.text,{color:"#fff"}]}>Make Appoinment</Text>
+                            <Text style={[styles.text,{color:"#fff"}]}>Make Appointment</Text>
                             <View style={{marginLeft:20}}>
                                 <AntDesign name="right" size={20} color="#fff"/>
                             </View>
