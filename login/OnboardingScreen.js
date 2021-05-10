@@ -12,7 +12,7 @@ const bgs = ['#A5BBFF', '#DDBEFE', '#FF63ED', '#B98EFF'];
 const DATA = [
     {
         "key": "3571572",
-        "title": "Multi-lateral intermediate moratorium",
+        "title": "changed occursss",
         "description": "I'll back up the multi-byte XSS matrix, that should feed the SCSI application!",
         "image": "https://image.freepik.com/free-vector/online-doctor-concept_52683-37585.jpg"
     },

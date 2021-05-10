@@ -87,6 +87,7 @@ class Priscription extends React.Component {
     getPateintPrescription = async()=>{
         let api = `${url}/api/prescription/prescriptions/?forUser=${this.props.user.id}`
         let data =await HttpsClient.get(api)
+        console.log(api)
         if(data.type =="success"){
             this.setState({ prescriptions:data.data,isFetching:false})
         }
@@ -115,6 +116,7 @@ class Priscription extends React.Component {
     getClinics = async()=>{
         const api = `${url}/api/prescription/getDoctorClinics/?doctor=${this.props.user.id}`
         const data = await HttpsClient.get(api)
+        console.log(api)
        console.log(data)
         if(data.type=="success"){
       
@@ -260,7 +262,7 @@ class Priscription extends React.Component {
                   <View style={{justifyContent:"space-around",flex:1}}>
                       <Text style={[styles.text, { fontSize: 18,}]}>{item?.clinicname.name}</Text>
                       <Text style={[styles.text, { fontSize: 12,fontWeight:"bold" }]}>Reason:</Text>
-                      <Text style={[styles.text, { fontSize: 12, }]}>{item.reason}</Text>
+                      <Text style={[styles.text, { fontSize: 12, }]}>{item.ongoing_treatment}</Text>
                   </View>
 
               </View>

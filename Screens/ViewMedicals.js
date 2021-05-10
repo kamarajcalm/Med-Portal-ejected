@@ -93,7 +93,6 @@ class ViewMedicals extends Component {
 
         const now = moment.tz(timezone);
 
-
         const date = now.format("YYYY-MM-DD");
         const storeOpenTime = moment.tz(date + ' ' + openTime, "YYYY-MM-DD h:mmA", timezone);
         const storeCloseTime = moment.tz(date + ' ' + closeTime, "YYYY-MM-DD h:mmA", timezone);
@@ -276,21 +275,13 @@ class ViewMedicals extends Component {
                         </ScrollView>
                     </View>
 
-                    <TouchableOpacity style={{ height: height * 0.07, position: 'absolute', width: width * 0.6, backgroundColor: themeColor, bottom: 30, left: 70, borderRadius: 20, alignItems: "center", justifyContent: "center", flexDirection: "row" }}
-                        onPress={() => { this.props.navigation.navigate('makeAppointmentClinic', { item: this.state.item, }) }}
-                    >
-                        <Text style={[styles.text, { color: "#fff" }]}>Book Appointment</Text>
-                        <View style={{ marginLeft: 20 }}>
-                            <AntDesign name="right" size={20} color="#fff" />
-                        </View>
-
-                    </TouchableOpacity>
+                   
                     <View style={{ alignItems: "center", justifyContent: "space-around", flexDirection: "row", position: "absolute", bottom: 100, width }}>
                         <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center' }}
                             onPress={() => { this.chatClinic() }}
                         >
                             <MaterialIcons name="chat" size={24} color="black" />
-                            <Text>with clinic</Text>
+                            <Text>with Store</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center' }}
                             onPress={() => {

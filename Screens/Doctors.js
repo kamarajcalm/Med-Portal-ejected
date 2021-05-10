@@ -30,7 +30,7 @@ const url =settings.url
             all:"true"
           }
          const data =await HttpsClient.post(api,sendData)
-      
+       console.log()
         if(data.type=="success"){
          
           this.setState({ markers: data.data.clinics})

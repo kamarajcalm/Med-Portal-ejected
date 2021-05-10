@@ -34,13 +34,50 @@ class SearchDoctors extends Component {
     }
 
     SearchDoctors = async(query)=>{
-        let api = `${url}/api/profile/userss/?search=${query}&role=Doctor`
+        let api = `${url}/api/prescription/searchClinic/?search=${query}`
         console.log(api)
         let data =await HttpsClient.get(api)
         console.log(data)
         if(data.type ="success"){
             this.setState({ doctors:data.data})
         }
+    }
+    differentiateTypes= (item)=>{
+        if (item.type =="Clinic"){
+            return (
+                <>
+                    <View>
+                        <Text style={[styles.text]}>{item.title}</Text>
+                    </View>
+                    { item.doctor_name?<View>
+                        <Text style={[styles.text,{color:"gray"}]}>({item.doctor_name})</Text>
+                    </View>:
+                    <View>
+                            <Text style={[styles.text, { color: "gray" }]}>({item.type})</Text>
+                    </View>
+                    }
+                </>
+            )
+        }
+        if (item.type == "MedicalStore") {
+            return (
+                <>
+                    <View>
+                        <Text style={[styles.text]}>{item.title}</Text>
+                    </View>
+                    <View>
+                        <Text style={[styles.text,{color:"gray"}]}>({item.type})</Text>
+                    </View>
+                </>
+            )
+        }
+ 
+    }
+    navigate = (item) => {
+        if (item.type == "MedicalStore") {
+            return this.props.navigation.navigate('ViewMedicals', { item })
+        }
+        return this.props.navigation.navigate('ViewClinic', { item })
     }
     render() {
         return (
@@ -70,24 +107,24 @@ class SearchDoctors extends Component {
                    data ={this.state.doctors}
                    keyExtractor ={(item,index)=>index.toString()}
                    renderItem ={({item,index})=>{
-                       console.log(item,"jjj")
+                       let dp =''
+                       if (item.displayPicture){
+                           dp = `${url}${item.displayPicture}`
+                       }
                      return(
                          <TouchableOpacity style={{height:height*0.07,marginTop:20,flexDirection:"row"}}
-                             onPress={() => { this.props.navigation.navigate("ProfileView",{item})}}
+                             onPress={() => { this.navigate(item)}}
                          >
                              <View style={{ flex: 0.3, alignItems: 'center', justifyContent: "center" }}>
                                  <Image
-                                     source={{ uri: item.displayPicture ||"https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
+                                     source={{ uri: dp||"https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
                                      style={{ height: 60, width: 60, borderRadius: 30 }}
                                  />
                              </View>
                              <View style ={{flex:0.7}}>
-                                  <View>
-                                      <Text style={[styles.text]}>{item.name}</Text>
-                                  </View>
-                                 <View>
-                                     <Text style={[styles.text]}>{item.specialization}</Text>
-                                 </View>
+                                 {
+                                     this.differentiateTypes (item)
+                                 }
                              </View>
                          </TouchableOpacity>
                      )
