@@ -9,6 +9,7 @@ import authAxios from '../api/authAxios';
 const fontFamily = settings.fontFamily;
 const themeColor = settings.themeColor;
 const url =settings.url;
+const date =new Date()
 import { Linking } from 'react-native';
 import { Feather ,Entypo} from '@expo/vector-icons';
 import HttpsClient from '../api/HttpsClient';
@@ -91,28 +92,71 @@ class ViewMedicals extends Component {
                                 </View>
 
                             </View>
-                            <View style={{ marginHorizontal: 20, marginTop: 10, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
-                                    <View style={{ justifyContent: "center", alignItems: "center" }}>
-                                        <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>OpeningTime:</Text>
-
-                                    </View>
-                                    <View style={{ alignItems: "center", justifyContent: "center", marginTop: 3, marginLeft: 5 }}>
-                                        <Text>{this.state?.item?.startingtime}</Text>
-                                    </View>
-
+                            <View style={{ marginHorizontal: 20, marginTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: "space-between" }}>
+                                <View>
+                                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>OpeningTime:</Text>
                                 </View>
-                                <View style={{ flexDirection: 'row', alignItems: "center", justifyContent: "center" }}>
-                                    <View style={{ alignItems: "center", justifyContent: "center" }}>
-                                        <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>ClosingTime:</Text>
-
-                                    </View>
-                                    <View style={{ alignItems: "center", justifyContent: "center", marginTop: 3, marginLeft: 5 }}>
-                                        <Text>{this.state?.item?.closingtime}</Text>
-                                    </View>
-
+                                <View>
+                                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>ClosingTime:</Text>
                                 </View>
                             </View>
+                            <View style={{ marginHorizontal: 20, marginTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: "space-between" }}>
+                                <View>
+                                    <View style={{ alignSelf: "flex-start" }}>
+                                        <Text style={[styles.text, { fontWeight: "bold", fontSize: 18, color: "gray" }]}>Today:</Text>
+                                    </View>
+
+                                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>{this.state?.item?.working_hours[date?.getDay()][0]}</Text>
+                                </View>
+                                <View>
+                                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>{this.state?.item?.working_hours[date?.getDay()][1]}</Text>
+                                </View>
+
+                            </View>
+                            <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                <TouchableOpacity
+                                    onPress={() => { this.setState({ showAll: !this.state.showAll }) }}
+                                >
+                                    <Text>{this.state.showAll ? "showLess" : "showAll"}</Text>
+                                </TouchableOpacity>
+                            </View>
+                            {this.state.showAll &&
+                                this.state.item.working_hours.map((i) => {
+                                    let day = ""
+                                    if (i[2] == "0") {
+                                        day = "Sun"
+                                    } else if (i[2] == "1") {
+                                        day = "Mon"
+                                    } else if (i[2] == "2") {
+                                        day = "Tue"
+                                    } else if (i[2] == "3") {
+                                        day = "Wed"
+                                    } else if (i[2] == "4") {
+                                        day = "Thu"
+                                    } else if (i[2] == "5") {
+                                        day = "Fri"
+                                    } else if (i[2] == "6") {
+                                        day = "Sat"
+                                    } else {
+                                        day == ""
+                                    }
+
+                                    return (
+                                        <View style={{ marginHorizontal: 20, marginTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: "space-between" }}>
+                                            <View>
+                                                <View style={{ alignSelf: "flex-start" }}>
+                                                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 18, color: "gray" }]}>{day}:</Text>
+                                                </View>
+
+                                                <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>{i[0]}</Text>
+                                            </View>
+                                            <View>
+                                                <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>{i[1]}</Text>
+                                            </View>
+                                        </View>
+                                    )
+                                })
+                            }
                             <View style={{ flexDirection: "row", marginHorizontal: 20, marginTop: 10 }}>
                                 <View style={{ alignItems: "center", justifyContent: "center" }}>
                                     <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Mobile:</Text>

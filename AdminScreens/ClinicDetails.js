@@ -50,7 +50,7 @@ class ClinicDetails extends Component {
     getDoctors =async()=>{
         let api = `${url}/api/prescription/clinicDoctors/?clinic=${this.state.item.id}`
         const data = await HttpsClient.get(api)
-        console.log(data,"jjjjj")
+        console.log(api,"jjjjj")
         if (data.type == "success") {
             this.setState({ doctors: data.data })
         }
@@ -81,6 +81,7 @@ class ClinicDetails extends Component {
         }
     }
     componentDidMount() {
+        
         this.getReceptionList();
         this.getDoctors();
         this._unsubscribe = this.props.navigation.addListener('focus', () => {
@@ -88,6 +89,25 @@ class ClinicDetails extends Component {
             this.getReceptionList();
             this.getDoctors();
         });
+    }
+    getTodayTimings =(item)=>{
+      let  days =["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
+      let today =days[date.getDay()]
+      return(
+          item.clinicShits[today].map((i,index)=>{
+              return(
+                  <View style={{flexDirection:"row",marginTop:5}}>
+                      <Text>{index+1}.</Text>
+                      <Text style={{marginLeft:5}}>{i.timings[0][0]}</Text>
+                      <Text>-</Text>
+                      <Text>{i.timings[0][1]}</Text>
+                  </View>
+              )
+          })
+      )
+
+       
+       
     }
     componentWillUnmount() {
         this._unsubscribe();
@@ -161,10 +181,10 @@ class ClinicDetails extends Component {
                                         <Text style={[styles.text, { fontWeight: "bold", fontSize: 18, color: "gray" }]}>Today:</Text>
                                     </View>
 
-                                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>{this.state.item.working_hours[date.getDay()][0]}</Text>
+                                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>{this.state?.item?.working_hours[date?.getDay()][0]}</Text>
                                 </View>
                                 <View>
-                                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>{this.state.item.working_hours[date.getDay()][1]}</Text>
+                                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>{this.state?.item?.working_hours[date?.getDay()][1]}</Text>
                                 </View>
                                
                             </View>
@@ -313,7 +333,11 @@ class ClinicDetails extends Component {
                                     keyExtractor={(item, index) => index.toString()}
                                     renderItem={({ item, index }) => {
                                         return (
-                                            <View style={{ flexDirection: "row", height: height * 0.1, }}>
+                                            <TouchableOpacity style={{ flexDirection: "row", marginTop:15 }}
+                                              onPress={()=>{
+                                                  this.props.navigation.navigate('ViewDoctor',{item})
+                                              }}
+                                            >
                                                 <View style={{ alignItems: "center", justifyContent: "center",flex:0.2 }}>
                                                     <Image
                                                         source={{ uri: item.doctor.profile.displayPicture || "https://s3-ap-southeast-1.amazonaws.com/practo-fabric/practices/711061/lotus-multi-speciality-health-care-bangalore-5edf8fe3ef253.jpeg" }}
@@ -324,20 +348,22 @@ class ClinicDetails extends Component {
                                                 <View style={{ alignItems: 'center', justifyContent: "center" ,flex:0.2}}>
                                                     <Text>{item.doctor.first_name}</Text>
                                                 </View>
-                                                <View style={{ alignItems: 'center', justifyContent: "center", flex:0.2 }}>
-                                                    <Text style={[styles.text,{fontWeight:"bold"}]}>From :</Text>
-                                                    <Text style={[styles.text]}>{item.fromTimeStr}</Text>
-                                                </View>
-                                                <View style={{ alignItems: 'center', justifyContent: "center", flex:0.2 }}>
-                                                    <Text style={[styles.text, { fontWeight: "bold" }]}>To Time:</Text>
-                                                    <Text style={[styles.text]}>{item.toTimeStr}</Text>
-                                                </View>
-                                                <TouchableOpacity style={{alignItems:'center',justifyContent:'center',flex:0.2}} 
+                                                <View style={{flex:0.5, alignItems: 'center', justifyContent: 'center' }}>
+                                                    <View >
+                                                        <Text style={[styles.text]}>Today Timings:</Text>
+                                                    </View>
+                                                   {
+                                                       this.getTodayTimings(item)
+                                                   }
+                                                  
+                                               </View>
+                                                
+                                                <TouchableOpacity style={{alignItems:'center',justifyContent:'center',flex:0.1}} 
                                                   onPress={()=>{this.setState({showModal:true,deleteDoctor:item,deleteDocorIndex:index})}}
                                                 >
                                                     <Entypo name="circle-with-cross" size={24} color={themeColor} />
                                                 </TouchableOpacity>
-                                            </View>
+                                            </TouchableOpacity>
                                         )
                                     }}
                                 />

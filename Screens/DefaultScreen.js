@@ -1,20 +1,30 @@
 import React, { Component } from 'react';
 import { View, Text, SafeAreaView, Dimensions, StyleSheet, ActivityIndicator, StatusBar, AsyncStorage} from 'react-native';
 import settings from '../AppSettings';
-import { connect } from 'react-redux';
+import { connect, connectAdvanced } from 'react-redux';
 import { selectTheme ,selectUser} from '../actions';
 const { height, width } = Dimensions.get("window");
 import { NavigationContainer, CommonActions } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import HttpsClient from '../api/HttpsClient';
+import Constants from 'expo-constants';
+import * as Notifications from 'expo-notifications';
 const fontFamily = settings.fontFamily;
 const themeColor = settings.themeColor;
 const url = settings.url;
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
+
  class DefaultScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-        
+        token:null
     };
   }
      getUserDetails = async () => {
@@ -31,13 +41,14 @@ const url = settings.url;
       //    })
       //  )
          const login = await AsyncStorage.getItem("login")
-        
-         
+       this.registerForPushNotificationsAsync().then(token => this.setState({token}));
+        //  console.log(this.state.token,"tttt")
+        // return
          if (login) {
               const data = await HttpsClient.get(`${url}/api/HR/users/?mode=mySelf&format=json`);
               console.log(data)
               if(data.type =="success"){
-                console.log("Geeeee")
+                 
                 this.props.selectUser(data.data[0]);
                 if (data.data[0].is_superuser) {
                   return this.props.navigation.dispatch(
@@ -94,7 +105,36 @@ const url = settings.url;
   componentDidMount(){
       this.getUserDetails()
   }
+  registerForPushNotificationsAsync =async function () {
+  let token;
+  if (Constants.isDevice) {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+      alert('Failed to get push token for push notification!');
+      return;
+    }
+    token = (await Notifications.getExpoPushTokenAsync()).data;
+    console.log(token);
+  } else {
+    alert('Must use physical device for Push Notifications');
+  }
 
+  if (Platform.OS === 'android') {
+    Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#FF231F7C',
+    });
+  }
+
+  return token;
+}
   render() {
     return (
           <>

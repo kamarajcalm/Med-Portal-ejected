@@ -29,12 +29,13 @@ class PriscriptionIssue extends Component {
             show: false,
             priscriptions:[],
             showModal:false,
-            medicals:[]
+            medicals:[],
+            showCalender:false
         };
     }
     onChange = (selectedDate) => {
         if (selectedDate.type == "set") {
-            this.setState({ today: moment(new Date(selectedDate.nativeEvent.timestamp)).format('YYYY-MM-DD'), show: false, date: new Date(selectedDate.nativeEvent.timestamp) }, () => {
+            this.setState({ today: moment(new Date(selectedDate.nativeEvent.timestamp)).format('YYYY-MM-DD'),showCalender: false, date: new Date(selectedDate.nativeEvent.timestamp) }, () => {
                 this.getPriscriptions(this.props.medical.clinicpk)
                 console.log(this.props.medical,"vvvv")
 
@@ -110,7 +111,7 @@ class PriscriptionIssue extends Component {
                                     <Text style={[styles.text, { color: '#fff', fontWeight: 'bold', fontSize: 23, marginLeft: 20 }]}>Priscription</Text>
                                 </View>
                                 {this.props.user.profile.occupation == "MediacalRep" &&<TouchableOpacity style={{ flex: 0.5, alignItems: "center", justifyContent: "center" ,flexDirection:"row"}}
-                                  onPress ={()=>{this.setState({showModal:true})}}
+                                    onPress={() => { this.setState({ showModal: true, showCalender:false})}}
                                 >
                                     <View style={{alignItems:"center",justifyContent:"center"}}>
                                         <Text style={[styles.text, { color: '#fff', }]}>{this.props?.medical?.name}</Text>
@@ -130,12 +131,13 @@ class PriscriptionIssue extends Component {
                                 <Text style={[styles.text, { color: "#000" }]}>{this.state.today}</Text>
                                 <TouchableOpacity
                                     style={{ marginLeft: 20 }}
-                                    onPress={() => { this.setState({ show: true }) }}
+                                    onPress={() => { this.setState({ showCalender: true }) }}
                                 >
                                     <Fontisto name="date" size={24} color={themeColor} />
                                 </TouchableOpacity>
-                                {this.state.show && (
+                                {this.state.showCalender && (
                                     <DateTimePicker
+                                        
                                         testID="dateTimePicker1"
                                         value={this.state.date}
                                         mode={this.state.mode}

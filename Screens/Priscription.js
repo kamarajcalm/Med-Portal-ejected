@@ -12,7 +12,8 @@ import {
     FlatList,
     TouchableOpacity,
     Image,
-    ActivityIndicator
+    ActivityIndicator,
+    TextInput
 } from "react-native";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { AntDesign } from '@expo/vector-icons';
@@ -25,7 +26,7 @@ import { selectTheme,selectClinic } from '../actions';
 import authAxios from '../api/authAxios';
 import HttpsClient from "../api/HttpsClient";
 import Modal from 'react-native-modal';
-import { Ionicons, Entypo, Feather, MaterialCommunityIcons, FontAwesome, FontAwesome5} from '@expo/vector-icons';
+import { Ionicons, Entypo, Feather, MaterialCommunityIcons, FontAwesome, FontAwesome5, EvilIcons} from '@expo/vector-icons';
 const url =settings.url
 const fontFamily = settings.fontFamily;
 const themeColor =settings.themeColor
@@ -63,7 +64,8 @@ class Priscription extends React.Component {
             clinics:[],
             prescriptions:[],
             isReceptionist:false,
-            isFetching:false
+            isFetching:false,
+            search:false
         };
     }
     onChange = (selectedDate) => {
@@ -164,6 +166,12 @@ class Priscription extends React.Component {
             
         });
     }
+    searchPriscriptions =(text)=>{
+     let filter  =this.state.prescriptions.filter((i)=>{
+         return i.clinicname.name.includes(text)
+     })
+        this.setState({ prescriptions:filter})
+    }
     componentWillUnmount(){
         this._unsubscribe();
     }
@@ -236,7 +244,8 @@ class Priscription extends React.Component {
               </TouchableOpacity>
           )
       }
-                // if patient
+        
+      // if patient
       return(
           <TouchableOpacity style={[styles.card, { flexDirection: "row", borderRadius: 5 }]}
               onPress={() => { this.props.navigation.navigate('showCard', { item }) }}
@@ -251,7 +260,7 @@ class Priscription extends React.Component {
                   <View style={{justifyContent:"space-around",flex:1}}>
                       <Text style={[styles.text, { fontSize: 18,}]}>{item?.clinicname.name}</Text>
                       <Text style={[styles.text, { fontSize: 12,fontWeight:"bold" }]}>Reason:</Text>
-                      <Text style={[styles.text, { fontSize: 12, }]}>For Feverrr</Text>
+                      <Text style={[styles.text, { fontSize: 12, }]}>{item.reason}</Text>
                   </View>
 
               </View>
@@ -301,10 +310,33 @@ class Priscription extends React.Component {
 
         return(
             <>
-                <View style={{ flex: 0.5, alignItems: 'center', justifyContent: "center" }}>
+                {!this.state.search?<View style={{ flex: 1, flexDirection:"row"}}>
+                    <View style={{flex:0.8,justifyContent:'center'}}>
+                        <Text style={{ color: '#fff', fontFamily: "openSans", marginLeft: 20, fontSize: 30, fontWeight: "bold" }}>Prescription</Text>
 
-                     <Text style={{ color: '#fff', fontFamily: "openSans", marginLeft: 20, fontSize: 30, fontWeight: "bold" }}>Prescription</Text>
-                </View>
+                    </View>
+                    <TouchableOpacity style={{flex:0.2,alignItems:'center',justifyContent:"center"}}
+                     onPress={()=>{this.setState({search:true})}}
+                    >
+                        <Feather name="search" size={24} color="#fff" />
+                    </TouchableOpacity>
+                </View>:
+                    <View style={{ height: height * 0.1, backgroundColor: themeColor, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, flexDirection: 'row', alignItems: "center" ,flex:1}}>
+                        <TouchableOpacity style={{ flex: 0.2, alignItems: "center", justifyContent: "center" }}
+                            onPress={() => { this.setState({ search: false }); }}
+                        >
+                            <Ionicons name="chevron-back-circle" size={30} color="#fff" />
+                        </TouchableOpacity>
+                        <View style={{ flex: 0.8 }}>
+                            <TextInput
+
+                                style={{ height: height * 0.04, width: width * 0.7, backgroundColor: "#fff", borderRadius: 10, paddingLeft: 20 }}
+                                placeholder="search"
+                                onChangeText={(text) => { this.searchPriscriptions(text) }}
+                            />
+                        </View>
+                    </View>
+                }
                 
             </>
         )

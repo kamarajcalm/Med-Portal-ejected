@@ -236,12 +236,13 @@ class Appointments extends Component {
     FirstRoute =()=>{
         return(
             <FlatList 
+              contentContainerStyle={{paddingBottom:90}}
               data={this.state.Appointments}
               keyExtractor ={(item,index)=>index.toString()}
               renderItem ={({item,index})=>{
              
             if (this.props.user.profile.occupation == "Customer") {
-              
+              console.log(item)
                             let dp =null
                             if (item.doctordetails.dp){
                                 dp = `${url}${item.doctordetails.dp}`
@@ -249,7 +250,7 @@ class Appointments extends Component {
                
                 return(
                     <TouchableOpacity
-                        onPress={() => { this.viewAppointments(item) }}
+                        onPress={() => { this.viewAppointments(item)}}
                       style={{
                             marginTop: 10,
                             minHeight: height * 0.1,
@@ -268,22 +269,26 @@ class Appointments extends Component {
                         }}
 
                     >
-                        <TouchableOpacity style={{ flex: 0.2, alignItems: "center", justifyContent: 'center' }}
-                            onPress={() => { this.props.navigation.navigate('ProfileView') }}
-                        >
-                            <Image
-                                source={{ uri: dp||"https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
-                                style={{ height: 60, width: 60, borderRadius: 30 }}
-                            />
-                        </TouchableOpacity>
-                        <View style={{ flex: 0.4, justifyContent: "space-around", alignItems: "center", }}>
-                            <Text style={[styles.text]}>{item.doctordetails.name}</Text>
-                            <Text style={[styles.text]}>{item.clinicname}</Text>
+                       
+                        <View style={{ flex: 0.6,justifyContent:"center"}}>
+                            <View style={{flexDirection:"row",margin:5,flex:0.5}}>
+
+                                    <Text style={[styles.text,{fontWeight:"bold"}]}>Clinic   :</Text>
+                                    <Text style={[styles.text,{marginLeft:10}]}>{item.clinicname}</Text>
+                            </View>
+                            <View style={{ flexDirection: "row", margin: 5 ,flex:0.5}}>
+                                    <Text style={[styles.text,{fontWeight:"bold"}]}>Reason:</Text>
+                                    <View style={{justifyContent:'center',flex:1}}>
+                                        <Text style={[styles.text, { marginLeft: 10}]}>{item.reason}</Text>
+
+                                    </View>
+                                  
+                            </View>
                         </View>
 
                         {/* TABS */}
 
-                        <View style={{ flex: 0.4, flexDirection: "row", alignItems: "center", justifyContent: 'center' }}>
+                        <View style={{ flex: 0.4, flexDirection: "row", alignItems: "center", justifyContent: 'center',}}>
                             <View style={{ alignItems: 'center', justifyContent: "center" }}>
                                 <Text style={[styles.text]}>Status:</Text>
                                 <Text style={[styles.text,{color:this.validateColor(item.status)}]}>{item.status}</Text>
@@ -330,18 +335,21 @@ class Appointments extends Component {
                             }}
 
                         >
-                            <TouchableOpacity style={{ flex: 0.2, alignItems: "center", justifyContent: 'center' }}
-                                onPress={() => { this.props.navigation.navigate('ProfileView') }}
-                            >
-                                <Image
-                                    source={{ uri: item.patientname.dp || "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
-                                    style={{ height: 60, width: 60, borderRadius: 30 }}
-                                />
-                            </TouchableOpacity>
-                            <View style={{ flex: 0.4, justifyContent: "space-around", alignItems: "center", }}>
-                                <Text style={[styles.text]}>{item.patientname.name}</Text>
-                                <Text style={[styles.text]}>{item.patientname.mobile}</Text>
-                            </View>
+                                <View style={{ flex: 0.6, justifyContent: "center" }}>
+                                    <View style={{ flexDirection: "row", margin: 5, flex: 0.5 }}>
+
+                                        <Text style={[styles.text, { fontWeight: "bold" }]}>Name   :</Text>
+                                        <Text style={[styles.text, { marginLeft: 10 }]}>{item.clinicname}</Text>
+                                    </View>
+                                    <View style={{ flexDirection: "row", margin: 5, flex: 0.5 }}>
+                                        <Text style={[styles.text, { fontWeight: "bold" }]}>Reason:</Text>
+                                        <View style={{ justifyContent: 'center', flex: 1 }}>
+                                            <Text style={[styles.text, { marginLeft: 10 }]}>{item.reason}</Text>
+
+                                        </View>
+
+                                    </View>
+                                </View>
 
 
 
@@ -419,6 +427,7 @@ class Appointments extends Component {
     SecondRoute =()=>{
         return(
             <FlatList
+            contentContainerStyle={{paddingBottom:90}}
                 data={this.state.Appointments2}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item, index }) => {
@@ -429,6 +438,7 @@ class Appointments extends Component {
                         }
                         return (
                             <TouchableOpacity
+                                onPress={() => { this.viewAppointments(item) }}
                                 style={{
                                     marginTop: 10,
                                     minHeight: height * 0.1,
@@ -439,17 +449,21 @@ class Appointments extends Component {
                                 }}
 
                             >
-                                <TouchableOpacity style={{ flex: 0.2, alignItems: "center", justifyContent: 'center' }}
-                                    onPress={() => { this.props.navigation.navigate('ProfileView') }}
-                                >
-                                    <Image
-                                        source={{ uri: dp || "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
-                                        style={{ height: 60, width: 60, borderRadius: 30 }}
-                                    />
-                                </TouchableOpacity>
-                                <View style={{ flex: 0.4, justifyContent: "space-around", alignItems: "center", }}>
-                                    <Text style={[styles.text]}>{item.doctordetails.name}</Text>
-                                    <Text style={[styles.text]}>{item.clinicname}</Text>
+                               
+                                <View style={{ flex: 0.6, justifyContent: "center" }}>
+                                    <View style={{ flexDirection: "row", margin: 5, flex: 0.5 }}>
+
+                                        <Text style={[styles.text, { fontWeight: "bold" }]}>Clinic   :</Text>
+                                        <Text style={[styles.text, { marginLeft: 10 }]}>{item.clinicname}</Text>
+                                    </View>
+                                    <View style={{ flexDirection: "row", margin: 5, flex: 0.5 }}>
+                                        <Text style={[styles.text, { fontWeight: "bold" }]}>Reason:</Text>
+                                        <View style={{ justifyContent: 'center', flex: 1 }}>
+                                            <Text style={[styles.text, { marginLeft: 10 }]}>{item.reason}</Text>
+
+                                        </View>
+
+                                    </View>
                                 </View>
 
                                 {/* TABS */}

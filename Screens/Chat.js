@@ -15,10 +15,9 @@ import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
  class Chat extends Component {
   constructor(props) {
     const routes = [
-      { key: 'Clinics', title: 'Clinics & Medicals' },
+      { key: 'Clinics', title: 'Clinics' },
       { key: 'Doctors', title: 'Doctors' },
-    
-
+      { key: 'Medicals', title: 'Medicals'},
     ];
     super(props);
     this.state = {
@@ -27,6 +26,7 @@ import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
       chats:[],
       clinics:[],
       doctors:[],
+      medicals:[]
     };
   }
    getChats = async()=>{
@@ -42,9 +42,14 @@ import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
        api = `${url}/api/prescription/getThreads/?type=doctor&doctor=${this.props.user.id}`
      }
      let data =await HttpsClient.get(api)
-     console.log(data,"kkk")
+      console.log(api,'ghj')
      if(data.type =="success"){
-       this.setState({ clinics: data.data.clinicchats, doctors: data.data.doctorchats, chats:data.data})
+       this.setState({ 
+         clinics: data.data.clinicchats, 
+         doctors: data.data.doctorchats, 
+         medicals: data.data.medicalchats,
+         chats:data.data
+        })
      }
    }
 componentDidMount(){
@@ -122,6 +127,42 @@ componentDidMount(){
        />
      )
    }
+   ThirdRoute =()=>{
+     return (
+       <FlatList
+         contentContainerStyle={{ paddingBottom: 90 }}
+
+         data={this.state.medicals}
+
+         keyExtractor={(item, index) => index.toString()}
+
+         renderItem={({ item, index }) => {
+           return (
+             <TouchableOpacity style={{ height: height * 0.1, backgroundColor: "#fafafa", marginTop: 1, flexDirection: 'row' }}
+               onPress={() => { this.navigate(item, "doctor") }}
+             >
+               <View style={{ flex: 0.3, alignItems: "center", justifyContent: "center" }}>
+                 <Image
+                   source={{
+                     uri: item.dp || "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"
+                   }}
+                   style={{ height: 60, width: 60, borderRadius: 30, }}
+                 />
+               </View>
+               <View style={{ flex: 0.7, }}>
+                 <View style={{ flex: 0.4, justifyContent: "center" }}>
+                   <Text style={[styles.text, { fontWeight: 'bold', fontSize: 16 }]}>{item.title}</Text>
+                 </View>
+                 <View style={{ flex: 0.6, }}>
+                   <Text style={[styles.text]}>{item.lastmsg}</Text>
+                 </View>
+               </View>
+             </TouchableOpacity>
+           )
+         }}
+       />
+     )
+   }
 navigate =(item,type)=>{
 let itemArrange ={}
 if(type=="clinic"){
@@ -145,6 +186,7 @@ if(type=="clinic"){
    renderScene = SceneMap({
      Clinics: this.FirstRoute,
      Doctors:this.SecondRoute,
+     Medicals:this.ThirdRoute,
    });
    indexChange = async (index,) => {
   

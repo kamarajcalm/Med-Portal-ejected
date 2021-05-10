@@ -22,7 +22,7 @@ import Toast from 'react-native-simple-toast';
 import authAxios from '../api/authAxios';
 import SimpleToast from 'react-native-simple-toast';
 const url = settings.url
-class AddDoctor extends Component {
+class EditDoctorTimings extends Component {
     constructor(props) {
         let clinic = props.route.params.clinic
         console.log(clinic)
@@ -34,7 +34,7 @@ class AddDoctor extends Component {
             date: new Date(),
             show1: false,
             show2: false,
-            doctor:null,
+            doctor: null,
             clinic,
             Sun: {
                 day: "Sun",
@@ -78,13 +78,13 @@ class AddDoctor extends Component {
                 endtime: "7:00 pm",
                 index: 6,
             },
-            SunArray:[],
-            MonArray:[],
-            TueArray:[],
-            WedArray:[],
-            ThuArray:[],
-            FriArray:[],
-            SatArray:[],
+            SunArray: [],
+            MonArray: [],
+            TueArray: [],
+            WedArray: [],
+            ThuArray: [],
+            FriArray: [],
+            SatArray: [],
         };
     }
 
@@ -216,11 +216,11 @@ class AddDoctor extends Component {
         }
 
     }
-    addDoctor = async()=>{
-        let api  =`${url}/api/prescription/addDoctors/`
-        let timings =[
+    addDoctor = async () => {
+        let api = `${url}/api/prescription/addDoctors/`
+        let timings = [
             {
-                type: "Monday", 
+                type: "Monday",
                 timings: this.state.MonArray
             },
             {
@@ -248,29 +248,29 @@ class AddDoctor extends Component {
                 timings: this.state.SunArray
             },
         ]
-        let sendData ={
+        let sendData = {
             doctor: this.state.doctor.user,
-            clinic:this.state.clinic,
+            clinic: this.state.clinic,
             timings
-          
+
         }
-     
-        let post  =await HttpsClient.post(api,sendData)
-        console.log(post,"jkjjj")
-        if(post.type=="success"){
-              Toast.show("Added Successfully");
-              setTimeout(()=>{
-                  this.props.navigation.goBack()
-              })
-        }else{
+
+        let post = await HttpsClient.post(api, sendData)
+        console.log(post, "jkjjj")
+        if (post.type == "success") {
+            Toast.show("Added Successfully");
+            setTimeout(() => {
+                this.props.navigation.goBack()
+            })
+        } else {
             Toast.show("try again");
         }
     }
     componentDidMount() {
 
     }
-    pushSun = ()=>{
-        let duplicate =this.state.SunArray
+    pushSun = () => {
+        let duplicate = this.state.SunArray
         if (this.state.Sun.starttime == undefined) {
             return SimpleToast.show("please add from Time")
         }
@@ -278,17 +278,17 @@ class AddDoctor extends Component {
             return SimpleToast.show("please add end Time")
         }
         duplicate.push(this.state.Sun)
-        this.setState({ Sun: {}, SunArray:duplicate})
+        this.setState({ Sun: {}, SunArray: duplicate })
     }
-    removeSunArray =(item,index)=>{
+    removeSunArray = (item, index) => {
         let duplicate = this.state.SunArray
-        duplicate.splice(index,1)
-        this.setState({ SunArray: duplicate})
+        duplicate.splice(index, 1)
+        this.setState({ SunArray: duplicate })
     }
     pushMon = () => {
         let duplicate = this.state.MonArray
-     
-        if (this.state.Mon.starttime==undefined) {
+
+        if (this.state.Mon.starttime == undefined) {
             return SimpleToast.show("please add from Time")
         }
         if (this.state.Mon.endtime == undefined) {
@@ -304,7 +304,7 @@ class AddDoctor extends Component {
     }
     pushTue = () => {
         let duplicate = this.state.TueArray
-    
+
         if (this.state.Tue.starttime == undefined) {
             return SimpleToast.show("please add from Time")
         }
@@ -416,7 +416,7 @@ class AddDoctor extends Component {
                             <ScrollView style={{ margin: 20 }}
                                 showsVerticalScrollIndicator={false}
                             >
-                            
+
                                 <View >
                                     <Text style={styles.text}>Name</Text>
                                     <TouchableOpacity
@@ -426,41 +426,41 @@ class AddDoctor extends Component {
                                         <Text>{this.state?.doctor?.name}</Text>
                                     </TouchableOpacity>
                                 </View>
-                                           {/* TIMINGS... */}
+                                {/* TIMINGS... */}
 
                                 <View style={{ padding: 20 }}>
                                     <View>
                                         <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Sun :</Text>
                                     </View>
                                     {
-                                        this.state.SunArray.map((i,index)=>{
-                                              return(
-                                                  <View 
-                                                    style={{flexDirection:"row",marginTop:7}}
+                                        this.state.SunArray.map((i, index) => {
+                                            return (
+                                                <View
+                                                    style={{ flexDirection: "row", marginTop: 7 }}
                                                     key={index}
-                                                  >
-                                                    <View style={{flexDirection:'row'}}>
-                                                          <Text style={[styles.text,{color:"gray"}]}>{i.starttime}</Text>
-                                                          <Text style={[styles.text, { color: "gray" }]}>-</Text>
-                                                          <Text style={[styles.text, { color: "gray" }]}>{i.endtime}</Text>
+                                                >
+                                                    <View style={{ flexDirection: 'row' }}>
+                                                        <Text style={[styles.text, { color: "gray" }]}>{i.starttime}</Text>
+                                                        <Text style={[styles.text, { color: "gray" }]}>-</Text>
+                                                        <Text style={[styles.text, { color: "gray" }]}>{i.endtime}</Text>
                                                     </View>
-                                                     <TouchableOpacity 
-                                                     style={{marginLeft:10}}
-                                                      onPress ={()=>{this.removeSunArray(i,index)}}
-                                                     >
-                                                          <Entypo name="circle-with-cross" size={24} color="red" />
-                                                     </TouchableOpacity>
-                                                  </View>
-                                              )
+                                                    <TouchableOpacity
+                                                        style={{ marginLeft: 10 }}
+                                                        onPress={() => { this.removeSunArray(i, index) }}
+                                                    >
+                                                        <Entypo name="circle-with-cross" size={24} color="red" />
+                                                    </TouchableOpacity>
+                                                </View>
+                                            )
                                         })
                                     }
-                                    <View style={{ height: height * 0.08, flexDirection: "row",alignItems:"center",justifyContent:"space-between" }}>
+                                    <View style={{ height: height * 0.08, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
 
                                         <View style={{ flex: 0.33 }}>
-                                            <View style={{alignItems:"center",justifyContent:"center"}}>
+                                            <View style={{ alignItems: "center", justifyContent: "center" }}>
                                                 <Text style={styles.text}>From Time</Text>
                                             </View>
-                                           
+
                                             <View style={{ flexDirection: "row", marginTop: 5, alignItems: "center", }}>
                                                 <TouchableOpacity
                                                     onPress={() => { this.setState({ show1: true, day: "Sun" }) }}
@@ -475,10 +475,10 @@ class AddDoctor extends Component {
                                         </View>
 
                                         <View style={{ flex: 0.33, }}>
-                                            <View style={{alignItems:"center",justifyContent:"center"}}>
+                                            <View style={{ alignItems: "center", justifyContent: "center" }}>
                                                 <Text style={styles.text}>To Time</Text>
                                             </View>
-                                          
+
                                             <View style={{ flexDirection: "row", marginTop: 5, alignItems: "center", }}>
                                                 <TouchableOpacity
                                                     onPress={() => { this.setState({ show2: true, day: "Sun" }) }}
@@ -491,10 +491,10 @@ class AddDoctor extends Component {
                                             </View>
 
                                         </View>
-                                        <TouchableOpacity style={{height:height*0.05,backgroundColor:themeColor,alignItems:'center',justifyContent:'center',borderRadius:10,flex:0.33}}
-                                          onPress={()=>{this.pushSun()}}
+                                        <TouchableOpacity style={{ height: height * 0.05, backgroundColor: themeColor, alignItems: 'center', justifyContent: 'center', borderRadius: 10, flex: 0.33 }}
+                                            onPress={() => { this.pushSun() }}
                                         >
-                                            <Text style={[styles.text,{color:"#fff"}]}>Add</Text>
+                                            <Text style={[styles.text, { color: "#fff" }]}>Add</Text>
                                         </TouchableOpacity>
                                     </View>
                                     <View>
@@ -503,9 +503,9 @@ class AddDoctor extends Component {
                                     {
                                         this.state.MonArray.map((i, index) => {
                                             return (
-                                                <View 
-                                                  style={{ flexDirection: "row" ,marginTop:7}}
-                                                   key ={index}
+                                                <View
+                                                    style={{ flexDirection: "row", marginTop: 7 }}
+                                                    key={index}
                                                 >
                                                     <View style={{ flexDirection: 'row' }}>
                                                         <Text style={[styles.text, { color: "gray" }]}>{i.starttime}</Text>
@@ -565,7 +565,7 @@ class AddDoctor extends Component {
                                     {
                                         this.state.TueArray.map((i, index) => {
                                             return (
-                                                <View style={{ flexDirection: "row" ,marginTop:7}}>
+                                                <View style={{ flexDirection: "row", marginTop: 7 }}>
                                                     <View style={{ flexDirection: 'row' }}>
                                                         <Text style={[styles.text, { color: "gray" }]}>{i.starttime}</Text>
                                                         <Text style={[styles.text, { color: "gray" }]}>-</Text>
@@ -582,7 +582,7 @@ class AddDoctor extends Component {
                                     }
                                     <View style={{ height: height * 0.07, flexDirection: "row", }}>
 
-                                        <View style={{ flex: 0.33}}>
+                                        <View style={{ flex: 0.33 }}>
                                             <Text style={styles.text}>From Time</Text>
                                             <View style={{ flexDirection: "row", marginTop: 5, alignItems: "center", }}>
                                                 <TouchableOpacity
@@ -685,7 +685,7 @@ class AddDoctor extends Component {
                                     {
                                         this.state.ThuArray.map((i, index) => {
                                             return (
-                                                <View style={{ flexDirection: "row" ,marginTop:7}}>
+                                                <View style={{ flexDirection: "row", marginTop: 7 }}>
                                                     <View style={{ flexDirection: 'row' }}>
                                                         <Text style={[styles.text, { color: "gray" }]}>{i.starttime}</Text>
                                                         <Text style={[styles.text, { color: "gray" }]}>-</Text>
@@ -745,7 +745,7 @@ class AddDoctor extends Component {
                                     {
                                         this.state.FriArray.map((i, index) => {
                                             return (
-                                                <View style={{ flexDirection: "row",marginTop:7 }}>
+                                                <View style={{ flexDirection: "row", marginTop: 7 }}>
                                                     <View style={{ flexDirection: 'row' }}>
                                                         <Text style={[styles.text, { color: "gray" }]}>{i.starttime}</Text>
                                                         <Text style={[styles.text, { color: "gray" }]}>-</Text>
@@ -805,7 +805,7 @@ class AddDoctor extends Component {
                                     {
                                         this.state.SatArray.map((i, index) => {
                                             return (
-                                                <View style={{ flexDirection: "row" ,marginTop:7}}>
+                                                <View style={{ flexDirection: "row", marginTop: 7 }}>
                                                     <View style={{ flexDirection: 'row' }}>
                                                         <Text style={[styles.text, { color: "gray" }]}>{i.starttime}</Text>
                                                         <Text style={[styles.text, { color: "gray" }]}>-</Text>
@@ -879,7 +879,7 @@ class AddDoctor extends Component {
                                     )}
                                 </View>
 
-                                <View style={{ alignItems: 'center', justifyContent: 'center' ,marginTop:20}}>
+                                <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
                                     <TouchableOpacity style={{ width: width * 0.4, height: height * 0.05, borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: themeColor }}
                                         onPress={() => { this.addDoctor() }}
                                     >
@@ -891,7 +891,7 @@ class AddDoctor extends Component {
 
                         </View>
 
-                
+
                         {this.state.show1 && (
                             <DateTimePicker
                                 testID="TimePicker1"
@@ -948,4 +948,4 @@ const mapStateToProps = (state) => {
 
     }
 }
-export default connect(mapStateToProps, { selectTheme })(AddDoctor)
+export default connect(mapStateToProps, { selectTheme })(EditDoctorTimings)

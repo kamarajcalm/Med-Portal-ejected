@@ -20,7 +20,8 @@
       "supportsTablet": true,
       "config":{
         "googleMapsApiKey":"AIzaSyCOSH383cU0Ywb6J1JZA_vlRq6Y6I6DgtE"
-      }
+      },
+      "bundleIdentifier": "in.poa.medPortal"
     },
     "android": {
       "adaptiveIcon": {
@@ -31,7 +32,8 @@
         "googleMaps":{
           "apiKey":"AIzaSyCOSH383cU0Ywb6J1JZA_vlRq6Y6I6DgtE"
         }
-      }
+      },
+      "package": "in.poa.medPortal"
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View,Text, StatusBar, Dimensions, Image, StyleSheet, TouchableOpacity, AsyncStorage, SafeAreaView, ScrollView,RefreshControl } from 'react-native';
+import { View, Text, StatusBar, Dimensions, Image, StyleSheet, TouchableOpacity, AsyncStorage, SafeAreaView, ScrollView, RefreshControl } from 'react-native';
 import settings from '../AppSettings';
 import axios from 'axios';
 import Modal from 'react-native-modal';
@@ -15,10 +15,10 @@ import { NavigationContainer, CommonActions } from '@react-navigation/native';
 import * as  ImagePicker from 'expo-image-picker';
 import { TextInput } from 'react-native-gesture-handler';
 import * as Location from 'expo-location';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import moment from 'moment';
+
 import HttpsClient from '../api/HttpsClient';
 import Toast from 'react-native-simple-toast';
+import SimpleToast from 'react-native-simple-toast';
 class CreateMedicals extends Component {
     constructor(props) {
         super(props);
@@ -27,30 +27,92 @@ class CreateMedicals extends Component {
             openImageModal: false,
             latitude: "",
             longitude: '',
-
-            clinicName: "Sri Annai Medicals",
+            clinicName: "new clinic",
             openingTime: null,
             closingTime: null,
-            mode: 'time',
-            date: new Date(),
+
             show1: false,
             show2: false,
-            mobile: "7878987878",
-            GST: "gytyg4565456",
-            address: "5/3278 Adaiyar",
-            pincode: "786656",
-            state: "Karnataka",
-            city: "Bengaluru",
-            firstEmergencyContactNo: "9869669867",
-            secondEmergencyContactNo: '9778776767',
-            isFetching:false
+            mobile: "9060606060",
+            GST: "adadad",
+            address: "sdddkgkfjskfka",
+            pincode: "465482",
+            state: "karnataka",
+            city: "bengaluru",
+            firstEmergencyContactNo: "9698564241",
+            secondEmergencyContactNo: '9568659596',
+            startingArray: [],
+            closingArray: [],
+            day: "",
+            isFetching: false,
+            doctor: null
         };
     }
-    createMedical = async () => {
+    createClinic = async () => {
+
+        let token = await AsyncStorage.getItem('csrf')
+
+
+        if (this.state.doctor == null) {
+            return SimpleToast.show("Please select owner")
+        }
+        if (this.state.clinicName == "") {
+            return SimpleToast.show("Please fill MedicalName")
+        }
+        if (this.state.mobile == "") {
+            return SimpleToast.show("Please fill mobile")
+        }
+        if (this.state.GST == "") {
+            return SimpleToast.show("Please fill GST")
+        }
+        if (this.state.pincode == "") {
+            return SimpleToast.show("Please fill pincode")
+        }
+        if (this.state.address == "") {
+            return SimpleToast.show("Please fill address")
+        }
+        if (this.state.city == "") {
+            return SimpleToast.show("Please fill city")
+        }
+        if (this.state.state == "") {
+            return SimpleToast.show("Please fill state")
+        }
+        if (this.state.latitude == "") {
+            return SimpleToast.show("Please fill latitude")
+        }
+        if (this.state.longitude == "") {
+            return SimpleToast.show("Please fill longitude")
+        }
+
+
         let api = `${url}/api/prescription/createClinic/`
-        console.log(api, "a")
+
+        // let sendData2 =new FormData()
+        // sendData2.append('owner', this.state.doctor.user)
+        // sendData2.append('displayPicture', this.state.image)
+        // sendData2.append('mobile', this.state.mobile)
+        // sendData2.append('gstin', this.state.GST)
+        // sendData2.append('companyName', this.state.clinicName)
+        // sendData2.append('address', this.state.address)
+        // sendData2.append('pincode', this.state.pincode)
+        // sendData2.append('state', this.state.state)
+        // sendData2.append('city', this.state.city)
+        // sendData2.append('firstEmergencyContactNo', this.state.firstEmergencyContactNo)
+        // sendData2.append('secondEmergencyContactNo', this.state.secondEmergencyContactNo)
+        // sendData2.append('lat', this.state.latitude)
+        // sendData2.append('long', this.state.longitude)
+        // sendData2.append('times', times)
+
+        // let post2 = await axios.post(api,sendData2,{
+        //     headers:{
+        //         'X-CSRFToken': token
+        //     }
+        // })
+        // // console.log(api,"a")
+        // console.log(post2,"pppp")
+        // return
         let sendData = {
-            owner: this.state.owner.user,
+            owner: this.state.doctor.user,
             displayPicture: this.state.image,
             mobile: this.state.mobile,
             gstin: this.state.GST,
@@ -63,20 +125,16 @@ class CreateMedicals extends Component {
             secondEmergencyContactNo: this.state.secondEmergencyContactNo,
             lat: this.state.latitude,
             long: this.state.longitude,
-            startingtime: this.state.openingTime,
-            closingtime: this.state.closingTime,
             type:"MedicalStore"
         }
-        console.log(sendData, "hhh")
         if (this.state.image) {
             sendData.bodyType = "formData"
         }
+
         const post = await HttpsClient.post(api, sendData)
+        console.log(post, "pppp")
         if (post.type == "success") {
-            Toast.show('created SuccessFully');
-            setTimeout(() => {
-                this.props.navigation.goBack();
-            }, 2000)
+            return this.props.navigation.navigate('UpdateTimings', { clinicPk: post.data.clinicPk,medical:true })
         } else {
             Toast.show("Try again")
         }
@@ -84,34 +142,11 @@ class CreateMedicals extends Component {
     }
     backFunction = async (item) => {
         console.log(item, "bbbbbb")
-        this.setState({ owner: item })
+        this.setState({ doctor: item })
 
 
     }
-    onChange1 = (selectedDate) => {
-        if (selectedDate.type == "set") {
-            this.setState({ openingTime: moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a'), show1: false, startingtime: new Date(selectedDate.nativeEvent.timestamp) }, () => {
-                console.log(this.state.openingTime, "jjjj")
 
-            })
-
-        } else {
-            return null
-        }
-
-    }
-    onChange2 = (selectedDate) => {
-        if (selectedDate.type == "set") {
-            this.setState({ closingTime: moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a'), show2: false, }, () => {
-                console.log(this.state.closingTime, "jjjj")
-
-            })
-
-        } else {
-            return null
-        }
-
-    }
     _pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -159,7 +194,7 @@ class CreateMedicals extends Component {
         this.setState({ image: photo, changedImage: true })
     }
     getLocation = async () => {
-        let { status } = await Location.requestPermissionsAsync()
+        let { status } = await Location.requestForegroundPermissionsAsync()
         if (status !== 'granted') {
             console.warn('Permission to access location was denied');
             return;
@@ -167,10 +202,14 @@ class CreateMedicals extends Component {
         let location = await Location.getCurrentPositionAsync({});
         console.log(location, "jjjj")
         this.setState({
+            isFetching: false,
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
-            isFetching:false
         })
+    }
+    onRefresh = () => {
+        this.setState({ isFetching: true })
+        this.getLocation()
     }
     renderModal = () => {
         return (
@@ -213,12 +252,8 @@ class CreateMedicals extends Component {
     componentDidMount() {
         this.getLocation()
     }
-    onRefresh = () => {
-        this.setState({ isFetching: true })
-        this.getLocation()
-    }
     render() {
-        console.log(this.state.latitude, "hhhhh")
+
         return (
             <>
                 <SafeAreaView style={styles.topSafeArea} />
@@ -234,7 +269,7 @@ class CreateMedicals extends Component {
                                 <Ionicons name="chevron-back-circle" size={30} color="#fff" />
                             </TouchableOpacity>
                             <View style={{ flex: 0.6, alignItems: 'center', justifyContent: "center" }}>
-                                <Text style={[styles.text, { color: "#fff" }]}>Create MedicalStore</Text>
+                                <Text style={[styles.text, { color: "#fff" }]}>Create Clinic</Text>
                             </View>
                             <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
 
@@ -272,7 +307,7 @@ class CreateMedicals extends Component {
                                         style={{ width: width * 0.8, height: height * 0.05, borderRadius: 15, backgroundColor: "#eeee", margin: 10, paddingLeft: 10, justifyContent: "center" }}
                                         onPress={() => { this.props.navigation.navigate('SearchRep', { backFunction: (item) => { this.backFunction(item) } }) }}
                                     >
-                                        <Text>{this.state?.owner?.name}</Text>
+                                        <Text>{this.state?.doctor?.name}</Text>
                                     </TouchableOpacity>
                                     {/* <TextInput
                                         value={this.state.Name}
@@ -291,37 +326,11 @@ class CreateMedicals extends Component {
                                         style={{ width: width * 0.8, height: height * 0.05, borderRadius: 15, backgroundColor: "#eeee", margin: 10, paddingLeft: 10 }}
                                     />
                                 </View>
-                                <View style={{ height: height * 0.07, flexDirection: "row", }}>
-                                    <View style={{ flex: 0.5 }}>
-                                        <Text style={styles.text}>Opening Time</Text>
-                                        <View style={{ flexDirection: "row", marginTop: 5, alignItems: "center", }}>
-                                            <TouchableOpacity
-                                                onPress={() => { this.setState({ show1: true }) }}
-                                            >
-                                                <Entypo name="clock" size={24} color="black" />
 
-                                            </TouchableOpacity>
 
-                                            <Text style={{ marginLeft: 10 }}>{this.state.openingTime}</Text>
-                                        </View>
 
-                                    </View>
 
-                                    <View style={{ flex: 0.5, }}>
-                                        <Text style={styles.text}>Closing Time</Text>
-                                        <View style={{ flexDirection: "row", marginTop: 5, alignItems: "center", }}>
-                                            <TouchableOpacity
-                                                onPress={() => { this.setState({ show2: true }) }}
-                                            >
-                                                <Entypo name="clock" size={24} color="black" />
 
-                                            </TouchableOpacity>
-
-                                            <Text style={{ marginLeft: 10 }}>{this.state.closingTime}</Text>
-                                        </View>
-
-                                    </View>
-                                </View>
                                 <View>
                                     <Text style={styles.text}>Mobile</Text>
                                     <TextInput
@@ -403,6 +412,8 @@ class CreateMedicals extends Component {
                                 <View>
                                     <Text style={styles.text}>Latitude</Text>
                                     <TextInput
+                                        keyboardType="numeric"
+                                        onChangeText={(text) => { this.setState({ latitude: text }) }}
                                         value={this.state?.latitude.toString()}
                                         multiline={true}
                                         selectionColor={themeColor}
@@ -412,6 +423,7 @@ class CreateMedicals extends Component {
                                 <View>
                                     <Text style={styles.text}>Longitude</Text>
                                     <TextInput
+                                        onChangeText={(text) => { this.setState({ longitude: text }) }}
                                         value={this.state?.longitude.toString()}
                                         multiline={true}
                                         selectionColor={themeColor}
@@ -420,7 +432,7 @@ class CreateMedicals extends Component {
                                 </View>
                                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                                     <TouchableOpacity style={{ width: width * 0.4, height: height * 0.05, borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: themeColor }}
-                                        onPress={() => { this.createMedical() }}
+                                        onPress={() => { this.createClinic() }}
                                     >
                                         <Text style={[styles.text, { color: "#fff" }]}>Create</Text>
                                     </TouchableOpacity>
@@ -431,26 +443,7 @@ class CreateMedicals extends Component {
                         </View>
 
                         {this.renderModal()}
-                        {this.state.show1 && (
-                            <DateTimePicker
-                                testID="TimePicker1"
-                                value={this.state.date}
-                                mode={this.state.mode}
-                                is24Hour={false}
-                                display="default"
-                                onChange={(time) => { this.onChange1(time) }}
-                            />
-                        )}
-                        {this.state.show2 && (
-                            <DateTimePicker
-                                testID="TimePicker2"
-                                value={this.state.date}
-                                mode={this.state.mode}
-                                is24Hour={false}
-                                display="default"
-                                onChange={(time) => { this.onChange2(time) }}
-                            />
-                        )}
+
                     </View>
                 </SafeAreaView>
 

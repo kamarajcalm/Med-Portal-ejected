@@ -67,7 +67,9 @@ class TabNavigator extends Component {
         if (routeName == "ViewAppointmentDoctors") {
             return false
         }
-      
+        if (routeName == "ViewPriscription") {
+            return false
+        }
 
         return true
     }
@@ -101,7 +103,7 @@ class TabNavigator extends Component {
             
                 <Tab.Navigator
                     tabBar={props => <MyTabBar {...props} />}
-                    
+             
                 >
                     <Tab.Screen name="Prescription" component={PriscriptionStack}
                         options={({ route }) => ({

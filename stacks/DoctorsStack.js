@@ -8,6 +8,7 @@ import MakeAppointment from '../Screens/MakeAppointment';
 import ChatScreen from '../Screens/ChatScreen';
 import ViewClinic from '../Screens/ViewClinic';
 import makeAppointmentClinic from '../Screens/makeAppointmentClinic';
+import ViewMedicals from '../Screens/ViewMedicals';
 const Stack = createStackNavigator();
 export default class DoctorsStack extends Component {
   constructor(props) {
@@ -26,6 +27,7 @@ export default class DoctorsStack extends Component {
             <Stack.Screen name="ViewClinic" component={ViewClinic} options={{ headerShown: false }} />
             <Stack.Screen name="Chat" component={ChatScreen} options={{ headerShown: false }} />
             <Stack.Screen name="makeAppointmentClinic" component={makeAppointmentClinic} options={{ headerShown: false }} />
+        <Stack.Screen name="ViewMedicals" component={ViewMedicals} options={{ headerShown: false }} />
         </Stack.Navigator>
     );
   }

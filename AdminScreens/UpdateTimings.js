@@ -22,6 +22,7 @@ class UpdateTimings extends Component {
        
         super(props);
         this.state = {
+            isMedical:this.props.route.params.medical||false,
             show1:false,
             show2:false,
             mode: 'time',
@@ -105,8 +106,22 @@ class UpdateTimings extends Component {
             times
         }
         let post =  await HttpsClient.post(api,sendData)
+          console.log(post,"hjj")
         if(post.type =="success"){
+                if(this.state.isMedical){
+                    return this.props.navigation.dispatch(
+                        CommonActions.reset({
+                            index: 0,
+                            routes: [
+                                {
+                                    name: 'Medicals',
 
+                                },
+
+                            ],
+                        })
+                    )
+                }
               return this.props.navigation.dispatch(
                 CommonActions.reset({
                     index: 0,
@@ -120,7 +135,9 @@ class UpdateTimings extends Component {
                 })
             )
         }
-
+        else{
+            SimpleToast.show("try again")
+        }
     }
     onChange1 = (selectedDate) => {
         if (selectedDate.type == "set") {

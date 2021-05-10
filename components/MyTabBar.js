@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Keyboard,Alert } from 'react-native';
 import { FontAwesome, MaterialCommunityIcons, MaterialIcons, SimpleLineIcons, Entypo, Fontisto, Feather, Ionicons } from '@expo/vector-icons';
 import settings from '../AppSettings';
 const themeColor = settings.themeColor
@@ -9,9 +9,25 @@ export default class MyTabBar extends Component {
         super(props);
         this.state = {
            show:true,
-           user:"doctor"
+           user:"doctor",
+           showTab:true
         };
     }
+    componentDidMount(){
+        Keyboard.addListener('keyboardDidShow', this._keyboardDidShow);
+        Keyboard.addListener('keyboardDidHide', this._keyboardDidHide);
+    }
+    componentWillUnmount(){
+        Keyboard.removeListener('keyboardDidShow', this._keyboardDidShow);
+        Keyboard.removeListener('keyboardDidHide', this._keyboardDidHide);
+    }
+    _keyboardDidShow = () => {
+        this.setState({showTab:false})
+    };
+
+    _keyboardDidHide = () => {
+        this.setState({ showTab: true })
+    };
 UNSAFE_componentWillReceiveProps(){
     const { state, descriptors, navigation } = this.props
     {
@@ -58,6 +74,9 @@ UNSAFE_componentWillReceiveProps(){
     }
     render() {
         const { state, descriptors, navigation } = this.props
+        if(this.state.showTab){
+
+    
         if(this.state.show){
 
     
@@ -162,8 +181,12 @@ UNSAFE_componentWillReceiveProps(){
             </View>
         );
         }
+
         return null
     }
+       return null
+    }
+   
 }
 
 const styles = StyleSheet.create({

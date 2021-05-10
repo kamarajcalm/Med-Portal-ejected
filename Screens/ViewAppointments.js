@@ -124,6 +124,7 @@ class ViewAppointments extends Component {
                                 <Text style={[styles.text, { marginLeft: 10, color: "gray" }]}>{this.state.item.acceptedtime}</Text>
                             </View>
                         </View>
+                        
                    </View>
                  
                 </SafeAreaView>
@@ -155,6 +156,13 @@ class ViewAppointments extends Component {
                         <Text>With Clinic</Text>
                     </TouchableOpacity>
                 </View>
+               {this.state.item.status=="Completed"&& <View style={{ alignItems: 'center', justifyContent: 'center', position: "absolute", bottom: 300, width }}>
+                    <TouchableOpacity style={{ height: height * 0.05, width: width * 0.4, alignItems: 'center', justifyContent: "center", borderRadius: 10, backgroundColor: themeColor }}
+                        onPress={() => { this.props.navigation.navigate('ViewPriscription', { pk: this.state.item.prescription})}}
+                    >
+                        <Text style={[styles.text, { color: "#fff" }]}>Show Prescription</Text>
+                    </TouchableOpacity>
+                </View>}
             </>
         );
     }

@@ -20,6 +20,7 @@ import MedicalStack from '../stacks/MedicalStack';
 import AdminProfileStack from '../stacks/AdminProfileStack';
 import ClincicPriscriptionStack from '../stacks/ClincicPriscriptionStack';
 import MedicalInventoryStack from '../stacks/MedicalInventoryStack';
+import ChatStack from '../stacks/ChatStack';
 
 const Tab = createBottomTabNavigator();
 
@@ -71,7 +72,7 @@ class MediacalTab extends Component {
                     }}
 
                 />
-                <Tab.Screen name="Inventory" component={MedicalInventoryStack}
+                {/* <Tab.Screen name="Inventory" component={MedicalInventoryStack}
                     options={{
                         tabBarIcon: ({ focused, color, size }) => {
                             return <MaterialIcons name="inventory" size={24} color={focused?"#fff":"gray"} />
@@ -83,8 +84,20 @@ class MediacalTab extends Component {
 
                     }}
 
+                /> */}
+                <Tab.Screen name="Chats" component={ChatStack}
+                    options={{
+                        tabBarIcon: ({ focused, color, size }) => {
+                            return <Ionicons name="chatbubble-ellipses" size={24} color={focused ? "#fff" : "gray"} />
+
+                        },
+                        tabBarLabel: ({ focused }) => {
+                            return <Text style={{ color: focused ? "#fff" : "gray", fontFamily }}>Chats</Text>
+                        }
+
+                    }}
+
                 />
-            
                 <Tab.Screen name="AdminProfileStack" component={AdminProfileStack}
                     options={{
                         tabBarIcon: ({ focused, color, size }) => {

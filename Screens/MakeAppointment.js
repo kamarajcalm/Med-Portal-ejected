@@ -91,7 +91,7 @@ class MakeAppointment extends Component {
     requestAppointment = async()=>{
         let api =`${url}/api/prescription/addAppointment/`
         let sendData ={
-            clinic: this.state.selectedClinic.pk,
+            clinic: this.state.selectedClinic.clinicpk,
             doctor: this.state.item.user,
             requesteduser:this.props.user.id,
             requesteddate:this.state.today,

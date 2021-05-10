@@ -41,7 +41,7 @@ class AddPrescription extends Component {
                 medicines:[],
                 mobileNo:"",
                 patientsName:'',
-                onGoingTreatMent:'',
+                Reason:'',
                 healthIssues:[],
                 loading: false,
                 doctorFees:"",
@@ -50,8 +50,14 @@ class AddPrescription extends Component {
                 Age:"",
                 selectedSex:sex[0].value,
                 nextVisit:null,
-              show1:false
+               show1:false,
+               appointment_taken:false,
+               appointmentId:null,
+               Address:""
     };
+  }
+  componentDidMount(){
+      
   }
     changeFunction = (type, value, index)=>{
         let duplicate = this.state.medicines
@@ -114,8 +120,8 @@ class AddPrescription extends Component {
            
             return SimpleToast.show("Please fill doctorFees")
         }
-        if (this.state.onGoingTreatMent =="") {
-            return SimpleToast.show("Please fill onGoingTreatMent")
+        if (this.state.Reason =="") {
+            return SimpleToast.show("Please fill Reason")
         }
         this.state.medicines.forEach((i)=>{
             try{
@@ -135,13 +141,15 @@ class AddPrescription extends Component {
             usermobile:this.state.mobileNo,
             ongoing_treatment:this.state.onGoingTreatMent,
             doctor_fees:this.state.doctorFees,
-            clinic: this.props.clinic.pk,
+            clinic: this.props.clinic.clinicpk,
             age:this.state.Age,
             sex:this.state.selectedSex,
-
+            appointment:this.state.appointmentId,
+            next_visit:this.state.nextVisit,
+            address:this.state.Address
         }
        const post = await HttpsClient.post(api,sendData)
- 
+       console.log(post)
        if(post.type=="success"){
            Toast.show("Added SuccessFully")
            setTimeout(()=>{
@@ -154,21 +162,28 @@ class AddPrescription extends Component {
     }
     onChange1 = (selectedDate) => {
         if (selectedDate.type == "set") {
-        let nextVisit =  moment(new Date(selectedDate.nativeEvent.timestamp)).format('YYYY/MM/DD')
+        let nextVisit =  moment(new Date(selectedDate.nativeEvent.timestamp)).format('YYYY-MM-DD')
         this.setState({ nextVisit,show1:false})
         }
     }
     searchUser = async(mobileNo)=>{
-        let api = `${url}/api/profile/userss/?search=${mobileNo}&role=Customer`
-        this.setState({mobileNo})
+        let api = `${url}/api/prescription/getAppointmentUser/?doctor=${this.props.user.id}&user=${mobileNo}&clinic=${this.props.clinic.clinicpk}&requesteddate=${moment(new Date()).format('YYYY-MM-DD')}`
+        this.setState({ mobileNo })
         if(mobileNo.length>9){
             this.setState({loading:true})
            const data = await HttpsClient.get(api)
-           console.log(data)
+           console.log(api)
+  console.log(data)
            if(data.type =="success"){
-               if (data.data[0]?.mobile == mobileNo){
+               if (data.data.user.mobile == mobileNo){
                   
-                   this.setState({ patientsName: data.data[0].name,healthIssues: data.data[0].health_issues})
+                   this.setState({ 
+                       patientsName: data.data.user.name, 
+                       healthIssues: data.data.user.health_issues,
+                       Reason: data.data.user.appointment_reason,
+                       appointment_taken: data.data.user.appointment_taken,
+                       appointmentId: data.data.user.appointment,
+                    })
                }
              this.setState({loading:false})
            }
@@ -235,6 +250,7 @@ class AddPrescription extends Component {
                 <View style={{ marginTop: 20 }}>
                     <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>Mobile No</Text>
                     <TextInput
+                         maxLength ={10}
                          value ={this.state.mobileNo}
                          selectionColor={themeColor}
                          keyboardType="numeric"
@@ -286,6 +302,16 @@ class AddPrescription extends Component {
                           
                         </View>
                         <View style={{ marginTop: 20 }}>
+                            <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>Address</Text>
+                            <TextInput
+                                value={this.state.Address}
+                                selectionColor={themeColor}
+                             
+                                onChangeText={(Address) => { this.setState({ Address }) }}
+                                style={{ width: width * 0.9, height: height * 0.1, backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10 ,textAlignVertical:"top"}}
+                            />
+                        </View>
+                        <View style={{ marginTop: 20 }}>
                             <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>Health issues</Text>
                             {
                                 this.state?.healthIssues?.map((i,index)=>{
@@ -325,11 +351,22 @@ class AddPrescription extends Component {
                             </View>
                           
                         </View>
+                       {this.state.mobileNo.length>9&& <View style={{ marginTop: 20 }}>
+                            <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>Appointment Details:</Text>
+                            <View style={{flexDirection:"row",marginTop:5,marginLeft:10}}>
+                                <Text style={[styles.text,{fontWeight:"bold",color:"gray"}]}>Appointment Taken:</Text>
+                                <Text style={[styles.text,{marginLeft:10}]}>{this.state.appointment_taken?"yes":"No"}</Text>
+                            </View>
+                            <View style={{ flexDirection: "row", marginTop: 5, marginLeft: 10 }}>
+                                <Text style={[styles.text, { fontWeight: "bold", color: "gray" }]}>Token Id:</Text>
+                                <Text style={[styles.text, { marginLeft: 10 }]}>{this.state.appointmentId}</Text>
+                            </View>
+                        </View>}
                         <View style={{ marginTop: 20 }}>
                             <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>Reason for this Visit</Text>
                             <TextInput
-                                value ={this.state.onGoingTreatMent}
-                                onChangeText={(onGoingTreatMent) => { this.setState({onGoingTreatMent}) }}
+                                value ={this.state.Reason}
+                                onChangeText={(Reason) => { this.setState({ Reason}) }}
                                 selectionColor={themeColor}
                                 multiline={true}
                                 style={{ width: width * 0.9, height: height * 0.15, backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10, textAlignVertical:"top"}}

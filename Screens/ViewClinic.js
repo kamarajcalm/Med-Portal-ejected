@@ -15,7 +15,7 @@ const url = settings.url;
 import moment from 'moment-timezone';
 const date = new Date();
 const day = date.getDay();
-console.log(day,"lklkl")
+
 class ViewClinic extends Component {
     constructor(props) {
         let item = props.route.params.item
@@ -25,7 +25,9 @@ class ViewClinic extends Component {
             item,
             clinicDetails:null,
             showAll:false,
-            doctors:[]
+            doctors:[],
+            showAllDoctorTimings:false,
+            selectedDoctor:null
         };
     }
     getDoctors = async (id) => {
@@ -46,8 +48,42 @@ class ViewClinic extends Component {
         }
     }
     componentDidMount() {
+       console.log(this.state.doctors,"jkjk")
         this.getClinicDetails()
         console.log(this.props.user)
+    }
+    getTodayTimings = (today,item) => {
+        return (
+            item.clinicShits[today].map((i, index) => {
+                return (
+                    <View style={{ flexDirection: "row", marginTop: 5 }}>
+                        <Text style={[styles.text, { fontWeight: "bold" }]}>{index + 1}.</Text>
+                        <Text style={[styles.text, { marginLeft: 5 }]}>{i.timings[0][0]}</Text>
+                        <Text style={[styles.text]}>-</Text>
+                        <Text style={[styles.text]}>{i.timings[0][1]}</Text>
+                    </View>
+                )
+            })
+        )
+    }
+    getTodayTimings2 = (item) => {
+        let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+        let today = days[date.getDay()]
+        return (
+            item.clinicShits[today].map((i, index) => {
+                return (
+                    <View style={{ flexDirection: "row", marginTop: 5 }}>
+                        <Text>{index + 1}.</Text>
+                        <Text style={{ marginLeft: 5 }}>{i.timings[0][0]}</Text>
+                        <Text>-</Text>
+                        <Text>{i.timings[0][1]}</Text>
+                    </View>
+                )
+            })
+        )
+
+
+
     }
     chatClinic = async () => {
         let api = `${url}/api/prescription/createClinicChat/?clinic=${this.state.item.pk}&customer=${this.props.user.id}`
@@ -90,9 +126,20 @@ class ViewClinic extends Component {
     validateOpen =()=>{
         if(this.getOpened()=="open"){
             return(
-                <View style={{flexDirection:'row'}}>
-                    <Text style={[styles.text, { color: "green" }]}>Open</Text>
-                    <Text style={[styles.text, { color: "green" }]}>closes at {this.state.clinicDetails?.working_hours[date.getDay()][1]}</Text>
+                <View style={{flexDirection:'row',}}>
+                    <View style={{alignItems:"center",justifyContent:"center"}}> 
+                        <Text style={[styles.text, { color: "green" }]}>Open</Text>
+
+                    </View>
+                    <TouchableOpacity style={{alignItems:"center",justifyContent:"center",flexDirection:"row"}}
+                        onPress={() => { this.setState({ showAll: !this.state.showAll }) }}
+                    >
+                        <Text style={[styles.text, { marginLeft: 10 }]}>closes at {this.state.clinicDetails?.working_hours[date.getDay()][1]}</Text>
+                        <View style={{alignItems:"center",justifyContent:"center"}}>
+                            <AntDesign name={this.state.showAll ? "up" : "down"} size={15} color="black" />
+                        </View>
+                      
+                    </TouchableOpacity>
                 </View>
                 
             )
@@ -120,7 +167,7 @@ class ViewClinic extends Component {
         if (this.state.item.displayPicture){
             dp = `${url}${this.state.item.displayPicture}`
         }
-         let duplicate =  this.state?.clinicDetails?.working_hours
+   
          
 
         return (
@@ -195,40 +242,30 @@ class ViewClinic extends Component {
                                 </View> */}
                               
                                 {this.state.showAll &&
-                                    this.state?.clinicDetails?.working_hours.map((i) => {
+                                    this.state?.clinicDetails?.sortedTimings.map((i) => {
                                         let day = ""
                                         let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday","Saturday"]
                                     
                                         day = days[i[2]]
                                        
-                                        // if (i[2] == "0") {
-                                        //     day = "Sunday"
-                                        // } else if (i[2] == "1") {
-                                        //     day = "Monday"
-                                        // } else if (i[2] == "2") {
-                                        //     day = "Tuesday"
-                                        // } else if (i[2] == "3") {
-                                        //     day = "Wednesday"
-                                        // } else if (i[2] == "4") {
-                                        //     day = "Thu"
-                                        // } else if (i[2] == "5") {
-                                        //     day = "Fri"
-                                        // } else if (i[2] == "6") {
-                                        //     day = "Sat"
-                                        // } else {
-                                        //     day == ""
-                                        // }
+                                     
                                         return (
                                             <View style={{ marginHorizontal: 20, marginTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: "space-between" }}>
                                                 <View style={{flexDirection:"row",width:width*0.6}}>
-                                                    <View style={{ alignSelf: "flex-start" ,flex:0.5}}>
-                                                        <Text style={[styles.text, { fontWeight: "bold", fontSize: 18, color: "gray" }]}>{day}:</Text>
+                                                    <View style={{ flex:0.5,flexDirection:"row"}}>
+                                                        <View style={{flex: 0.9,}}>
+                                                            <Text style={[styles.text, { fontWeight: "bold", fontSize: 18, color: "gray" }]}>{day}</Text>
+                                                        </View>
+                                                       <View style={{flex: 0.1,}}>
+                                                            <Text style={[styles.text, { fontWeight: "bold", fontSize: 18, color: "gray",  }]}>:</Text>
+
+                                                       </View>
                                                     </View>
                                                     <View style={{flexDirection:"row",flex:0.5}}>
                                                         <View style={{flexDirection:"row"}}>
-                                                            <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>{i[0]}</Text>
-                                                            <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>-</Text>
-                                                            <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>{i[1]}</Text>
+                                                            <Text style={[styles.text, { fontWeight:"bold"}]}>{i[0]}</Text>
+                                                            <Text style={[styles.text, { fontWeight: "bold" }]}>-</Text>
+                                                            <Text style={[styles.text, { fontWeight: "bold" }]}>{i[1]}</Text>
                                                         </View>
                                                     
                                                     </View>
@@ -239,39 +276,200 @@ class ViewClinic extends Component {
                                     })
                                 }
                             </View>
-                            <View style={{ padding: 10, }}>
-                                <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Doctors:</Text>
-                                <View style={{ padding: 10, }}>
-                                    <FlatList 
-                                      data={this.state.doctors}
-                                      keyExtractor ={(item,index)=>index.toString()}
-                                      renderItem ={({item,index})=>{
-                                            return(
-                                                <View style={{ flexDirection: "row", height: height * 0.1, }}>
-                                                    <View style={{ alignItems: "center", justifyContent: "center", flex: 0.2 }}>
-                                                        <Image
-                                                            source={{ uri: item.doctor.profile.displayPicture || "https://s3-ap-southeast-1.amazonaws.com/practo-fabric/practices/711061/lotus-multi-speciality-health-care-bangalore-5edf8fe3ef253.jpeg" }}
-                                                            style={{ height: 60, width: 60, borderRadius: 30, }}
-                                                        />
+                            <View style={{ margin: 20 }}>
+                                <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}> Doctors List:</Text>
+                                <FlatList
+                                    data={this.state.doctors}
+                                    keyExtractor={(item, index) => index.toString()}
+                                    renderItem={({ item, index }) => {
+                                        return (
+                                            <View style={{  }}
+                                               
+                                            >
+                                                <View style={{ flexDirection: "row", marginTop: 15}}>
+                                                    <View style={{ alignItems: 'center', justifyContent: "center", flex: 0.1 }}>
+                                                        <Text>{index + 1}.</Text>
                                                     </View>
-
-                                                    <View style={{ alignItems: 'center', justifyContent: "center", flex: 0.2 }}>
+                                                    <View style={{ justifyContent: "center", flex: 0.3 }}>
                                                         <Text>{item.doctor.first_name}</Text>
                                                     </View>
-                                                    <View style={{ alignItems: 'center', justifyContent: "center", flex: 0.2 }}>
-                                                        <Text style={[styles.text, { fontWeight: "bold" }]}>From :</Text>
-                                                        <Text style={[styles.text]}>{item.fromTimeStr}</Text>
+                                                    <View style={{ flex: 0.6, alignItems: 'center', justifyContent: 'center' }}>
+                                                        <View >
+                                                            <Text style={[styles.text]}>Today Timings:</Text>
+                                                        </View>
+                                                        {
+                                                            this.getTodayTimings2(item)
+                                                        }
+
                                                     </View>
-                                                    <View style={{ alignItems: 'center', justifyContent: "center", flex: 0.2 }}>
-                                                        <Text style={[styles.text, { fontWeight: "bold" }]}>To Time:</Text>
-                                                        <Text style={[styles.text]}>{item.toTimeStr}</Text>
-                                                    </View>
-                                                   
-                                                </View>
-                                            )
-                                      }}
-                                    />
-                                </View>
+                                               </View>
+                                                        {/* Show all timings... */}
+                                               
+                                                   <View >
+                                                         <TouchableOpacity style={{alignItems:"center",justifyContent:"center",marginTop:10}}
+                                                        onPress={() => this.setState({ showAllDoctorTimings:!this.state.showAllDoctorTimings,selectedDoctor:item})}
+                                                         >
+                                                            {
+                                                                this.state.showAllDoctorTimings&&this.state.selectedDoctor == item  ?
+                                                                <View style={{flexDirection:"row",}}>
+                                                                       <View style={{alignItems:"center",justifyContent:"center"}}>
+                                                                        <Text style={[styles.text]}>show less</Text>
+                                                                       </View>
+                                                                    <View style={{ alignItems: "center", justifyContent: "center",marginLeft: 5, marginTop:3}}>
+                                                                        <AntDesign name={"up"} size={15} color="black" />
+
+                                                                      </View>
+                                                                </View>:
+                                                                <View style={{ flexDirection: "row" }}>
+                                                                    <View style={{alignItems:"center",justifyContent:"center"}}>
+                                                                        <Text style={[styles.text]}>show all</Text>
+                                                                    </View>
+                                                                   <View style={{alignItems:"center",justifyContent:"center",marginLeft:5,}}>
+                                                                        <AntDesign name={"down"} size={15} color="black" />
+
+                                                                   </View>
+                                                                </View>
+                                                            }
+                                                         </TouchableOpacity>
+                                                         {
+                                                        this.state.showAllDoctorTimings&&this.state.selectedDoctor==item&&
+                                                             <>
+                                                           
+                                                            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-around", marginTop: 20 }}>
+                                                                <View style={{ flex: 0.5, alignItems: "center", justifyContent: 'center', flexDirection: "row" }}>
+                                                                    <View style={{ flex: 0.8, alignItems: "center", justifyContent: "center" }}>
+                                                                        <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Day</Text>
+                                                                    </View>
+                                                                    <View style={{ flex: 0.2 }}>
+                                                                        <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>:</Text>
+
+                                                                    </View>
+                                                                </View>
+                                                                <View style={{ flex: 0.5, alignItems: "center", justifyContent: 'center' }}>
+                                                                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Working Timings:</Text>
+                                                                </View>
+                                                            </View>
+                                                            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-around", marginTop: 20 }}>
+                                                                <View style={{ flex: 0.5, alignItems: "center", justifyContent: 'center', flexDirection: "row" }}>
+                                                                    <View style={{ flex: 0.8, alignItems: "center", justifyContent: "center" }}>
+                                                                        <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Sunday</Text>
+                                                                    </View>
+                                                                    <View style={{ flex: 0.2 }}>
+                                                                        <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>:</Text>
+
+                                                                    </View>
+                                                                </View>
+                                                                <View style={{ flex: 0.5, alignItems: "center", justifyContent: 'center' }}>
+                                                                    {
+                                                                        this.getTodayTimings("Sunday",item)
+                                                                    }
+                                                                </View>
+                                                            </View>
+                                                            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-around", marginTop: 20 }}>
+                                                                <View style={{ flex: 0.5, alignItems: "center", justifyContent: 'center', flexDirection: "row" }}>
+                                                                    <View style={{ flex: 0.8, alignItems: "center", justifyContent: "center" }}>
+                                                                        <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Monday</Text>
+                                                                    </View>
+                                                                    <View style={{ flex: 0.2 }}>
+                                                                        <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>:</Text>
+
+                                                                    </View>
+                                                                </View>
+                                                                <View style={{ flex: 0.5, alignItems: "center", justifyContent: 'center' }}>
+                                                                    {
+                                                                        this.getTodayTimings("Monday",item)
+                                                                    }
+                                                                </View>
+                                                            </View>
+
+                                                            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-around", marginTop: 20 }}>
+                                                                <View style={{ flex: 0.5, alignItems: "center", justifyContent: 'center', flexDirection: "row" }}>
+                                                                    <View style={{ flex: 0.8, alignItems: "center", justifyContent: "center" }}>
+                                                                        <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Tuesday</Text>
+                                                                    </View>
+                                                                    <View style={{ flex: 0.2 }}>
+                                                                        <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>:</Text>
+
+                                                                    </View>
+                                                                </View>
+                                                                <View style={{ flex: 0.5, alignItems: "center", justifyContent: 'center' }}>
+                                                                    {
+                                                                        this.getTodayTimings("Tuesday",item)
+                                                                    }
+                                                                </View>
+                                                            </View>
+                                                            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-around", marginTop: 20 }}>
+                                                                <View style={{ flex: 0.5, alignItems: "center", justifyContent: 'center', flexDirection: "row" }}>
+                                                                    <View style={{ flex: 0.8, alignItems: "center", justifyContent: "center" }}>
+                                                                        <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Wednesday</Text>
+                                                                    </View>
+                                                                    <View style={{ flex: 0.2 }}>
+                                                                        <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>:</Text>
+
+                                                                    </View>
+                                                                </View>
+                                                                <View style={{ flex: 0.5, alignItems: "center", justifyContent: 'center' }}>
+                                                                    {
+                                                                        this.getTodayTimings("Wednesday",item)
+                                                                    }
+                                                                </View>
+                                                            </View>
+                                                            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-around", marginTop: 20 }}>
+                                                                <View style={{ flex: 0.5, alignItems: "center", justifyContent: 'center', flexDirection: "row" }}>
+                                                                    <View style={{ flex: 0.8, alignItems: "center", justifyContent: "center" }}>
+                                                                        <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Thursday</Text>
+                                                                    </View>
+                                                                    <View style={{ flex: 0.2 }}>
+                                                                        <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>:</Text>
+
+                                                                    </View>
+                                                                </View>
+                                                                <View style={{ flex: 0.5, alignItems: "center", justifyContent: 'center' }}>
+                                                                    {
+                                                                        this.getTodayTimings("Thursday",item)
+                                                                    }
+                                                                </View>
+                                                            </View>
+                                                            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-around", marginTop: 20 }}>
+                                                                <View style={{ flex: 0.5, alignItems: "center", justifyContent: 'center', flexDirection: "row" }}>
+                                                                    <View style={{ flex: 0.8, alignItems: "center", justifyContent: "center" }}>
+                                                                        <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Friday</Text>
+                                                                    </View>
+                                                                    <View style={{ flex: 0.2 }}>
+                                                                        <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>:</Text>
+
+                                                                    </View>
+                                                                </View>
+                                                                <View style={{ flex: 0.5, alignItems: "center", justifyContent: 'center' }}>
+                                                                    {
+                                                                        this.getTodayTimings("Friday",item)
+                                                                    }
+                                                                </View>
+                                                            </View>
+                                                            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-around", marginTop: 20 }}>
+                                                                <View style={{ flex: 0.5, alignItems: "center", justifyContent: 'center', flexDirection: "row" }}>
+                                                                    <View style={{ flex: 0.8, alignItems: "center", justifyContent: "center" }}>
+                                                                        <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Saturday</Text>
+                                                                    </View>
+                                                                    <View style={{ flex: 0.2 }}>
+                                                                        <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>:</Text>
+
+                                                                    </View>
+                                                                </View>
+                                                                <View style={{ flex: 0.5, alignItems: "center", justifyContent: 'center' }}>
+                                                                    {
+                                                                        this.getTodayTimings("Saturday",item)
+                                                                    }
+                                                                </View>
+                                                            </View>
+                                                             </>
+                                                         }
+                                                   </View>
+                                               
+                                            </View>
+                                        )
+                                    }}
+                                />
                             </View>
                           
                              

@@ -30,6 +30,7 @@ const url =settings.url
             all:"true"
           }
          const data =await HttpsClient.post(api,sendData)
+      
         if(data.type=="success"){
          
           this.setState({ markers: data.data.clinics})
@@ -51,6 +52,12 @@ const url =settings.url
    }
  componentDidMount(){
    this.getLocation()
+ }
+ navigate =(item)=>{
+   if (item.type =="MedicalStore"){
+     return this.props.navigation.navigate('ViewMedicals',{ item })
+   }
+    return  this.props.navigation.navigate('ViewClinic', { item })
  }
   render() {
     const {location} =this.state
@@ -83,7 +90,7 @@ const url =settings.url
                       >
                         <MapView.Callout
                           tooltip={true}
-                          onPress={() => { this.props.navigation.navigate('ViewClinic',{item}) }}
+                          onPress={() => { this.navigate(item) }}
                         >
                           <View style={{ height: height * 0.2, backgroundColor: "#fff", width: width * 0.4, alignItems: "center",  }}>
                             <Text style={{ height: 80 }}>
