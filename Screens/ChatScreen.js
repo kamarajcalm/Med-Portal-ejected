@@ -115,7 +115,7 @@ class ChatScreen extends Component {
              
              )
          }
-        } else if (this.props.user.profile.occupation == "ClinicRecoptionist"){
+        } else if (this.props.user.profile.occupation == "ClinicRecoptionist" || this.props.user.profile.occupation == "MedicalRecoptionist"){
          return this.setState({ chatType: "clinic&pateint" },()=>{
              this.getChatMessage("clinicThread")
          })
@@ -123,6 +123,11 @@ class ChatScreen extends Component {
       
             return this.setState({ chatType: "doctor&pateint" }, () => {
                 this.getChatMessage("doctorThread")
+            })
+        } else if (this.props.user.profile.occupation == "MediacalRep") {
+
+            return this.setState({ chatType: "clinic&pateint" }, () => {
+                this.getChatMessage("clinicThread")
             })
         }
         
@@ -359,6 +364,9 @@ sendMessage =async()=>{
       if (this.props.user.profile.occupation == "ClinicRecoptionist") {
           chatTitle = this.state.item.clinictitle
       }
+      if (this.props.user.profile.occupation == "MediacalRep") {
+          chatTitle = this.state.item.clinictitle
+      }
 //  console.log(this.props.user)
     return (
           <>
@@ -395,9 +403,17 @@ sendMessage =async()=>{
               ref={ref => this.flatRef = ref}
               keyExtractor={(item,index)=>index.toString()}
               renderItem={({item,index})=>{
-                 
+                //   if (this.state.chatType =="clinic&pateint"){
+                //       console.log(item)
+                //       return (
+                //           <View>
+                //               <Text>gjjjg</Text>
+                //           </View>
+                //       )
+                //   }
                
                         //   if non -sender
+                   
                   if (item.senderPk.toString()!=this.props.user.id.toString()){
                       if (item.msgType =="text"){
                           return (
