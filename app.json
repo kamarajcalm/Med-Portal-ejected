@@ -21,7 +21,7 @@
       "config":{
         "googleMapsApiKey":"AIzaSyCOSH383cU0Ywb6J1JZA_vlRq6Y6I6DgtE"
       },
-      "bundleIdentifier": "in.poa.medPortal"
+      "bundleIdentifier": "in.poa.medportal"
     },
     "android": {
       "adaptiveIcon": {
@@ -33,7 +33,7 @@
           "apiKey":"AIzaSyCOSH383cU0Ywb6J1JZA_vlRq6Y6I6DgtE"
         }
       },
-      "package": "in.poa.medPortal"
+      "package": "in.poa.medportal"
     },
     "web": {
       "favicon": "./assets/favicon.png"
