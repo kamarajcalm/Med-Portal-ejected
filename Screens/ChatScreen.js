@@ -403,132 +403,247 @@ sendMessage =async()=>{
               ref={ref => this.flatRef = ref}
               keyExtractor={(item,index)=>index.toString()}
               renderItem={({item,index})=>{
-                //   if (this.state.chatType =="clinic&pateint"){
-                //       console.log(item)
-                //       return (
-                //           <View>
-                //               <Text>gjjjg</Text>
-                //           </View>
-                //       )
-                //   }
-               
-                        //   if non -sender
-                   
-                  if (item.senderPk.toString()!=this.props.user.id.toString()){
-                      if (item.msgType =="text"){
-                          return (
-                              <View style={{ alignSelf: "flex-start", backgroundColor: '#eeee', padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
-                                  
-                                  <Text style={[styles.text]}>{item.message}</Text>
-                                  <View style={{ alignSelf: "flex-end" }}>
-                                      <Text style={[styles.text, { color: "#1f1f1f", fontSize: 8 }]}>{moment(item.created).format('hh:mm a')}</Text>
-                                  </View>
-                                  <View style={styles.leftArrow}></View>
+                  if (this.state.chatType =="clinic&pateint"){
+                      //   if non -sender
 
-                                  <View style={styles.leftArrowOverlap}></View>
+                      if (item.senderPk.toString() != this.props.user.id.toString() && !item.is_clinic) {
+                          if (item.msgType == "text") {
+                              return (
+                                  <View style={{ alignSelf: "flex-start", backgroundColor: '#eeee', padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
+
+                                      <Text style={[styles.text]}>{item.message}</Text>
+                                      <View style={{ alignSelf: "flex-end" }}>
+                                          <Text style={[styles.text, { color: "#1f1f1f", fontSize: 8 }]}>{moment(item.created).format('hh:mm a')}</Text>
+                                      </View>
+                                      <View style={styles.leftArrow}></View>
+
+                                      <View style={styles.leftArrowOverlap}></View>
+                                  </View>
+                              )
+                          }
+                          if (item.msgType == "image") {
+
+                              return (
+                                  <View style={{ alignSelf: "flex-start", backgroundColor: '#eeee', padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
+                                      <Image
+                                          source={{ uri: item.attachment }}
+                                          style={{ height: height * 0.15, width: width * 0.4, resizeMode: "contain" }}
+                                      />
+
+                                      <Text style={[styles.text]}>{item.message}</Text>
+                                      <View style={{ alignSelf: "flex-end" }}>
+                                          <Text style={[styles.text, { color: "#fff", fontSize: 8 }]}>{moment(item?.created).format("hh:mm a")}</Text>
+                                      </View>
+                                      <View style={styles.leftArrow}></View>
+
+                                      <View style={styles.leftArrowOverlap}></View>
+                                  </View>
+                              )
+
+                          }
+                          if (item.msgType == "voice") {
+                              return (
+                                  <View style={{ alignSelf: "flex-start", backgroundColor: '#eeee', padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
+                                      <TouchableOpacity
+                                          onPress={() => { this.playAudio(item.attachment) }}
+                                      >
+
+
+                                          <Text>voice</Text>
+                                          <View style={{ alignSelf: "flex-end" }}>
+                                              <Text style={[styles.text, { color: "#1f1f1f", fontSize: 8 }]}>{moment(item?.created).format("hh:mm a")}</Text>
+                                          </View>
+                                      </TouchableOpacity>
+                                      <View style={styles.leftArrow}></View>
+
+                                      <View style={styles.leftArrowOverlap}></View>
+
+                                  </View>
+                              )
+
+
+                          }
+
+                      }
+
+                      //    if sender
+                      if (item.msgType == "text") {
+                          return (
+                              <View style={{ alignSelf: 'flex-end', backgroundColor: themeColor, padding: 10, borderRadius: 20, marginRight: 20, marginTop: 10, maxWidth: width * 0.6 }}>
+                                  <Text style={[styles.text, { color: "#fff" }]}>{item.message}</Text>
+                                  <View style={{ alignSelf: "flex-end" }}>
+                                      <Text style={[styles.text, { color: "#fff", fontSize: 8 }]}>{moment(item?.created).format("hh:mm a")}</Text>
+                                  </View>
+                                  <View style={styles.rightArrow}></View>
+
+                                  <View style={styles.rightArrowOverlap}></View>
                               </View>
                           )
                       }
-                      if (item.msgType == "image"){
-                       
-                         return(
-                             <View style={{ alignSelf: "flex-start", backgroundColor: '#eeee', padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
-                                 <Image
-                                     source={{ uri: item.attachment }}
-                                     style={{ height: height * 0.15, width: width * 0.4, resizeMode: "contain" }}
-                                 />
+                      if (item.msgType == "image") {
 
-                                 <Text style={[styles.text]}>{item.message}</Text>
-                                 <View style={{ alignSelf: "flex-end" }}>
-                                     <Text style={[styles.text, { color: "#fff", fontSize: 8 }]}>{moment(item?.created).format("hh:mm a")}</Text>
-                                 </View>
-                                 <View style={styles.leftArrow}></View>
+                          return (
+                              <View style={{ alignSelf: 'flex-end', backgroundColor: themeColor, padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
+                                  <Image
+                                      resizeMethod="scale"
+                                      source={{ uri: item.attachment }}
+                                      style={{ height: height * 0.15, width: width * 0.4, resizeMode: "contain" }}
+                                  />
 
-                                 <View style={styles.leftArrowOverlap}></View>
-                             </View>
-                         )
-                      
+                                  <Text style={[styles.text, { color: "#fff" }]}>{item.message}</Text>
+                                  <View style={{ alignSelf: "flex-end" }}>
+                                      <Text style={[styles.text, { color: "#fff", fontSize: 8 }]}>{moment(item?.created).format("hh:mm a")}</Text>
+                                  </View>
+                                  <View style={styles.rightArrow}></View>
+
+                                  <View style={styles.rightArrowOverlap}></View>
+                              </View>
+                          )
+
                       }
                       if (item.msgType == "voice") {
+
                           return (
-                              <View style={{ alignSelf: "flex-start", backgroundColor: '#eeee', padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
-                                 <TouchableOpacity
+                              <View style={{ alignSelf: "flex-end", backgroundColor: themeColor, padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
+                                  <TouchableOpacity
                                       onPress={() => { this.playAudio(item.attachment) }}
-                                 >
-
-                                
-                                  <Text>voice</Text>
-                                  <View style={{ alignSelf: "flex-end" }}>
-                                      <Text style={[styles.text, { color: "#1f1f1f", fontSize: 8 }]}>{moment(item?.created).format("hh:mm a")}</Text>
-                                  </View>
+                                  >
+                                      <Text style={[styles.text, { color: "#fff" }]}>Play</Text>
                                   </TouchableOpacity>
-                                  <View style={styles.leftArrow}></View>
+                                  <View style={{ alignSelf: "flex-end" }}>
+                                      <Text style={[styles.text, { color: "#fff", fontSize: 8 }]}>{moment(item?.created).format("hh:mm a")}</Text>
+                                  </View>
+                                  <View style={styles.rightArrow}></View>
 
-                                  <View style={styles.leftArrowOverlap}></View>
-                           
+                                  <View style={styles.rightArrowOverlap}></View>
                               </View>
                           )
 
 
                       }
-                     
-                  }
-             
-                    //    if sender
-                  if (item.msgType == "text") {
-                  return(
-                      <View style={{ alignSelf: 'flex-end', backgroundColor: themeColor, padding: 10, borderRadius: 20, marginRight: 20, marginTop: 10, maxWidth: width * 0.6}}>
-                          <Text style={[styles.text,{color:"#fff"}]}>{item.message}</Text>
-                          <View style={{alignSelf:"flex-end"}}>
-                              <Text style={[styles.text, { color: "#fff", fontSize: 8 }]}>{moment(item?.created).format("hh:mm a")}</Text>
-                          </View>
-                          <View style={styles.rightArrow}></View>
+                  }else{
+                      //   if non -sender
 
-                          <View style={styles.rightArrowOverlap}></View>
-                      </View>
-                  )
-                  }
-                  if (item.msgType == "image") {
-                       
-                      return (
-                          <View style={{ alignSelf: 'flex-end', backgroundColor: themeColor, padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
-                              <Image
-                                  resizeMethod="scale"
-                                  source={{ uri: item.attachment }}
-                                  style={{ height: height * 0.15, width: width * 0.4, resizeMode: "contain" }}
-                              />
+                      if (item.senderPk.toString() != this.props.user.id.toString()) {
+                          if (item.msgType == "text") {
+                              return (
+                                  <View style={{ alignSelf: "flex-start", backgroundColor: '#eeee', padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
 
-                              <Text style={[styles.text, { color: "#fff" }]}>{item.message}</Text>
-                              <View style={{ alignSelf: "flex-end" }}>
-                                  <Text style={[styles.text, { color: "#fff", fontSize: 8 }]}>{moment(item?.created).format("hh:mm a")}</Text>
+                                      <Text style={[styles.text]}>{item.message}</Text>
+                                      <View style={{ alignSelf: "flex-end" }}>
+                                          <Text style={[styles.text, { color: "#1f1f1f", fontSize: 8 }]}>{moment(item.created).format('hh:mm a')}</Text>
+                                      </View>
+                                      <View style={styles.leftArrow}></View>
+
+                                      <View style={styles.leftArrowOverlap}></View>
+                                  </View>
+                              )
+                          }
+                          if (item.msgType == "image") {
+
+                              return (
+                                  <View style={{ alignSelf: "flex-start", backgroundColor: '#eeee', padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
+                                      <Image
+                                          source={{ uri: item.attachment }}
+                                          style={{ height: height * 0.15, width: width * 0.4, resizeMode: "contain" }}
+                                      />
+
+                                      <Text style={[styles.text]}>{item.message}</Text>
+                                      <View style={{ alignSelf: "flex-end" }}>
+                                          <Text style={[styles.text, { color: "#fff", fontSize: 8 }]}>{moment(item?.created).format("hh:mm a")}</Text>
+                                      </View>
+                                      <View style={styles.leftArrow}></View>
+
+                                      <View style={styles.leftArrowOverlap}></View>
+                                  </View>
+                              )
+
+                          }
+                          if (item.msgType == "voice") {
+                              return (
+                                  <View style={{ alignSelf: "flex-start", backgroundColor: '#eeee', padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
+                                      <TouchableOpacity
+                                          onPress={() => { this.playAudio(item.attachment) }}
+                                      >
+
+
+                                          <Text>voice</Text>
+                                          <View style={{ alignSelf: "flex-end" }}>
+                                              <Text style={[styles.text, { color: "#1f1f1f", fontSize: 8 }]}>{moment(item?.created).format("hh:mm a")}</Text>
+                                          </View>
+                                      </TouchableOpacity>
+                                      <View style={styles.leftArrow}></View>
+
+                                      <View style={styles.leftArrowOverlap}></View>
+
+                                  </View>
+                              )
+
+
+                          }
+
+                      }
+
+                      //    if sender
+                      if (item.msgType == "text") {
+                          return (
+                              <View style={{ alignSelf: 'flex-end', backgroundColor: themeColor, padding: 10, borderRadius: 20, marginRight: 20, marginTop: 10, maxWidth: width * 0.6 }}>
+                                  <Text style={[styles.text, { color: "#fff" }]}>{item.message}</Text>
+                                  <View style={{ alignSelf: "flex-end" }}>
+                                      <Text style={[styles.text, { color: "#fff", fontSize: 8 }]}>{moment(item?.created).format("hh:mm a")}</Text>
+                                  </View>
+                                  <View style={styles.rightArrow}></View>
+
+                                  <View style={styles.rightArrowOverlap}></View>
                               </View>
-                              <View style={styles.rightArrow}></View>
+                          )
+                      }
+                      if (item.msgType == "image") {
 
-                              <View style={styles.rightArrowOverlap}></View>
-                          </View>
-                      )
+                          return (
+                              <View style={{ alignSelf: 'flex-end', backgroundColor: themeColor, padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
+                                  <Image
+                                      resizeMethod="scale"
+                                      source={{ uri: item.attachment }}
+                                      style={{ height: height * 0.15, width: width * 0.4, resizeMode: "contain" }}
+                                  />
 
-                  }
-                  if (item.msgType == "voice") {
-                      
-                      return (
-                          <View style={{ alignSelf: "flex-end", backgroundColor: themeColor, padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
-                              <TouchableOpacity 
-                                  onPress={() => { this.playAudio(item.attachment)}}
-                              >
-                                  <Text style={[styles.text,{color:"#fff"}]}>Play</Text>
-                              </TouchableOpacity>
-                              <View style={{ alignSelf: "flex-end" }}>
-                                  <Text style={[styles.text, { color: "#fff", fontSize: 8 }]}>{moment(item?.created).format("hh:mm a")}</Text>
+                                  <Text style={[styles.text, { color: "#fff" }]}>{item.message}</Text>
+                                  <View style={{ alignSelf: "flex-end" }}>
+                                      <Text style={[styles.text, { color: "#fff", fontSize: 8 }]}>{moment(item?.created).format("hh:mm a")}</Text>
+                                  </View>
+                                  <View style={styles.rightArrow}></View>
+
+                                  <View style={styles.rightArrowOverlap}></View>
                               </View>
-                              <View style={styles.rightArrow}></View>
+                          )
 
-                              <View style={styles.rightArrowOverlap}></View>
-                          </View>
-                      )
+                      }
+                      if (item.msgType == "voice") {
+
+                          return (
+                              <View style={{ alignSelf: "flex-end", backgroundColor: themeColor, padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
+                                  <TouchableOpacity
+                                      onPress={() => { this.playAudio(item.attachment) }}
+                                  >
+                                      <Text style={[styles.text, { color: "#fff" }]}>Play</Text>
+                                  </TouchableOpacity>
+                                  <View style={{ alignSelf: "flex-end" }}>
+                                      <Text style={[styles.text, { color: "#fff", fontSize: 8 }]}>{moment(item?.created).format("hh:mm a")}</Text>
+                                  </View>
+                                  <View style={styles.rightArrow}></View>
+
+                                  <View style={styles.rightArrowOverlap}></View>
+                              </View>
+                          )
 
 
+                      }
                   }
+               
+
+           
+            
               }}
             />
             <View style={{flexDirection:'row',alignItems:"center",justifyContent:"center",minHeight:height*0.07,elevation:5,backgroundColor:"#ffff"}}> 

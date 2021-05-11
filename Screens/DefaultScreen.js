@@ -41,9 +41,10 @@ Notifications.setNotificationHandler({
       //    })
       //  )
          const login = await AsyncStorage.getItem("login")
-       this.registerForPushNotificationsAsync().then(token => this.setState({token}));
-        //  console.log(this.state.token,"tttt")
-        // return
+       this.registerForPushNotificationsAsync().then(token => this.setState({token},()=>{
+         alert(token,"dwd")
+       }));
+     
          if (login) {
               const data = await HttpsClient.get(`${url}/api/HR/users/?mode=mySelf&format=json`);
               console.log(data)
