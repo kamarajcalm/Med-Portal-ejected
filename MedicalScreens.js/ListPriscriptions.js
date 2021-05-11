@@ -79,7 +79,7 @@ class ListPriscriptions extends Component {
                                     <View style={{ flex: 0.4, justifyContent: 'center', alignItems: 'center' }}>
                                         <View >
                                             <Text style={[styles.text, { fontSize: 18, }]}>{item?.doctordetails?.name}</Text>
-                                            <Text style={[styles.text, { fontSize: 12, }]}>{item?.clinicname}</Text>
+                                            <Text style={[styles.text, { fontSize: 12, }]}>{item?.clinicname?.name}</Text>
                                         </View>
 
                                     </View>

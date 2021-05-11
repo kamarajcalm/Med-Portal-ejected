@@ -303,7 +303,7 @@ class ShowCard extends Component {
             dp = `${url}${this.state.item.doctordetails.dp}`
         }
 
-        console.log(item, "iiii")
+       
         return (
             <>
                 <SafeAreaView style={styles.topSafeArea} />

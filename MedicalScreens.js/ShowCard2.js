@@ -62,31 +62,231 @@ import SimpleToast from 'react-native-simple-toast';
          )
      }
     
-renderItem =(item)=>{
- return(
-     <View style={{ flexDirection: "row", marginTop: 10 ,alignItems:"center",justifyContent:'space-between'}}>
-        
-         <View style={{ alignItems: 'center', justifyContent: "center" }}>
-             <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>{item.after_food ? "Yes" : "No"}</Text>
-         </View>
-         <View style={{ alignItems: 'center', justifyContent: "center" }}>
-             <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>{item.morning_count}</Text>
-         </View>
-         <View style={{ alignItems: 'center', justifyContent: "center" }}>
-             <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>{item.afternoon_count}</Text>
-         </View>
-         <View style={{ alignItems: 'center', justifyContent: "center" }}>
-             <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>{item.night_count}</Text>
-         </View>
-         <View style={{ alignItems: 'center', justifyContent: "center" }}>
-             <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>{item.total_qty}</Text>
-         </View>
-         <View style={{ alignItems: 'center', justifyContent: "center" }}>
-             <Text style={[styles.text, { fontWeight: "bold", fontSize: 12 }]}>{item.days}</Text>
-         </View>
-     </View>
- )
-}
+     renderItem = (item) => {
+         console.log(item, "kkk")
+
+         if (item.medicinename.type == "Tablet" || item.medicinename.type == "Capsules") {
+             return (
+
+                 <View style={{ marginTop: 10, flexDirection: "row" }}>
+
+
+                     <View style={{ flex: 0.8, paddingLeft: 20 }}>
+                         {item.morning_count != 0 && <View style={{}}>
+                             <View style={{ flexDirection: "row" }}>
+                                 <Text style={{ borderColor: "#000", borderRightWidth: 1, width: width * 0.2 }}>Morning </Text>
+                                 <Text style={[styles.text, { fontSize: 12, marginLeft: 10 }]}>{item.morning_count} tablet {item.after_food ? "afterFood" : "before Food"}</Text>
+
+
+                             </View>
+
+                         </View>}
+                         {item.afternoon_count != 0 && <View style={{}}>
+                             <View style={{ flexDirection: "row" }}>
+                                 <Text style={{ borderColor: "#000", borderRightWidth: 1, width: width * 0.2 }}>Afternoon </Text>
+                                 <Text style={[styles.text, { fontSize: 12, marginLeft: 10 }]}>{item.afternoon_count} tablet {item.after_food ? "afterFood" : "before Food"}</Text>
+
+
+
+                             </View>
+
+                         </View>}
+                         {item.night_count != 0 && <View style={{}}>
+                             <View style={{ flexDirection: "row" }}>
+                                 <Text style={{ borderColor: "#000", borderRightWidth: 1, width: width * 0.2 }}>Night </Text>
+
+                                 <Text style={[styles.text, { fontSize: 12, marginLeft: 10 }]}>{item.night_count} tablet {item.after_food ? "afterFood" : "before Food"}</Text>
+
+
+                             </View>
+                         </View>}
+                         <View style={{ marginTop: 10 }}>
+                             <Text style={[styles.text, { fontWeight: "bold" }]}>Comments:</Text>
+                             <View>
+                                 <Text style={[styles.text, { marginLeft: 10 }]}>{item.command}</Text>
+                             </View>
+                         </View>
+                         <View style={{ alignSelf: "flex-end" }}>
+                             <Text>Qty: {item.total_qty}</Text>
+                         </View>
+                     </View>
+
+
+                 </View>
+             )
+         }
+         if (item.medicinename.type == "Drops") {
+             return (
+
+                 <View style={{ marginTop: 10, flexDirection: "row" }}>
+
+
+                     <View style={{ flex: 0.8, paddingLeft: 20 }}>
+                         {item.morning_count != 0 && <View style={{}}>
+                             <View style={{ flexDirection: "row" }}>
+                                 <Text style={{ borderColor: "#000", borderRightWidth: 1, width: width * 0.2 }}>Morning </Text>
+                                 <Text style={[styles.text, { fontSize: 12, marginLeft: 10 }]}>{item.morning_count} drops </Text>
+
+
+                             </View>
+
+                         </View>}
+                         {item.afternoon_count != 0 && <View style={{}}>
+                             <View style={{ flexDirection: "row" }}>
+                                 <Text style={{ borderColor: "#000", borderRightWidth: 1, width: width * 0.2 }}>Afternoon </Text>
+                                 <Text style={[styles.text, { fontSize: 12, marginLeft: 10 }]}>{item.afternoon_count} drops </Text>
+
+
+
+                             </View>
+
+                         </View>}
+                         {item.night_count != 0 && <View style={{}}>
+                             <View style={{ flexDirection: "row" }}>
+                                 <Text style={{ borderColor: "#000", borderRightWidth: 1, width: width * 0.2 }}>Night </Text>
+
+                                 <Text style={[styles.text, { fontSize: 12, marginLeft: 10 }]}>{item.night_count} drops </Text>
+
+
+                             </View>
+                         </View>}
+                         <View style={{ marginTop: 10 }}>
+                             <Text style={[styles.text, { fontWeight: "bold" }]}>Comments:</Text>
+                             <View>
+                                 <Text style={[styles.text, { marginLeft: 10 }]}>{item.command}</Text>
+                             </View>
+                         </View>
+                         <View style={{ alignSelf: "flex-end" }}>
+                             <Text>Qty: {item.total_qty}</Text>
+                         </View>
+                     </View>
+
+
+                 </View>
+             )
+         }
+         if (item.medicinename.type == "Liquid") {
+             return (
+
+                 <View style={{ marginTop: 10, flexDirection: "row" }}>
+
+
+                     <View style={{ flex: 0.8, paddingLeft: 20 }}>
+                         {item.morning_count != 0 && <View style={{}}>
+                             <View style={{ flexDirection: "row" }}>
+                                 <Text style={{ borderColor: "#000", borderRightWidth: 1, width: width * 0.2 }}>Morning </Text>
+                                 <Text style={[styles.text, { fontSize: 12, marginLeft: 10 }]}>{item.morning_count} ml {item.after_food ? "afterFood" : "before Food"}</Text>
+
+
+                             </View>
+
+                         </View>}
+                         {item.afternoon_count != 0 && <View style={{}}>
+                             <View style={{ flexDirection: "row" }}>
+                                 <Text style={{ borderColor: "#000", borderRightWidth: 1, width: width * 0.2 }}>Afternoon </Text>
+                                 <Text style={[styles.text, { fontSize: 12, marginLeft: 10 }]}>{item.afternoon_count} ml {item.after_food ? "afterFood" : "before Food"}</Text>
+
+
+
+                             </View>
+
+                         </View>}
+                         {item.night_count != 0 && <View style={{}}>
+                             <View style={{ flexDirection: "row" }}>
+                                 <Text style={{ borderColor: "#000", borderRightWidth: 1, width: width * 0.2 }}>Night </Text>
+
+                                 <Text style={[styles.text, { fontSize: 12, marginLeft: 10 }]}>{item.night_count} ml {item.after_food ? "afterFood" : "before Food"}</Text>
+
+
+                             </View>
+                         </View>}
+                         <View style={{ marginTop: 10 }}>
+                             <Text style={[styles.text, { fontWeight: "bold" }]}>Comments:</Text>
+                             <View>
+                                 <Text style={[styles.text, { marginLeft: 10 }]}>{item.command}</Text>
+                             </View>
+                         </View>
+                         <View style={{ alignSelf: "flex-end" }}>
+                             <Text>Qty: {item.total_qty}</Text>
+                         </View>
+                     </View>
+
+
+                 </View>
+             )
+         }
+         if (item.medicinename.type == "Cream") {
+             return (
+
+                 <View style={{ marginTop: 10, flexDirection: "row" }}>
+
+
+                     <View style={{ flex: 0.8, paddingLeft: 20 }}>
+                         {item.morning_count != 0 && <View style={{}}>
+                             <View style={{ flexDirection: "row" }}>
+                                 <Text style={{ borderColor: "#000", borderRightWidth: 1, width: width * 0.2 }}>Morning </Text>
+                                 <Text style={[styles.text, { fontSize: 12, marginLeft: 10 }]}>{item.morning_count} time</Text>
+
+
+                             </View>
+
+                         </View>}
+                         {item.afternoon_count != 0 && <View style={{}}>
+                             <View style={{ flexDirection: "row" }}>
+                                 <Text style={{ borderColor: "#000", borderRightWidth: 1, width: width * 0.2 }}>Afternoon </Text>
+                                 <Text style={[styles.text, { fontSize: 12, marginLeft: 10 }]}>{item.afternoon_count} time</Text>
+
+
+
+                             </View>
+
+                         </View>}
+                         {item.night_count != 0 && <View style={{}}>
+                             <View style={{ flexDirection: "row" }}>
+                                 <Text style={{ borderColor: "#000", borderRightWidth: 1, width: width * 0.2 }}>Night </Text>
+
+                                 <Text style={[styles.text, { fontSize: 12, marginLeft: 10 }]}>{item.night_count} time</Text>
+                             </View>
+                         </View>}
+                         <View style={{ marginTop: 10 }}>
+                             <Text style={[styles.text, { fontWeight: "bold" }]}>Comments:</Text>
+                             <View>
+                                 <Text style={[styles.text, { marginLeft: 10 }]}>{item.command}</Text>
+                             </View>
+                         </View>
+                         <View style={{ alignSelf: "flex-end" }}>
+                             <Text>Qty: {item.total_qty}</Text>
+                         </View>
+                     </View>
+
+
+                 </View>
+             )
+         }
+         if (item.medicinename.type == "Others") {
+             return (
+
+                 <View style={{ marginTop: 10, flexDirection: "row", flex: 1 }}>
+
+                     <View style={{ flex: 0.77, paddingLeft: 20 }}>
+                         <View style={{ marginTop: 10 }}>
+                             <Text style={[styles.text, { fontWeight: "bold" }]}>Comments:</Text>
+                             <View>
+                                 <Text style={[styles.text, { marginLeft: 10 }]}>{item.command}</Text>
+                             </View>
+                         </View>
+                     </View>
+
+                     <View style={{}}>
+                         <Text>Qty: {item.total_qty}</Text>
+                     </View>
+
+
+                 </View>
+             )
+         }
+
+     }
      showError =()=>{
          Toast.showWithGravity("Priscription is not valid", Toast.SHORT, Toast.CENTER)
      }
@@ -110,70 +310,114 @@ renderItem =(item)=>{
          )
      }
   render() {
-      const {item} = this.state
+      const { item } = this.state
       let dp = null
-      if (this.state.item.doctordetails.dp){
+      if (this?.state?.item?.doctordetails?.dp) {
           dp = `${url}${this.state.item.doctordetails.dp}`
       }
        
-       console.log(item,"iiii")
+
     return (
       <>
             <SafeAreaView style={styles.topSafeArea} />
             <SafeAreaView style={styles.bottomSafeArea}>
                       {/*Headers  */}
-                <View style={{ height: height * 0.1, backgroundColor: themeColor, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, justifyContent:"center",flexDirection:"row"}}>
-                    <TouchableOpacity style={{flex: 0.2,marginLeft:20,alignItems:"center",justifyContent:'center'}}
-                    onPress={()=>{this.props.navigation.goBack()}}
-                    >
-                        <Ionicons name="chevron-back-circle" size={30} color="#fff" />
-                    </TouchableOpacity>
-                    <View style={{flex:0.6,alignItems:'center',justifyContent:"center"}}>
-                    <Text style={[styles.text,{color:"#fff"}]}>Priscription Details</Text>   
-                    </View>
-                        <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
-                        
-                        </View>
-                </View>
-                  {/* DETAILS */}
-               <View >
-                   <View style={{alignItems:"center",justifyContent:"center",marginTop:20}}>
-                        <Text style={[styles.text,{fontSize:20}]}>{item.clinicname || "Clinic Name"}</Text>
-                   </View>
-                 <View style={{alignSelf:"flex-end",flexDirection:"row"}}>
-                     <View style={{alignItems:"center",justifyContent:"center"}}>
-                            <Text style={[styles.text, { color: "gray" }]}>{item.doctordetails.name || "Clinic Name"}</Text>
+                <View style={{ height: height * 0.2, justifyContent: "center", }}>
 
-                     </View>
-                        <View style={{ alignItems: "center", justifyContent: "center" }}>
-                            <Image
-                                source={{ uri: dp||"https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
-                                style={{ height: 30, width: 30, borderRadius: 15 }}
-                            />
+
+                    <View style={{ flexDirection: "row" }}>
+
+                        <TouchableOpacity style={{ flex: 0.2, marginLeft: 20, alignItems: "center", justifyContent: 'center' }}
+                            onPress={() => { this.props.navigation.goBack() }}
+                        >
+                            <Ionicons name="chevron-back-circle" size={30} color="#007A7A" />
+                        </TouchableOpacity>
+
+                        <Image
+                            style={{ height: 50, width: 50, resizeMode: "contain", marginLeft: 10 }}
+                            source={require('../assets/icons/34.png')}
+                        />
+                        <View style={{ alignItems: "center", justifyContent: 'center' }}>
+                            <Text style={[styles.text, { fontSize: 25, fontWeight: "bold", color: "#007A7A", marginLeft: 10 }]}>{item?.clinicname?.name || "Clinic Name"}</Text>
+
                         </View>
-                 </View>
-                 <FlatList 
-                     data={item.medicines}
-                     keyExtractor ={(item,index)=>index.toString()}
-                     
-                     renderItem ={({item,index})=>{
-                        return(
-                            <View style={{margin:20}}>
-                                <View style={{flexDirection:"row"}}>
-                                    <Text style={[styles.text, { fontWeight: "bold" }]}>{index+1}.Medicine Name:</Text>
-                                    <Text style={[styles.text, { color:"gray" }]}>  {item.medicinename}</Text>
+                    </View>
+
+                    <View style={{ alignSelf: "flex-start", height: 30, alignItems: "center", justifyContent: "center" }}>
+                        <Text style={[styles.text, { paddingLeft: 20 }]}>{item?.clinicname?.address}</Text>
+                    </View>
+
+
+                    <Image
+                        style={{ height: 20, width: width, resizeMode: "stretch", }}
+                        source={require('../assets/logooo.png')}
+                    />
+                    {/*                             
+                            <View style={{ alignSelf: "flex-end", flexDirection: "row" }}>
+                                <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                    <Text style={[styles.text, { color: "gray" }]}>{item.doctordetails.name || "Clinic Name"}</Text>
+
                                 </View>
-                                {
-                                    this.header()
-                                }
-                                {
-                                    this.renderItem(item)
-                                }
-                            </View>
-                        )
-                     }}
-                 />
-                
+                                <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                    <Image
+                                        source={{ uri: dp || "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
+                                        style={{ height: 30, width: 30, borderRadius: 15 }}
+                                    />
+                                </View>
+                            </View> */}
+
+                </View>
+
+
+
+
+
+
+
+                {/* DETAILS */}
+                <View >
+
+                    <FlatList
+                        data={item.medicines}
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={({ item, index }) => {
+                            return (
+                                <View style={{
+                                    flex: 1,
+                                    // borderWidth: 1,
+                                    // borderRadius: 1,
+                                    // borderStyle: 'dashed',
+                                    borderColor: '#D1D2DE',
+                                    backgroundColor: '#FFFFFF',
+                                }}>
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", paddingLeft: 15 }}>
+                                        <View style={{ flexDirection: "row", flex: 0.7 }}>
+                                            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+
+
+                                                <Text style={[styles.text, { color: "#000", fontWeight: "bold", fontSize: 18 }]}>{item.medicinename.name}</Text>
+                                                <Text style={[styles.text, { color: "gray", fontWeight: "bold" }]}> * {item.days} days</Text>
+                                                <Text style={[styles.text, { color: "gray", fontWeight: "bold" }]}> </Text>
+                                            </View>
+
+                                        </View>
+
+
+                                    </View>
+
+                                    {
+                                        this.renderItem(item)
+                                    }
+                                    <View>
+                                        <Image
+                                            style={{ width, height: 30, resizeMode: "stretch" }}
+                                            source={{ uri: "https://uwosh.edu/studenthealth/wp-content/uploads/sites/26/2016/08/dotted-bar.png" }}
+                                        />
+                                    </View>
+                                </View>
+                            )
+                        }}
+                    />
                </View>
                {
                    this.footer()

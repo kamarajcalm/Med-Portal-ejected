@@ -159,7 +159,7 @@ class PriscriptionIssue extends Component {
                             renderItem={({ item, index }) => {
                                 return (
                                     <TouchableOpacity style={[styles.card, { flexDirection: "row", borderRadius: 5 ,marginTop:15}]}
-                                        onPress={() => { this.props.navigation.navigate('showCard', { item }) }}
+                                        onPress={() => { this.props.navigation.navigate('showCard2', { item }) }}
                                     >
                                         <View style={{ flex: 0.3, alignItems: 'center', justifyContent: "center" }}>
                                             <Image
