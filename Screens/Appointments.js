@@ -339,7 +339,7 @@ class Appointments extends Component {
                                     <View style={{ flexDirection: "row", margin: 5, flex: 0.5 }}>
 
                                         <Text style={[styles.text, { fontWeight: "bold" }]}>Name   :</Text>
-                                        <Text style={[styles.text, { marginLeft: 10 }]}>{item.clinicname}</Text>
+                                        <Text style={[styles.text, { marginLeft: 10 }]}>{item.patientname.name}</Text>
                                     </View>
                                     <View style={{ flexDirection: "row", margin: 5, flex: 0.5 }}>
                                         <Text style={[styles.text, { fontWeight: "bold" }]}>Reason:</Text>
@@ -480,7 +480,8 @@ class Appointments extends Component {
                         )
                     } else {
                         return (
-                            <View
+                            <TouchableOpacity
+                                onPress={() => { this.viewAppointments(item) }}
                                 style={{
                                     marginTop: 10,
                                     minHeight: height * 0.1,
@@ -491,17 +492,20 @@ class Appointments extends Component {
                                 }}
 
                             >
-                                <TouchableOpacity style={{ flex: 0.2, alignItems: "center", justifyContent: 'center' }}
-                                    onPress={() => { this.props.navigation.navigate('ProfileView') }}
-                                >
-                                    <Image
-                                        source={{ uri: item.patientname.dp || "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
-                                        style={{ height: 60, width: 60, borderRadius: 30 }}
-                                    />
-                                </TouchableOpacity>
-                                <View style={{ flex: 0.4, justifyContent: "space-around", alignItems: "center", }}>
-                                    <Text style={[styles.text]}>{item.patientname.name}</Text>
-                                    <Text style={[styles.text]}>{item.patientname.mobile}</Text>
+                                <View style={{ flex: 0.6, justifyContent: "center" }}>
+                                    <View style={{ flexDirection: "row", margin: 5, flex: 0.5 }}>
+
+                                        <Text style={[styles.text, { fontWeight: "bold" }]}>Name   :</Text>
+                                        <Text style={[styles.text, { marginLeft: 10 }]}>{item.patientname.name}</Text>
+                                    </View>
+                                    <View style={{ flexDirection: "row", margin: 5, flex: 0.5 }}>
+                                        <Text style={[styles.text, { fontWeight: "bold" }]}>Reason:</Text>
+                                        <View style={{ justifyContent: 'center', flex: 1 }}>
+                                            <Text style={[styles.text, { marginLeft: 10 }]}>{item.reason}</Text>
+
+                                        </View>
+
+                                    </View>
                                 </View>
 
 
@@ -513,7 +517,7 @@ class Appointments extends Component {
                                         <Octicons name="primitive-dot" size={24} color={this.validateStatus(item.status)} />
                                     </View>
                                 </View>
-                            </View>
+                            </TouchableOpacity>
                         )
                     }
                 }}

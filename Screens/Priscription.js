@@ -65,7 +65,10 @@ class Priscription extends React.Component {
             prescriptions:[],
             isReceptionist:false,
             isFetching:false,
-            search:false
+            search:false,
+            textRef1:React.createRef(),
+            textRef2:React.createRef(),
+
         };
     }
     onChange = (selectedDate) => {
@@ -174,27 +177,32 @@ class Priscription extends React.Component {
      })
         this.setState({ prescriptions:filter})
     }
+    searchPriscriptions2 = (text) => {
+        let filter = this.state.prescriptions.filter((i) => {
+            let match = i.username.toUpperCase()
+            console.log(match,"gjhgjh")
+            return match.includes(text.toUpperCase())
+        })
+        console.log(filter)
+        this.setState({ prescriptions: filter })
+    }
     componentWillUnmount(){
         this._unsubscribe();
     }
     showDifferentPriscription =(item,index)=>{
       if(this.state.isDoctor){
+
           return(
-              <TouchableOpacity style={[styles.card, { flexDirection: "row", borderRadius: 5 }]}
+              <TouchableOpacity style={[styles.card,{ flexDirection: "row", borderRadius: 5 }]}
                   onPress={() => { this.props.navigation.navigate('showCard', { item }) }}
               >
-                  <View style={{ flex: 0.3, alignItems: 'center', justifyContent: "center" }}>
-                      <Image
-                          source={{ uri: "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
-                          style={{ height: 60, width: 60, borderRadius: 30 }}
-                      />
-                  </View>
-                  <View style={{ flex: 0.4, justifyContent: 'center', alignItems: 'center' }}>
-                      <View >
-                          <Text style={[styles.text, { fontSize: 18, }]}>{item.username}</Text>
+                   <View style={{flex:0.7}}> 
+                      <View style={{ justifyContent: "space-around", flex: 1 }}>
+                          <Text style={[styles.text, { fontSize: 18, }]}>{item?.username}</Text>
+                          <Text style={[styles.text, { fontSize: 12, fontWeight: "bold" }]}>Reason:</Text>
+                          <Text style={[styles.text, { fontSize: 12, }]}>{item.ongoing_treatment}</Text>
                       </View>
-
-                  </View>
+                   </View>
                   <View style={{ flex: 0.3, justifyContent: 'center', alignItems: "center" }}>
                       <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
                           <Text>{moment(item.created).format("DD/MM/YYYY")}</Text>
@@ -291,16 +299,47 @@ class Priscription extends React.Component {
     }
     validateHeaders =()=>{
         if(this.state.isDoctor){
-            return(<View style={{flex:1,justifyContent:'center'}}>
-                <TouchableOpacity style={{ flexDirection:"row",}}
-                    onPress={() => { this.setState({ showModal: true }) }}
-                >
-                    <Text style={{ color: '#fff', fontFamily: "openSans", marginLeft: 20, fontSize: 25, fontWeight: "bold" }}>{this.props?.clinic?.name}</Text>
-                   <View style={{alignItems:'center',justifyContent:"center",marginLeft:10}}>
-                        <FontAwesome5 name="angle-down" size={24} color="#fff" />
-                   </View>
-                
-                </TouchableOpacity>
+            return(
+            <View style={{flex:1,justifyContent:'center'}}>
+                    {!this.state.search ?
+                    <View style={{flexDirection:"row",flex:1,justifyContent:'center'}}>
+                            <TouchableOpacity style={{ flexDirection: "row",flex:0.8 ,}}
+                                onPress={() => { this.setState({ showModal: true }) }}
+                            >   
+                            <View style={{justifyContent:'center'}}>
+                                    <Text style={{ color: '#fff', fontFamily: "openSans", marginLeft: 20, fontSize: 25, fontWeight: "bold" }}>{this.props?.clinic?.name}</Text>
+
+                            </View>
+                                <View style={{ alignItems: 'center', justifyContent: "center", marginLeft: 10 }}>
+                                    <FontAwesome5 name="angle-down" size={24} color="#fff" />
+                                </View>
+
+                            </TouchableOpacity>
+                            <TouchableOpacity style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}
+                                onPress={() => { this.setState({ search: true },()=>{
+                                     
+                                }) }}
+                            >
+                                <Feather name="search" size={24} color="#fff" />
+                            </TouchableOpacity>
+                    </View>
+                 :
+                    <View style={{ height: height * 0.1, backgroundColor: themeColor, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, flexDirection: 'row', alignItems: "center", flex: 1 }}>
+                        <TouchableOpacity style={{ flex: 0.2, alignItems: "center", justifyContent: "center" }}
+                            onPress={() => { this.setState({ search: false }); }}
+                        >
+                            <Ionicons name="chevron-back-circle" size={30} color="#fff" />
+                        </TouchableOpacity>
+                        <View style={{ flex: 0.8 }}>
+                            <TextInput
+                                ref ={this.state.textRef1}
+                                selectionColor={themeColor}
+                                style={{ height: height * 0.04, width: width * 0.7, backgroundColor: "#fff", borderRadius: 10, paddingLeft: 20 }}
+                                placeholder="search"
+                                onChangeText={(text) => { this.searchPriscriptions2(text) }}
+                            />
+                        </View>
+                    </View>}
 
             </View>
                 
@@ -318,7 +357,9 @@ class Priscription extends React.Component {
 
                     </View>
                     <TouchableOpacity style={{flex:0.2,alignItems:'center',justifyContent:"center"}}
-                     onPress={()=>{this.setState({search:true})}}
+                     onPress={()=>{this.setState({search:true},()=>{
+                            
+                     })}}
                     >
                         <Feather name="search" size={24} color="#fff" />
                     </TouchableOpacity>
@@ -331,7 +372,9 @@ class Priscription extends React.Component {
                         </TouchableOpacity>
                         <View style={{ flex: 0.8 }}>
                             <TextInput
-
+                       
+                                autoFocus={true}
+                                selectionColor ={themeColor}
                                 style={{ height: height * 0.04, width: width * 0.7, backgroundColor: "#fff", borderRadius: 10, paddingLeft: 20 }}
                                 placeholder="search"
                                 onChangeText={(text) => { this.searchPriscriptions(text) }}
@@ -343,7 +386,41 @@ class Priscription extends React.Component {
             </>
         )
     }
+    renderFilter =()=>{
+    if(this.state.isDoctor||this.state.isReceptionist){
+        return (
+
+            <View style={{ height: height * 0.07, alignItems: "center", justifyContent: "space-around", flexDirection: "row", }}>
+                <View style={{ flexDirection: "row" }}>
+                    <Text style={[styles.text, { color: "#000" }]}>{this.state.today}</Text>
+                    <TouchableOpacity
+                        style={{ marginLeft: 20 }}
+                        onPress={() => { this.setState({ show: true }) }}
+                    >
+                        <Fontisto name="date" size={24} color={themeColor} />
+                    </TouchableOpacity>
+                    {this.state.show && (
+                        <DateTimePicker
+                            testID="dateTimePicker1"
+                            value={this.state.date}
+                            mode={this.state.mode}
+                            is24Hour={true}
+                            display="default"
+                            onChange={(time) => { this.onChange(time) }}
+                        />
+                    )}
+                </View>
+                <View>
+                    <Text style={[styles.text,]}> Total:{this.state.prescriptions.length}</Text>
+                </View>
+            </View>
+
+        )
+    }
+
+    }
     render() {
+        console.log(this.state.isDoctor,"hkjh")
         const y= new Animated.Value(0);
         const onScroll = Animated.event([{nativeEvent:{contentOffset:{y}}}],{
             useNativeDriver:true
@@ -360,33 +437,12 @@ class Priscription extends React.Component {
                             this.validateHeaders()
                         }
                     </View>
-   {  !this.state.loading?       <View style={{flex:1,backgroundColor:"#f3f3f3f3"}}>
+   {  !this.state.loading?<View style={{flex:1,backgroundColor:"#f3f3f3f3"}}>
            
-                 
-                        {this.state.isDoctor || this.state.isReceptionist&&<View style={{height: height * 0.07,alignItems:"center",justifyContent:"space-around",flexDirection:"row"}}>
-                 <View style={{flexDirection:"row"}}>
-                                <Text style={[styles.text, { color: "#000" }]}>{this.state.today}</Text>
-                                <TouchableOpacity
-                                    style={{ marginLeft: 20 }}
-                                    onPress={() => { this.setState({ show: true }) }}
-                                >
-                                    <Fontisto name="date" size={24} color={themeColor} />
-                                </TouchableOpacity>
-                                {this.state.show && (
-                                    <DateTimePicker
-                                        testID="dateTimePicker1"
-                                        value={this.state.date}
-                                        mode={this.state.mode}
-                                        is24Hour={true}
-                                        display="default"
-                                        onChange={(time) => { this.onChange(time) }}
-                                    />
-                                )}
-                    </View>
-                    <View>
-                        <Text style={[styles.text,]}> Total:{this.state.prescriptions.length}</Text>
-                    </View>
-                </View>}
+                 {
+                     this.renderFilter()
+                 }
+              
                         <FlatList
                           contentContainerStyle={{ paddingBottom: 90 }}
                           onRefresh={() => this.onRefresh()}

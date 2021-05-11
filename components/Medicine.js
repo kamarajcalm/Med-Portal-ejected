@@ -26,8 +26,9 @@ export default class Medicine extends Component {
                     style={{ height: "80%", width: "80%", resizeMode: "contain", borderRadius: 15 }}
                 />
             </View>
-            <View style={{ flex: 0.6, alignItems: "center", justifyContent: "center" }}>
+            <View style={{ flex: 0.6, alignItems: "center", justifyContent: "center" ,flexDirection:"row"}}>
                 <Text style={[styles.text]}>{item.title}</Text>
+                <Text style={[styles.text,{marginLeft:10,color:"gray"}]}>({item.type})</Text>
             </View>
             <View style={{ flex: 0.2, alignItems: "center", justifyContent: 'center' }}
                 

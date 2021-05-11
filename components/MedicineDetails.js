@@ -67,7 +67,7 @@ export default class MedicineDetails extends Component {
       }
     
                         // if tablets
-      if (item.type == "Tablet" || item.type =="Drops"){
+      if (item.type == "Tablet" || item.type =="Drops"||item.type =="Capsules"){
          return (
         <View
             key={index}
@@ -75,10 +75,7 @@ export default class MedicineDetails extends Component {
         >
             <View style={{ flex: 0.2,flexDirection:"row" ,margin:10}}>
                 <Text style={[styles.text, { fontWeight: "bold", fontSize: 20 }]}>{item.title}</Text>
-                <View style={{alignItems:'center',justifyContent:'center'}}>
-                         <Text style={[styles.text, { fontWeight: "bold", fontSize: 14, color: "gray", marginLeft: 10 }]}>(Brand Name)</Text>
-
-                </View>
+              
 
             </View>
             <View style={{flexDirection:"row",marginHorizontal:10,alignItems:"center",justifyContent:"space-between"}}>
@@ -246,8 +243,8 @@ export default class MedicineDetails extends Component {
                 </View>
             </View>
             <>
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-around", flex: 0.2 }}>
-                <View style={{flexDirection:"row"}}>
+         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-around", flex: 0.2 }}>
+              { item.type!="Drops"&&<View style={{flexDirection:"row"}}>
                     <Text style={[styles.text, { fontWeight: 'bold' }]}>After food</Text>
 
                     <Switch
@@ -258,7 +255,7 @@ export default class MedicineDetails extends Component {
                         onValueChange={() => { this.toggleSwitch() }}
                         value={this.state.afterFood}
                     />
-                </View>
+                </View>}
                 <View style={{flexDirection:'row'}}>
                     <Text>No of days</Text>
                     <TextInput 
@@ -313,6 +310,13 @@ export default class MedicineDetails extends Component {
                       <TouchableOpacity style={{ height: height * 0.03, width: width * 0.2, backgroundColor: this.state.morning ? themeColor : "gray", alignItems: "center", justifyContent: 'center', borderRadius: 10 }}
                           onPress={() => {
                               this.setState({ morning: !this.state.morning }, () => {
+                                    if(this.state.morning){
+                                       this.props.changeFunction("morning_count",1,index)
+                                       this.setState({ morningCount: 1})
+                                   }else{
+                                       this.props.changeFunction("morning_count",0,index)
+                                       this.setState({ morningCount: 0 })
+                                   }
                                 
                               })
                           }}
@@ -324,7 +328,13 @@ export default class MedicineDetails extends Component {
                           onPress={() => {
                               this.setState({ afterNoon: !this.state.afterNoon }, () => {
 
-                                
+                                  if (this.state.afterNoon) {
+                                      this.props.changeFunction("afternoon_count", 1, index)
+                                      this.setState({ afterNoonCount: 1 })
+                                  } else {
+                                      this.props.changeFunction("afternoon_count", 0, index)
+                                      this.setState({ afterNoonCount: 0 })
+                                  }
 
                               })
                           }}
@@ -334,11 +344,18 @@ export default class MedicineDetails extends Component {
                       <TouchableOpacity style={{ height: height * 0.03, width: width * 0.2, backgroundColor: this.state.night ? themeColor : "gray", alignItems: "center", justifyContent: 'center', borderRadius: 10 }}
                           onPress={() => {
                               this.setState({ night: !this.state.night }, () => {
-                                
+                                  if (this.state.night) {
+                                      this.props.changeFunction("night_count", 1, index)
+                                      this.setState({ nightCount: 1 })
+                                  } else {
+                                      this.props.changeFunction("night_count", 0, index)
+                                      this.setState({ nightCount: 0 })
+                                  }
 
 
                               })
                           }}
+                      
                       >
                           <Text style={[styles.text, { color: "#fff" }]}>Night</Text>
                       </TouchableOpacity>
@@ -353,12 +370,7 @@ export default class MedicineDetails extends Component {
                               keyboardType={"numeric"}
                               selectionColor ={themeColor}
                               style={{ height: 30, width: 50, backgroundColor: '#eee', borderRadius: 5, marginLeft: 5, paddingLeft: 5 }}
-                              value={this.state.ml}
-                              onChangeText={(text) => { this.setState({ ml: text },()=>{
-                                 if(this.state.morning){
-                                      
-                                 }
-                              }) }}
+                              onChangeText={(text) => {this.changeQty(text)}}
                           />
                     </View>
                      
@@ -440,6 +452,13 @@ export default class MedicineDetails extends Component {
                       <TouchableOpacity style={{ height: height * 0.03, width: width * 0.2, backgroundColor: this.state.morning ? themeColor : "gray", alignItems: "center", justifyContent: 'center', borderRadius: 10 }}
                           onPress={() => {
                               this.setState({ morning: !this.state.morning }, () => {
+                                  if (this.state.morning) {
+                                      this.props.changeFunction("morning_count", 1, index)
+                                      this.setState({ morningCount: 1 })
+                                  } else {
+                                      this.props.changeFunction("morning_count", 0, index)
+                                      this.setState({ morningCount: 0 })
+                                  }
 
                               })
                           }}
@@ -451,7 +470,13 @@ export default class MedicineDetails extends Component {
                           onPress={() => {
                               this.setState({ afterNoon: !this.state.afterNoon }, () => {
 
-
+                                  if (this.state.afterNoon) {
+                                      this.props.changeFunction("afternoon_count", 1, index)
+                                      this.setState({ afterNoonCount: 1 })
+                                  } else {
+                                      this.props.changeFunction("afternoon_count", 0, index)
+                                      this.setState({ afterNoonCount: 0 })
+                                  }
 
                               })
                           }}
@@ -461,7 +486,13 @@ export default class MedicineDetails extends Component {
                       <TouchableOpacity style={{ height: height * 0.03, width: width * 0.2, backgroundColor: this.state.night ? themeColor : "gray", alignItems: "center", justifyContent: 'center', borderRadius: 10 }}
                           onPress={() => {
                               this.setState({ night: !this.state.night }, () => {
-
+                                  if (this.state.night) {
+                                      this.props.changeFunction("night_count", 1, index)
+                                      this.setState({ nightCount: 1 })
+                                  } else {
+                                      this.props.changeFunction("night_count", 0, index)
+                                      this.setState({ nightCount: 0 })
+                                  }
 
 
                               })
@@ -475,15 +506,15 @@ export default class MedicineDetails extends Component {
 
                       <View style={{ flexDirection: "row" }}>
                           <View style={{ alignItems: 'center', justifyContent: "center" }}>
-                              <Text>Enter no of days</Text>
+                              <Text>Enter no of Times</Text>
                           </View>
 
                           <TextInput
                               keyboardType={"numeric"}
                               selectionColor={themeColor}
                               style={{ height: 30, width: 50, backgroundColor: '#eee', borderRadius: 5, marginLeft: 5, paddingLeft: 5 }}
-                              value={this.state.days}
-                              onChangeText={(text) => { this.changeDays(text) }}
+                           
+                              onChangeText={(text) => { this.changeQty(text) }}
                           />
                       </View>
                   </View>
@@ -642,7 +673,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff",
         elevation: 6,
         margin: 10,
-        height: height * 0.25,
+        height: height * 0.27,
         borderRadius: 10,
 
     },

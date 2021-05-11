@@ -51,7 +51,7 @@ class ShowCard extends Component {
     renderItem = (item) => {
         console.log(item,"kkk")
        
-        if (item.medicinename.type=="Tablet"){
+        if (item.medicinename.type == "Tablet" || item.medicinename.type == "Capsules"){
             return (
 
                 <View style={{ marginTop: 10, flexDirection: "row" }}>
@@ -86,6 +86,12 @@ class ShowCard extends Component {
 
                             </View>
                         </View>}
+                        <View style={{ marginTop: 10 }}>
+                            <Text style={[styles.text, { fontWeight: "bold" }]}>Comments:</Text>
+                            <View>
+                                <Text style={[styles.text, { marginLeft: 10 }]}>{item.command}</Text>
+                            </View>
+                        </View>
                         <View style={{ alignSelf: "flex-end" }}>
                             <Text>Qty: {item.total_qty}</Text>
                         </View>
@@ -94,6 +100,56 @@ class ShowCard extends Component {
 
                 </View>
             )
+        }
+        if (item.medicinename.type == "Drops"){
+          return(
+
+              <View style={{ marginTop: 10, flexDirection: "row" }}>
+
+
+                  <View style={{ flex: 0.8, paddingLeft: 20 }}>
+                      {item.morning_count != 0 && <View style={{}}>
+                          <View style={{ flexDirection: "row" }}>
+                              <Text style={{ borderColor: "#000", borderRightWidth: 1, width: width * 0.2 }}>Morning </Text>
+                              <Text style={[styles.text, { fontSize: 12, marginLeft: 10 }]}>{item.morning_count} drops </Text>
+
+
+                          </View>
+
+                      </View>}
+                      {item.afternoon_count != 0 && <View style={{}}>
+                          <View style={{ flexDirection: "row" }}>
+                              <Text style={{ borderColor: "#000", borderRightWidth: 1, width: width * 0.2 }}>Afternoon </Text>
+                              <Text style={[styles.text, { fontSize: 12, marginLeft: 10 }]}>{item.afternoon_count} drops </Text>
+
+
+
+                          </View>
+
+                      </View>}
+                      {item.night_count != 0 && <View style={{}}>
+                          <View style={{ flexDirection: "row" }}>
+                              <Text style={{ borderColor: "#000", borderRightWidth: 1, width: width * 0.2 }}>Night </Text>
+
+                              <Text style={[styles.text, { fontSize: 12, marginLeft: 10 }]}>{item.night_count} drops </Text>
+
+
+                          </View>
+                      </View>}
+                      <View style={{ marginTop: 10 }}>
+                          <Text style={[styles.text, { fontWeight: "bold" }]}>Comments:</Text>
+                          <View>
+                              <Text style={[styles.text, { marginLeft: 10 }]}>{item.command}</Text>
+                          </View>
+                      </View>
+                      <View style={{ alignSelf: "flex-end" }}>
+                          <Text>Qty: {item.total_qty}</Text>
+                      </View>
+                  </View>
+
+
+              </View>
+          )
         }
         if (item.medicinename.type == "Liquid") {
             return (
@@ -130,6 +186,12 @@ class ShowCard extends Component {
 
                             </View>
                         </View>}
+                        <View style={{ marginTop: 10 }}>
+                            <Text style={[styles.text, { fontWeight: "bold" }]}>Comments:</Text>
+                            <View>
+                                <Text style={[styles.text, { marginLeft: 10 }]}>{item.command}</Text>
+                            </View>
+                        </View>
                         <View style={{ alignSelf: "flex-end" }}>
                             <Text>Qty: {item.total_qty}</Text>
                         </View>
@@ -172,6 +234,12 @@ class ShowCard extends Component {
                                 <Text style={[styles.text, { fontSize: 12, marginLeft: 10 }]}>{item.night_count} time</Text>
                             </View>
                         </View>}
+                        <View style={{ marginTop: 10 }}>
+                            <Text style={[styles.text, { fontWeight: "bold" }]}>Comments:</Text>
+                            <View>
+                                <Text style={[styles.text, { marginLeft: 10}]}>{item.command}</Text>
+                            </View>
+                        </View>
                         <View style={{ alignSelf: "flex-end" }}>
                             <Text>Qty: {item.total_qty}</Text>
                         </View>
@@ -184,14 +252,20 @@ class ShowCard extends Component {
         if (item.medicinename.type == "Others") {
             return (
 
-                <View style={{ marginTop: 10, flexDirection: "row" }}>
+                <View style={{ marginTop: 10, flexDirection: "row",flex:1 }}>
 
-
-                 
-                        <View style={{ alignSelf: "flex-end" }}>
-                            <Text>Qty: {item.total_qty}</Text>
+                    <View style={{flex:0.77,paddingLeft:20}}>
+                        <View style={{ marginTop: 10 }}>
+                            <Text style={[styles.text,{fontWeight:"bold"}]}>Comments:</Text>
+                            <View>
+                                <Text style={[styles.text,{marginLeft:10}]}>{item.command}</Text>
+                            </View>
                         </View>
+                    </View>
                  
+                    <View style={{ }}>
+                        <Text>Qty: {item.total_qty}</Text>
+                    </View>
 
 
                 </View>

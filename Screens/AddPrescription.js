@@ -125,8 +125,23 @@ class AddPrescription extends Component {
         }
         this.state.medicines.forEach((i)=>{
             try{
-                i.total_qty = i.days * (i.morning_count + i.afternoon_count + i.night_count)
-            }
+                if (i.type == "Liquid"){
+                    return 
+                } else if (i.type == "Injections"){
+                    return
+                }
+                else if (i.type == "Cream"){
+                    return
+                }
+                else{
+                    console.log("gjhj")
+                    i.total_qty = i.days * (i.morning_count + i.afternoon_count + i.night_count)
+                }
+               
+                 
+
+                }
+            
             catch (e){
                 console.log(e)
             }
@@ -144,9 +159,11 @@ class AddPrescription extends Component {
             clinic: this.props.clinic.clinicpk,
             age:this.state.Age,
             sex:this.state.selectedSex,
-            appointment:this.state.appointmentId,
             next_visit:this.state.nextVisit,
             address:this.state.Address
+        }
+        if(this.state.appointmentId){
+          sendData.appointment =this.state.appointmentId
         }
        const post = await HttpsClient.post(api,sendData)
        console.log(post)
@@ -186,6 +203,8 @@ class AddPrescription extends Component {
                     })
                }
              this.setState({loading:false})
+           }else{
+               this.setState({ loading: false })
            }
         }
     }
@@ -301,7 +320,7 @@ class AddPrescription extends Component {
                              </View>
                           
                         </View>
-                        <View style={{ marginTop: 20 }}>
+                        {/* <View style={{ marginTop: 20 }}>
                             <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>Address</Text>
                             <TextInput
                                 value={this.state.Address}
@@ -310,7 +329,7 @@ class AddPrescription extends Component {
                                 onChangeText={(Address) => { this.setState({ Address }) }}
                                 style={{ width: width * 0.9, height: height * 0.1, backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10 ,textAlignVertical:"top"}}
                             />
-                        </View>
+                        </View> */}
                         <View style={{ marginTop: 20 }}>
                             <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>Health issues</Text>
                             {
@@ -357,10 +376,10 @@ class AddPrescription extends Component {
                                 <Text style={[styles.text,{fontWeight:"bold",color:"gray"}]}>Appointment Taken:</Text>
                                 <Text style={[styles.text,{marginLeft:10}]}>{this.state.appointment_taken?"yes":"No"}</Text>
                             </View>
-                            <View style={{ flexDirection: "row", marginTop: 5, marginLeft: 10 }}>
+                            {this.state.appointment_taken&&<View style={{ flexDirection: "row", marginTop: 5, marginLeft: 10 }}>
                                 <Text style={[styles.text, { fontWeight: "bold", color: "gray" }]}>Token Id:</Text>
                                 <Text style={[styles.text, { marginLeft: 10 }]}>{this.state.appointmentId}</Text>
-                            </View>
+                            </View>}
                         </View>}
                         <View style={{ marginTop: 20 }}>
                             <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>Reason for this Visit</Text>

@@ -64,25 +64,7 @@ class PaymentPage extends Component {
                         </View>
 
                                                    {/* Current Pack */}
-                        <LinearGradient
-                          
-                            style={[styles.card, styles.elevation]}
-                            colors={['#4c669f', '#3b5998', '#192f6a']}
-                        >
-                      <View style={{flex:1}}>
-                          <View 
-                          style={{alignItems:'center',justifyContent:'center',flex:0.2}}
-                          >
-                              <Text style={[styles.text,{color:"#fff"}]}>Clinic Name</Text>
-                          </View>
-                          <View style={{flex:0.6}}>
-
-                          </View>
-                          <View style={{flex:0.2,alignItems:'center',justifyContent:"center"}}>
-                               <Text style={[styles.text,{color:"#fff"}]}>Current plan expires on :12/04/2022</Text>
-                          </View>
-                      </View>
-                        </LinearGradient>
+                       
                                                 {/* Our plans */}
 
                         <View style={{alignItems:'center',justifyContent:"center"}}>

@@ -60,8 +60,8 @@ class ViewAppointmentDoctors extends Component {
     }
     render() {
         let dp = null
-        if (this.state.item.doctordetails.dp) {
-            dp = `${url}${this.state.item.doctordetails.dp}`
+        if (this.state.item.patientname.dp) {
+            dp = `${url}${this.state.item.patientname.dp}`
         }
         return (
             <>
@@ -91,7 +91,7 @@ class ViewAppointmentDoctors extends Component {
                                     source={{ uri: dp || "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
                                 />
                                 <View style={{ alignItems: "center", justifyContent: "center", height: 60, marginRight: 10 }}>
-                                    <Text style={[styles.text]}>{this.state.item.doctordetails.name}</Text>
+                                    <Text style={[styles.text]}>{this.state.item.patientname.name}</Text>
                                 </View>
 
                             </View>
@@ -139,7 +139,13 @@ class ViewAppointmentDoctors extends Component {
                         <Text>With Patient</Text>
                     </TouchableOpacity>
                 </View>
-            
+                {this.state.item.status == "Completed" && <View style={{ alignItems: 'center', justifyContent: 'center', position: "absolute", bottom: 300, width }}>
+                    <TouchableOpacity style={{ height: height * 0.05, width: width * 0.4, alignItems: 'center', justifyContent: "center", borderRadius: 10, backgroundColor: themeColor }}
+                        onPress={() => { this.props.navigation.navigate('ViewPriscription', { pk: this.state.item.prescription }) }}
+                    >
+                        <Text style={[styles.text, { color: "#fff" }]}>Show Prescription</Text>
+                    </TouchableOpacity>
+                </View>}
             </>
         );
     }
