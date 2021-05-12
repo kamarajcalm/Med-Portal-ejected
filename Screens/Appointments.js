@@ -15,7 +15,7 @@ import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import moment from 'moment';
 import HttpsClient from '../api/HttpsClient';
 import { FontAwesome, FontAwesome5, Octicons} from '@expo/vector-icons';
-import Toast from 'react-native-simple-toast';
+import FlashMessage, { showMessage, hideMessage } from "react-native-flash-message";
 const url = settings.url
 class Appointments extends Component {
     constructor(props) {
@@ -102,6 +102,17 @@ class Appointments extends Component {
         }
 
     }
+    showSimpleMessage(content, color, type = "info", props = {}) {
+        const message = {
+            message: content,
+            backgroundColor: color,
+            icon: { icon: "auto", position: "left" },
+            type,
+            ...props,
+        };
+
+        showMessage(message);
+    }
     componentDidMount() {
         
       this.getAppointments();
@@ -129,10 +140,10 @@ class Appointments extends Component {
       if(post.type =="success"){
           let duplicate = this.state.Appointments
           duplicate[this.state.selectedIndex]=post.data
-          Toast.show("Accepted SuccessFully")
+          this.showSimpleMessage("Accepted SuccessFully", "#00A300","success")
           this.setState({ modal:false,Appointments:duplicate})
       }else{
-          Toast.show("Try again")
+          this.showSimpleMessage("Try again", "#B22222", "danger")
           this.setState({ modal: false })
       }
     }
@@ -146,10 +157,11 @@ class Appointments extends Component {
         if (post.type == "success") {
             let duplicate = this.state.Appointments
             duplicate.splice(this.state.selectedIndex, 1)
-            Toast.show("Rejected SuccessFully")
+            this.showSimpleMessage("Rejected SuccessFully", "#dd7030",)
+          
             this.setState({ modal: false, Appointments: duplicate })
         } else {
-            Toast.show("Try again")
+            this.showSimpleMessage("Try again", "#B22222", "danger")
             this.setState({ modal: false })
         }
     }
@@ -163,11 +175,12 @@ class Appointments extends Component {
         if (post.type == "success") {
             let duplicate = this.state.Appointments
             duplicate.splice(this.state.selectedIndex,1)
-            Toast.show("Completed SuccessFully")
+            this.showSimpleMessage("Completed SuccessFully", "#00A300", "success")
+      
             this.setState({ modal: false, Appointments: duplicate })
             this.getAppointments2();
         } else {
-            Toast.show("Try again")
+            this.showSimpleMessage("Try again", "#B22222", "danger")
             this.setState({ modal: false })
         }
     }

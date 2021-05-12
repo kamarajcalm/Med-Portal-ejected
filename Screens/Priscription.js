@@ -334,7 +334,7 @@ class Priscription extends React.Component {
                             <TextInput
                                 ref ={this.state.textRef1}
                                 selectionColor={themeColor}
-                                style={{ height: height * 0.04, width: width * 0.7, backgroundColor: "#fff", borderRadius: 10, paddingLeft: 20 }}
+                                style={{ height: height * 0.047, width: width * 0.7, backgroundColor: "#fff", borderRadius: 10, paddingLeft: 20 }}
                                 placeholder="search"
                                 onChangeText={(text) => { this.searchPriscriptions2(text) }}
                             />

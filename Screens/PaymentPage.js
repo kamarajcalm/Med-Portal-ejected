@@ -11,7 +11,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 const { height, width } = Dimensions.get("window");
 const fontFamily = settings.fontFamily;
 const themeColor = settings.themeColor;
+import RazorpayCheckout from 'react-native-razorpay';
 const url = settings.url;
+import axios from 'axios';
 
 class PaymentPage extends Component {
     constructor(props) {
@@ -42,7 +44,17 @@ class PaymentPage extends Component {
     componentDidMount() {
    
     }
-
+    makeOrder = async()=>{
+        let api =` https://api.razorpay.com/v1/orders`
+        let sendData ={
+            amount: 50000,
+            currency: "INR",
+            receipt: "receipt#1",
+            partial_payment:false,
+        }
+        let post = await axios.post(api,sendData)
+       console.log(post)
+    }
     render() {
         return (
             <>
@@ -85,6 +97,31 @@ class PaymentPage extends Component {
                                          >
                                             <TouchableOpacity 
                                              style={{flex:1}}
+                                                onPress={() => {
+                                                    var options = {
+                                                        description: 'cascaca',
+                                                        image: 'https://i.imgur.com/3g7nmJC.png',
+                                                        currency: 'INR',
+                                                        key: 'rzp_test_qlBHML4RDDiVon',
+                                                        name: 'Acme Corp',
+                                                        order_id:'order_H9o4idkggm3qMG',//Replace this with an order_id created using Orders API. Learn more at https://razorpay.com/docs/api/orders.
+                                                        prefill: {
+                                                            email: 'kamraj089@gmail.com',
+                                                            contact: '9191919191',
+                                                            name: 'kamaraj'
+                                                        },
+                                                        theme: { color: '#1f1f1f' }
+                                                    }
+                                                    RazorpayCheckout.open(options).then((data) => {
+                                                        console.log(data,"scs")
+                                                        // handle success
+                                                        alert(`Success: ${data.razorpay_payment_id}`);
+                                                    }).catch((error) => {
+                                                        // handle failure
+                                                        console.log(error,"eeeee")
+                                                        alert(`Error: ${error.code} | ${error.description}`);
+                                                    });
+                                                }}
                                             >
                                                 <View style={{ alignItems: "center", justifyContent: "center", flex: 0.3 }}>
                                                     <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 ,color:"#fff"}]}>{i.name}</Text>

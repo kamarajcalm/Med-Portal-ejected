@@ -12,7 +12,7 @@ const themeColor = settings.themeColor;
 const url = settings.url
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
-import SimpleToast from 'react-native-simple-toast';
+import FlashMessage, { showMessage, hideMessage } from "react-native-flash-message";
 import { StackActions, CommonActions} from '@react-navigation/native';
 
 
@@ -72,7 +72,17 @@ class UpdateTimings extends Component {
             },
         };
     }
+    showSimpleMessage(content, color, type = "info", props = {}) {
+        const message = {
+            message: content,
+            backgroundColor: color,
+            icon: { icon: "auto", position: "left" },
+            type,
+            ...props,
+        };
 
+        showMessage(message);
+    }
     componentDidMount() {
        
     }
@@ -93,10 +103,11 @@ class UpdateTimings extends Component {
         times.forEach((i) => {
 
             if (i.endtime == undefined) {
-                return SimpleToast.show(`please fill the endtime of ${i.day}`)
+                return this.showSimpleMessage(`please fill the endtime of ${i.day}`, "#dd7030",)
+             
             }
             if (i.starttime == undefined) {
-                return SimpleToast.show(`please fill the starttime of ${i.day}`)
+                return this.showSimpleMessage(`please fill the starttime of ${i.day}`, "#dd7030",)
             }
         })
         let api = `${url}/api/prescription/updateTime/`
@@ -136,7 +147,8 @@ class UpdateTimings extends Component {
             )
         }
         else{
-            SimpleToast.show("try again")
+
+            this.showSimpleMessage("Try again", "#B22222", "danger")
         }
     }
     onChange1 = (selectedDate) => {

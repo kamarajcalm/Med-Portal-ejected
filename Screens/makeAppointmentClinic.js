@@ -19,6 +19,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 import Toast from 'react-native-simple-toast';
 import SimpleToast from 'react-native-simple-toast';
+
+import FlashMessage, { showMessage, hideMessage } from "react-native-flash-message";
 class makeAppointmentClinic extends Component {
     constructor(props) {
 
@@ -86,10 +88,11 @@ class makeAppointmentClinic extends Component {
     }
     requestAppointment = async () => {
         if(this.state.today ==null){
-            return SimpleToast.show("please select date")
+            return this.showSimpleMessage("please select date", "#dd7030",)
+            
         }
         if (this.state.time == null) {
-            return SimpleToast.show("please select time")
+            return this.showSimpleMessage("please select time", "#dd7030",)
         }
         let api = `${url}/api/prescription/addAppointment/`
         let sendData = {
@@ -104,12 +107,13 @@ class makeAppointmentClinic extends Component {
         let post = await HttpsClient.post(api, sendData)
         console.log(post,"klkk")
         if (post.type == "success") {
-            Toast.show("requested Successfully")
+            this.showSimpleMessage("requested SuccessFully", "#00A300", "success")
+       
             setTimeout(() => {
                 this.props.navigation.goBack()
             }, 2000)
         } else {
-            Toast.show(post?.data?.error)
+            this.showSimpleMessage("Try again", "#B22222", "danger")
         }
     }
     getTodayTimings = (today) => {
@@ -129,6 +133,17 @@ class makeAppointmentClinic extends Component {
 
 
 
+    }
+    showSimpleMessage(content, color, type = "info", props = {}) {
+        const message = {
+            message: content,
+            backgroundColor: color,
+            icon: { icon: "auto", position: "left" },
+            type,
+            ...props,
+        };
+
+        showMessage(message);
     }
     render() {
         return (

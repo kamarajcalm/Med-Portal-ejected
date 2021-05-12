@@ -17,10 +17,10 @@ import * as Location from 'expo-location';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 import HttpsClient from '../api/HttpsClient';
+import FlashMessage, { showMessage, hideMessage } from "react-native-flash-message";
 
-import Toast from 'react-native-simple-toast';
 import authAxios from '../api/authAxios';
-import SimpleToast from 'react-native-simple-toast';
+
 const url = settings.url
 class EditDoctorTimings extends Component {
     constructor(props) {
@@ -93,6 +93,17 @@ class EditDoctorTimings extends Component {
         this.setState({ doctor: item })
 
 
+    }
+    showSimpleMessage(content, color, type = "info", props = {}) {
+        const message = {
+            message: content,
+            backgroundColor: color,
+            icon: { icon: "auto", position: "left" },
+            type,
+            ...props,
+        };
+
+        showMessage(message);
     }
     onChange1 = (selectedDate) => {
         if (selectedDate.type == "set") {
@@ -258,12 +269,12 @@ class EditDoctorTimings extends Component {
         let post = await HttpsClient.post(api, sendData)
         console.log(post, "jkjjj")
         if (post.type == "success") {
-            Toast.show("Added Successfully");
+            this.showSimpleMessage("Added Successfully", "#00A300", "success")
             setTimeout(() => {
                 this.props.navigation.goBack()
             })
         } else {
-            Toast.show("try again");
+            this.showSimpleMessage("Try again", "#B22222", "danger")
         }
     }
     componentDidMount() {
@@ -272,10 +283,12 @@ class EditDoctorTimings extends Component {
     pushSun = () => {
         let duplicate = this.state.SunArray
         if (this.state.Sun.starttime == undefined) {
-            return SimpleToast.show("please add from Time")
+            return this.showSimpleMessage("please add from Time", "#dd7030",)
+         
         }
         if (this.state.Sun.endtime == undefined) {
-            return SimpleToast.show("please add end Time")
+            return this.showSimpleMessage("please add end Time", "#dd7030",)
+          
         }
         duplicate.push(this.state.Sun)
         this.setState({ Sun: {}, SunArray: duplicate })
@@ -289,10 +302,10 @@ class EditDoctorTimings extends Component {
         let duplicate = this.state.MonArray
 
         if (this.state.Mon.starttime == undefined) {
-            return SimpleToast.show("please add from Time")
+            return this.showSimpleMessage("please add from Time", "#dd7030",)
         }
         if (this.state.Mon.endtime == undefined) {
-            return SimpleToast.show("please add end Time")
+            return this.showSimpleMessage("please add end Time", "#dd7030",)
         }
         duplicate.push(this.state.Mon)
         this.setState({ Mon: {}, MonArray: duplicate })
@@ -306,10 +319,10 @@ class EditDoctorTimings extends Component {
         let duplicate = this.state.TueArray
 
         if (this.state.Tue.starttime == undefined) {
-            return SimpleToast.show("please add from Time")
+            return this.showSimpleMessage("please add from Time", "#dd7030",)
         }
         if (this.state.Tue.endtime == undefined) {
-            return SimpleToast.show("please add end Time")
+            return this.showSimpleMessage("please add end Time", "#dd7030",)
         }
         duplicate.push(this.state.Tue)
         this.setState({ Tue: {}, TueArray: duplicate })
@@ -323,10 +336,10 @@ class EditDoctorTimings extends Component {
         let duplicate = this.state.WedArray
 
         if (this.state.Wed.starttime == undefined) {
-            return SimpleToast.show("please add from Time")
+            return this.showSimpleMessage("please add from Time", "#dd7030",)
         }
         if (this.state.Wed.endtime == undefined) {
-            return SimpleToast.show("please add end Time")
+            return this.showSimpleMessage("please add end Time", "#dd7030",)
         }
         duplicate.push(this.state.Wed)
         this.setState({ Wed: {}, WedArray: duplicate })
@@ -340,10 +353,10 @@ class EditDoctorTimings extends Component {
         let duplicate = this.state.ThuArray
 
         if (this.state.Thu.starttime == undefined) {
-            return SimpleToast.show("please add from Time")
+            return this.showSimpleMessage("please add from Time", "#dd7030",)
         }
         if (this.state.Thu.endtime == undefined) {
-            return SimpleToast.show("please add end Time")
+            return this.showSimpleMessage("please add end Time", "#dd7030",)
         }
         duplicate.push(this.state.Thu)
         this.setState({ Thu: {}, ThuArray: duplicate })
@@ -357,10 +370,10 @@ class EditDoctorTimings extends Component {
         let duplicate = this.state.FriArray
 
         if (this.state.Fri.starttime == undefined) {
-            return SimpleToast.show("please add from Time")
+            return this.showSimpleMessage("please add from Time", "#dd7030",)
         }
         if (this.state.Fri.endtime == undefined) {
-            return SimpleToast.show("please add end Time")
+            return this.showSimpleMessage("please add end Time", "#dd7030",)
         }
         duplicate.push(this.state.Fri)
         this.setState({ Fri: {}, FriArray: duplicate })
@@ -374,10 +387,10 @@ class EditDoctorTimings extends Component {
         let duplicate = this.state.SatArray
 
         if (this.state.Sat.starttime == undefined) {
-            return SimpleToast.show("please add from Time")
+            return this.showSimpleMessage("please add from Time", "#dd7030",)
         }
         if (this.state.Sat.endtime == undefined) {
-            return SimpleToast.show("please add end Time")
+            return this.showSimpleMessage("please add end Time", "#dd7030",)
         }
         duplicate.push(this.state.Sat)
         this.setState({ Sat: {}, SatArray: duplicate })

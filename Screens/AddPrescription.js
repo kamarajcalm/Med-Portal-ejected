@@ -114,14 +114,16 @@ class AddPrescription extends Component {
  addPriscription = async()=>{
         let api =`${url}/api/prescription/addPrescription/`
         if(this.state.medicines.length == 0){
-            return SimpleToast.show("Please add medicine")
+            return this.showSimpleMessage("Please add medicine", "#dd7030",)
+        
         }
         if (this.state.doctorFees =="") {
-           
-            return SimpleToast.show("Please fill doctorFees")
+            return this.showSimpleMessage("Please fill doctorFees", "#dd7030",)
+            
         }
         if (this.state.Reason =="") {
-            return SimpleToast.show("Please fill Reason")
+            return this.showSimpleMessage("Please fill Reason", "#dd7030",)
+       
         }
         this.state.medicines.forEach((i)=>{
             try{
@@ -168,12 +170,12 @@ class AddPrescription extends Component {
        const post = await HttpsClient.post(api,sendData)
        console.log(post)
        if(post.type=="success"){
-           Toast.show("Added SuccessFully")
+           this.showSimpleMessage("Added SuccessFully","#00A300","success")
            setTimeout(()=>{
              this.props.navigation.goBack()
            },1500)
        }else{
-           Toast.show("Try again")
+           this.showSimpleMessage("Try again", "#B22222", "danger")
        }
        
     }
