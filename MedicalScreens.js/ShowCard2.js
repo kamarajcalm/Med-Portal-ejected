@@ -12,6 +12,7 @@ const url = settings.url
 import { connect } from 'react-redux';
 import { selectTheme } from '../actions';
 import HttpsClient from '../api/HttpsClient';
+import { NavigationContainer, CommonActions } from '@react-navigation/native';
 import FlashMessage, { showMessage, hideMessage } from "react-native-flash-message";
  class ShowCard2 extends Component {
   constructor(props) {
@@ -30,9 +31,21 @@ import FlashMessage, { showMessage, hideMessage } from "react-native-flash-messa
          }
          
          let post = await HttpsClient.post(api,sendData)
+         console.log(post,"dd")
          if(post.type =="success"){
              this.showSimpleMessage("issued SuccessFully", "#00A300", "success")
+             return this.props.navigation.dispatch(
+                 CommonActions.reset({
+                     index: 0,
+                     routes: [
+                         {
+                             name: 'ClincicPriscriptionStack',
 
+                         },
+
+                     ],
+                 })
+             )
          
          }
      }

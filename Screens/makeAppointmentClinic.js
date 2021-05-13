@@ -15,11 +15,10 @@ import { selectTheme } from '../actions';
 import { NavigationContainer, CommonActions } from '@react-navigation/native';
 import HttpsClient from '../api/HttpsClient';
 import DropDownPicker from 'react-native-dropdown-picker';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 import Toast from 'react-native-simple-toast';
 import SimpleToast from 'react-native-simple-toast';
-
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import FlashMessage, { showMessage, hideMessage } from "react-native-flash-message";
 class makeAppointmentClinic extends Component {
     constructor(props) {
@@ -62,30 +61,60 @@ class makeAppointmentClinic extends Component {
     componentDidMount() {
        this.getDoctors()
     }
-    onChange = (selectedDate) => {
-        if (selectedDate.type == "set") {
-            this.setState({ today: moment(new Date(selectedDate.nativeEvent.timestamp)).format('YYYY-MM-DD'), show: false, date: new Date(selectedDate.nativeEvent.timestamp) }, () => {
+    showDatePicker = () => {
+        this.setState({ show: true })
+    };
+
+    hideDatePicker = () => {
+        this.setState({ show: false })
+    };
+    showDatePicker2 = () => {
+        this.setState({ show2: true })
+    };
+
+    hideDatePicker2 = () => {
+        this.setState({ show2: false })
+    };
+    handleConfirm = (date) => {
+        
+        this.setState({ today: moment(date).format('YYYY-MM-DD'), show: false, date: new Date(date) }, () => {
+          
+
+        })
+        this.hideDatePicker();
+    };
+    handleConfirm2 = (date) => {
+
+        this.setState({ time: moment(date).format('hh:mm a'), show2: false, date: new Date(date) }, () => {
+            
+
+        })
+        this.hideDatePicker2();
+    };
+    // onChange = (selectedDate) => {
+    //     if (selectedDate.type == "set") {
+    //         this.setState({ today: moment(new Date(selectedDate.nativeEvent.timestamp)).format('YYYY-MM-DD'), show: false, date: new Date(selectedDate.nativeEvent.timestamp) }, () => {
 
 
-            })
+    //         })
 
-        } else {
-            return null
-        }
+    //     } else {
+    //         return null
+    //     }
 
-    }
-    onChange2 = (selectedDate) => {
-        if (selectedDate.type == "set") {
-            this.setState({ time: moment(new Date(selectedDate.nativeEvent.timestamp)).format('hh:mm a'), show2: false, date: new Date(selectedDate.nativeEvent.timestamp) }, () => {
+    // }
+    // onChange2 = (selectedDate) => {
+    //     if (selectedDate.type == "set") {
+    //         this.setState({ time: moment(new Date(selectedDate.nativeEvent.timestamp)).format('hh:mm a'), show2: false, date: new Date(selectedDate.nativeEvent.timestamp) }, () => {
 
 
-            })
+    //         })
 
-        } else {
-            return null
-        }
+    //     } else {
+    //         return null
+    //     }
 
-    }
+    // }
     requestAppointment = async () => {
         if(this.state.today ==null){
             return this.showSimpleMessage("please select date", "#dd7030",)
@@ -388,7 +417,7 @@ class makeAppointmentClinic extends Component {
 
                                 </TouchableOpacity>
                             </View>
-                            {this.state.show && (
+                            {/* {this.state.show && (
                                 <DateTimePicker
                                     testID="dateTimePicker1"
                                     value={this.state.date}
@@ -408,7 +437,21 @@ class makeAppointmentClinic extends Component {
                                     onChange={(time) => { this.onChange2(time) }}
                                 />
                             )}
-                           
+                            */}
+                            <DateTimePickerModal
+                                testID="2"
+                                isVisible={this.state.show}
+                                mode="date"
+                                onConfirm={this.handleConfirm}
+                                onCancel={this.hideDatePicker}
+                            />
+                            <DateTimePickerModal
+                                testID="1"
+                                isVisible={this.state.show2}
+                                mode="time"
+                                onConfirm={this.handleConfirm2}
+                                onCancel={this.hideDatePicker2}
+                            />
                         </ScrollView>
                         
                        

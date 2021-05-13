@@ -19,7 +19,7 @@ import Toast from 'react-native-simple-toast';
 import SimpleToast from 'react-native-simple-toast';
 import DropDownPicker from 'react-native-dropdown-picker';
 import FlashMessage, { showMessage, hideMessage } from "react-native-flash-message";
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import moment from 'moment';
 class AddPrescription extends Component {
   constructor(props) {
@@ -179,12 +179,26 @@ class AddPrescription extends Component {
        }
        
     }
-    onChange1 = (selectedDate) => {
-        if (selectedDate.type == "set") {
-        let nextVisit =  moment(new Date(selectedDate.nativeEvent.timestamp)).format('YYYY-MM-DD')
+    showDatePicker = () => {
+        this.setState({ show: true })
+    };
+
+    hideDatePicker = () => {
+        this.setState({ show: false })
+    };
+    handleConfirm = (date) => {
+          if (selectedDate.type == "set") {
+        let nextVisit =  moment(date).format('YYYY-MM-DD')
         this.setState({ nextVisit,show1:false})
         }
-    }
+        this.hideDatePicker();
+    };
+    // onChange1 = (selectedDate) => {
+    //     if (selectedDate.type == "set") {
+    //     let nextVisit =  moment(new Date(selectedDate.nativeEvent.timestamp)).format('YYYY-MM-DD')
+    //     this.setState({ nextVisit,show1:false})
+    //     }
+    // }
     searchUser = async(mobileNo)=>{
         let api = `${url}/api/prescription/getAppointmentUser/?doctor=${this.props.user.id}&user=${mobileNo}&clinic=${this.props.clinic.clinicpk}&requesteddate=${moment(new Date()).format('YYYY-MM-DD')}`
         this.setState({ mobileNo })
@@ -459,7 +473,7 @@ class AddPrescription extends Component {
                         
                         </View>
             </ScrollView>
-                    {this.state.show1 && (
+                    {/* {this.state.show1 && (
                         <DateTimePicker
                             testID="TimePicker1"
                             value={this.state.date}
@@ -468,7 +482,14 @@ class AddPrescription extends Component {
                             display="default"
                             onChange={(time) => { this.onChange1(time) }}
                         />
-                    )}
+                    )} */}
+
+                    <DateTimePickerModal
+                        isVisible={this.state.show1}
+                        mode="date"
+                        onConfirm={this.handleConfirm}
+                        onCancel={this.hideDatePicker}
+                    />
         </View>
      </SafeAreaView>
        </>

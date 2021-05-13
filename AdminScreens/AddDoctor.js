@@ -14,7 +14,7 @@ import { NavigationContainer, CommonActions } from '@react-navigation/native';
 import * as  ImagePicker from 'expo-image-picker';
 import { TextInput } from 'react-native-gesture-handler';
 import * as Location from 'expo-location';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import moment from 'moment';
 import HttpsClient from '../api/HttpsClient';
 import FlashMessage, { showMessage, hideMessage } from "react-native-flash-message";
@@ -103,128 +103,255 @@ class AddDoctor extends Component {
 
         showMessage(message);
     }
-    onChange1 = (selectedDate) => {
-        if (selectedDate.type == "set") {
-            this.setState({ show1: false, }, () => {
-                if (this.state.day == "Sun") {
-                    let duplicate = this.state.Sun
+    showDatePicker = () => {
+        this.setState({ show1: true })
+    };
 
-                    duplicate.day = "Sun",
-                        duplicate.index = 0,
-                        duplicate.starttime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+    hideDatePicker = () => {
+        this.setState({ show2: false })
+    };
+    showDatePicker1 = () => {
+        this.setState({ show1: true })
+    };
 
-                    return this.setState({ Sun: duplicate })
-                }
-                if (this.state.day == "Mon") {
-                    let duplicate = this.state.Mon
+    hideDatePicker2 = () => {
+        this.setState({ show2: false })
+    };
+    handleConfirm = (date) => {
+        this.setState({ show1: false, }, () => {
+            if (this.state.day == "Sun") {
+                let duplicate = this.state.Sun
 
-                    duplicate.day = "Mon",
-                        duplicate.index = 1,
-                        duplicate.starttime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+                duplicate.day = "Sun",
+                    duplicate.index = 0,
+                    duplicate.starttime = moment(date).format('h:mm a')
 
-                    return this.setState({ Mon: duplicate })
-                }
-                if (this.state.day == "Tue") {
-                    let duplicate = this.state.Tue
+                return this.setState({ Sun: duplicate })
+            }
+            if (this.state.day == "Mon") {
+                let duplicate = this.state.Mon
 
-                    duplicate.day = "Tue",
-                        duplicate.index = 2,
-                        duplicate.starttime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+                duplicate.day = "Mon",
+                    duplicate.index = 1,
+                    duplicate.starttime = moment(date).format('h:mm a')
 
-                    return this.setState({ Tue: duplicate })
-                }
-                if (this.state.day == "Wed") {
-                    let duplicate = this.state.Wed
-                    duplicate.day = "Wed",
-                        duplicate.index = 3,
-                        duplicate.starttime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+                return this.setState({ Mon: duplicate })
+            }
+            if (this.state.day == "Tue") {
+                let duplicate = this.state.Tue
 
-                    return this.setState({ Wed: duplicate })
-                }
-                if (this.state.day == "Thu") {
-                    let duplicate = this.state.Thu
+                duplicate.day = "Tue",
+                    duplicate.index = 2,
+                    duplicate.starttime = moment(date).format('h:mm a')
 
-                    duplicate.day = "Thu",
-                        duplicate.index = 4,
-                        duplicate.starttime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+                return this.setState({ Tue: duplicate })
+            }
+            if (this.state.day == "Wed") {
+                let duplicate = this.state.Wed
+                duplicate.day = "Wed",
+                    duplicate.index = 3,
+                    duplicate.starttime = moment(date).format('h:mm a')
 
-                    return this.setState({ Thu: duplicate })
-                }
-                if (this.state.day == "Fri") {
-                    let duplicate = this.state.Fri
+                return this.setState({ Wed: duplicate })
+            }
+            if (this.state.day == "Thu") {
+                let duplicate = this.state.Thu
 
-                    duplicate.day = "Fri",
-                        duplicate.index = 5,
-                        duplicate.starttime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+                duplicate.day = "Thu",
+                    duplicate.index = 4,
+                    duplicate.starttime = moment(date).format('h:mm a')
 
-                    return this.setState({ Fri: duplicate })
-                }
-                if (this.state.day == "Sat") {
-                    let duplicate = this.state.Sat
+                return this.setState({ Thu: duplicate })
+            }
+            if (this.state.day == "Fri") {
+                let duplicate = this.state.Fri
 
-                    duplicate.day = "Sat",
-                        duplicate.index = 6,
-                        duplicate.starttime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+                duplicate.day = "Fri",
+                    duplicate.index = 5,
+                    duplicate.starttime = moment(date).format('h:mm a')
 
-                    return this.setState({ Sat: duplicate })
-                }
+                return this.setState({ Fri: duplicate })
+            }
+            if (this.state.day == "Sat") {
+                let duplicate = this.state.Sat
 
-            })
+                duplicate.day = "Sat",
+                    duplicate.index = 6,
+                    duplicate.starttime = moment(date).format('h:mm a')
 
-        } else {
-            return null
-        }
+                return this.setState({ Sat: duplicate })
+            }
 
-    }
-    onChange2 = (selectedDate) => {
-        if (selectedDate.type == "set") {
-            this.setState({ show2: false, }, () => {
+        })
+        this.hideDatePicker();
+    };
+    handleConfirm2 = (date) => {
+        this.setState({ show2: false, }, () => {
 
-                if (this.state.day == "Sun") {
-                    let duplicate = this.state.Sun
-                    duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
-                    return this.setState({ Sun: duplicate })
-                }
-                if (this.state.day == "Mon") {
-                    let duplicate = this.state.Mon
-                    duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
-                    return this.setState({ Mon: duplicate })
-                }
-                if (this.state.day == "Tue") {
-                    let duplicate = this.state.Tue
-                    duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
-                    return this.setState({ Tue: duplicate })
-                }
-                if (this.state.day == "Wed") {
-                    let duplicate = this.state.Wed
-                    duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
-                    return this.setState({ Wed: duplicate })
-                }
-                if (this.state.day == "Thu") {
-                    let duplicate = this.state.Thu
-                    duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
-                    return this.setState({ Thu: duplicate })
-                }
-                if (this.state.day == "Fri") {
-                    let duplicate = this.state.Fri
-                    duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
-                    return this.setState({ Fri: duplicate })
-                }
-                if (this.state.day == "Sat") {
-                    let duplicate = this.state.Sat
-                    duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
-                    return this.setState({ Sat: duplicate })
-                }
+            if (this.state.day == "Sun") {
+                let duplicate = this.state.Sun
+                duplicate.endtime = moment(date).format('h:mm a')
+                return this.setState({ Sun: duplicate })
+            }
+            if (this.state.day == "Mon") {
+                let duplicate = this.state.Mon
+                duplicate.endtime = moment(date).format('h:mm a')
+                return this.setState({ Mon: duplicate })
+            }
+            if (this.state.day == "Tue") {
+                let duplicate = this.state.Tue
+                duplicate.endtime = moment(date).format('h:mm a')
+                return this.setState({ Tue: duplicate })
+            }
+            if (this.state.day == "Wed") {
+                let duplicate = this.state.Wed
+                duplicate.endtime = moment(date).format('h:mm a')
+                return this.setState({ Wed: duplicate })
+            }
+            if (this.state.day == "Thu") {
+                let duplicate = this.state.Thu
+                duplicate.endtime = moment(date).format('h:mm a')
+                return this.setState({ Thu: duplicate })
+            }
+            if (this.state.day == "Fri") {
+                let duplicate = this.state.Fri
+                duplicate.endtime = moment(date).format('h:mm a')
+                return this.setState({ Fri: duplicate })
+            }
+            if (this.state.day == "Sat") {
+                let duplicate = this.state.Sat
+                duplicate.endtime = moment(date).format('h:mm a')
+                return this.setState({ Sat: duplicate })
+            }
 
 
 
-            })
+        })
+        this.hideDatePicker2();
+    };
 
-        } else {
-            return null
-        }
+    // onChange1 = (selectedDate) => {
+    //     if (selectedDate.type == "set") {
+    //         this.setState({ show1: false, }, () => {
+    //             if (this.state.day == "Sun") {
+    //                 let duplicate = this.state.Sun
 
-    }
+    //                 duplicate.day = "Sun",
+    //                     duplicate.index = 0,
+    //                     duplicate.starttime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+
+    //                 return this.setState({ Sun: duplicate })
+    //             }
+    //             if (this.state.day == "Mon") {
+    //                 let duplicate = this.state.Mon
+
+    //                 duplicate.day = "Mon",
+    //                     duplicate.index = 1,
+    //                     duplicate.starttime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+
+    //                 return this.setState({ Mon: duplicate })
+    //             }
+    //             if (this.state.day == "Tue") {
+    //                 let duplicate = this.state.Tue
+
+    //                 duplicate.day = "Tue",
+    //                     duplicate.index = 2,
+    //                     duplicate.starttime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+
+    //                 return this.setState({ Tue: duplicate })
+    //             }
+    //             if (this.state.day == "Wed") {
+    //                 let duplicate = this.state.Wed
+    //                 duplicate.day = "Wed",
+    //                     duplicate.index = 3,
+    //                     duplicate.starttime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+
+    //                 return this.setState({ Wed: duplicate })
+    //             }
+    //             if (this.state.day == "Thu") {
+    //                 let duplicate = this.state.Thu
+
+    //                 duplicate.day = "Thu",
+    //                     duplicate.index = 4,
+    //                     duplicate.starttime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+
+    //                 return this.setState({ Thu: duplicate })
+    //             }
+    //             if (this.state.day == "Fri") {
+    //                 let duplicate = this.state.Fri
+
+    //                 duplicate.day = "Fri",
+    //                     duplicate.index = 5,
+    //                     duplicate.starttime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+
+    //                 return this.setState({ Fri: duplicate })
+    //             }
+    //             if (this.state.day == "Sat") {
+    //                 let duplicate = this.state.Sat
+
+    //                 duplicate.day = "Sat",
+    //                     duplicate.index = 6,
+    //                     duplicate.starttime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+
+    //                 return this.setState({ Sat: duplicate })
+    //             }
+
+    //         })
+
+    //     } else {
+    //         return null
+    //     }
+
+    // }
+    // onChange2 = (selectedDate) => {
+    //     if (selectedDate.type == "set") {
+    //         this.setState({ show2: false, }, () => {
+
+    //             if (this.state.day == "Sun") {
+    //                 let duplicate = this.state.Sun
+    //                 duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+    //                 return this.setState({ Sun: duplicate })
+    //             }
+    //             if (this.state.day == "Mon") {
+    //                 let duplicate = this.state.Mon
+    //                 duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+    //                 return this.setState({ Mon: duplicate })
+    //             }
+    //             if (this.state.day == "Tue") {
+    //                 let duplicate = this.state.Tue
+    //                 duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+    //                 return this.setState({ Tue: duplicate })
+    //             }
+    //             if (this.state.day == "Wed") {
+    //                 let duplicate = this.state.Wed
+    //                 duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+    //                 return this.setState({ Wed: duplicate })
+    //             }
+    //             if (this.state.day == "Thu") {
+    //                 let duplicate = this.state.Thu
+    //                 duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+    //                 return this.setState({ Thu: duplicate })
+    //             }
+    //             if (this.state.day == "Fri") {
+    //                 let duplicate = this.state.Fri
+    //                 duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+    //                 return this.setState({ Fri: duplicate })
+    //             }
+    //             if (this.state.day == "Sat") {
+    //                 let duplicate = this.state.Sat
+    //                 duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
+    //                 return this.setState({ Sat: duplicate })
+    //             }
+
+
+
+    //         })
+
+    //     } else {
+    //         return null
+    //     }
+
+    // }
     addDoctor = async()=>{
         let api  =`${url}/api/prescription/addDoctors/`
         let timings =[
@@ -871,7 +998,7 @@ class AddDoctor extends Component {
                                             <Text style={[styles.text, { color: "#fff" }]}>Add</Text>
                                         </TouchableOpacity>
                                     </View>
-                                    {this.state.show1 && (
+                                    {/* {this.state.show1 && (
                                         <DateTimePicker
                                             testID="TimePicker1"
                                             value={this.state.date}
@@ -890,7 +1017,19 @@ class AddDoctor extends Component {
                                             display="default"
                                             onChange={(time) => { this.onChange2(time) }}
                                         />
-                                    )}
+                                    )} */}
+                                    <DateTimePickerModal
+                                        isVisible={this.state.show1}
+                                        mode="time"
+                                        onConfirm={this.handleConfirm}
+                                        onCancel={this.hideDatePicker}
+                                    />
+                                    <DateTimePickerModal
+                                        isVisible={this.state.show2}
+                                        mode="time"
+                                        onConfirm={this.handleConfirm2}
+                                        onCancel={this.hideDatePicker2}
+                                    />
                                 </View>
 
                                 <View style={{ alignItems: 'center', justifyContent: 'center' ,marginTop:20}}>
@@ -905,7 +1044,7 @@ class AddDoctor extends Component {
 
                         </View>
 
-                
+{/*                 
                         {this.state.show1 && (
                             <DateTimePicker
                                 testID="TimePicker1"
@@ -925,7 +1064,7 @@ class AddDoctor extends Component {
                                 display="default"
                                 onChange={(time) => { this.onChange2(time) }}
                             />
-                        )}
+                        )} */}
                     </View>
                 </SafeAreaView>
 

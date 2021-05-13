@@ -9,7 +9,8 @@ const fontFamily = settings.fontFamily;
 const themeColor = settings.themeColor;
 const screenHeight =Dimensions.get("screen").height;
 import Modal from 'react-native-modal';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+
 const initialLayout = { width: Dimensions.get('window').width };
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import moment from 'moment';
@@ -78,30 +79,55 @@ class Appointments extends Component {
             this.setState({ Appointments:data.data})
         }
     }
-    onChange = (selectedDate) => {
-        if (selectedDate.type == "set") {
-            this.setState({ today: moment(new Date(selectedDate.nativeEvent.timestamp)).format('YYYY-MM-DD'), show: false, date: new Date(selectedDate.nativeEvent.timestamp) }, () => {
+
+    showDatePicker = () => {
+        this.setState({ show: true })
+    };
+
+    hideDatePicker = () => {
+        this.setState({ show: false })
+    };
 
 
-            })
-
-        } else {
-            return null
-        }
-
-    }
-    onChange2 = (selectedDate) => {
-        if (selectedDate.type == "set") {
-            this.setState({ time: moment(new Date(selectedDate.nativeEvent.timestamp)).format('hh:mm a'), show2: false, date: new Date(selectedDate.nativeEvent.timestamp) }, () => {
+    handleConfirm = (date) => {
+        this.setState({ today: moment(date).format('YYYY-MM-DD'), show: false, date: new Date(date) }, () => {
 
 
-            })
+        })
+        this.hideDatePicker();
+    };
+    // onChange = (selectedDate) => {
+    //     if (selectedDate.type == "set") {
+    //         this.setState({ today: moment(new Date(selectedDate.nativeEvent.timestamp)).format('YYYY-MM-DD'), show: false, date: new Date(selectedDate.nativeEvent.timestamp) }, () => {
 
-        } else {
-            return null
-        }
 
-    }
+    //         })
+
+    //     } else {
+    //         return null
+    //     }
+
+    // }
+
+    handleConfirm2 = (date) => {
+        this.setState({ time: moment(date).format('hh:mm a'), show2: false, date: new Date(date) }, () => {
+
+
+        })
+        this.hideDatePicker();
+    };
+    // onChange2 = (selectedDate) => {
+    //     if (selectedDate.type == "set") {
+    //         this.setState({ time: moment(new Date(selectedDate.nativeEvent.timestamp)).format('hh:mm a'), show2: false, date: new Date(selectedDate.nativeEvent.timestamp) }, () => {
+
+
+    //         })
+
+    //     } else {
+    //         return null
+    //     }
+
+    // }
     showSimpleMessage(content, color, type = "info", props = {}) {
         const message = {
             message: content,
@@ -763,7 +789,7 @@ class Appointments extends Component {
                         />
                          {/* Appointments */}
                         {this.Modal()}
-                        {this.state.show && (
+                        {/* {this.state.show && (
                             <DateTimePicker
                                 testID="dateTimePicker1"
                                 value={this.state.date}
@@ -782,7 +808,20 @@ class Appointments extends Component {
                                 display="default"
                                 onChange={(time) => { this.onChange2(time) }}
                             />
-                        )}
+                        )} */}
+                        <DateTimePickerModal
+                            isVisible={this.state.show}
+                            mode="date"
+                            onConfirm={this.handleConfirm}
+                            onCancel={this.hideDatePicker}
+                        />
+                        <DateTimePickerModal
+                        
+                            isVisible={this.state.show2}
+                            mode="time"
+                            onConfirm={this.handleConfirm2}
+                            onCancel={this.hideDatePicker2}
+                        />
                     </View>
                 </SafeAreaView>
             </>

@@ -14,7 +14,7 @@ import { NavigationContainer, CommonActions } from '@react-navigation/native';
 import * as  ImagePicker from 'expo-image-picker';
 import { TextInput } from 'react-native-gesture-handler';
 import * as Location from 'expo-location';
-import DateTimePicker from '@react-native-community/datetimepicker';
+
 import moment from 'moment';
 import HttpsClient from '../api/HttpsClient';
 import FlashMessage, { showMessage, hideMessage } from "react-native-flash-message";

@@ -38,7 +38,6 @@ let sendData ={
      console.log(login)
    if(login.type=="success"){
      AsyncStorage.setItem('csrf', login.data.csrf_token)
-     AsyncStorage.setItem('pk', login.data.pk)
      AsyncStorage.setItem('login', "true")
      return this.props.navigation.dispatch(
        CommonActions.reset({
@@ -111,10 +110,13 @@ let sendData ={
           <View style={styles.footer}>
               <Text style={styles.text_footer}>Mobile or username</Text>
               <View style={styles.action}>
-                    <AntDesign name="mobile1" size={20} color="#05375a" />
+                <View style={{alignItems:"center",justifyContent:"center"}}>
+                     <AntDesign name="mobile1" size={20} color="#05375a" />
+                </View>
+                  
                     <TextInput 
                        value={this.state.username}
-                 
+                       selectionColor={themeColor}
                        placeholder="your username or mobile"
                        style={styles.textInput}
               onChangeText={(text) => { this.setState({ username:text})}}
@@ -122,32 +124,45 @@ let sendData ={
               </View>
           <Text style={[styles.text_footer,{marginTop:35}]}>Password</Text>
           <View style={styles.action}>
-            <Entypo name="lock-open" size={24} color="#05375a" />
+            <View style={{alignItems:"center",justifyContent:"center"}}>
+              <Entypo name="lock-open" size={24} color="#05375a" />
+            </View>
+       
          
             <TextInput
+              selectionColor={themeColor}
               value={this.state.password}
               placeholder="Your Password"
               style={styles.textInput}
               onChangeText={(password) => { this.setState({ password }) }}
             />
           </View>
-          <View style={{marginTop:20}}>
+          <View style={{marginTop:20,flexDirection:"row",justifyContent:"space-between"}}>
             <TouchableOpacity 
+              style={{}}
               onPress={()=>{this.props.navigation.navigate('ForgotPassword')}}
             >
-              <Text>Forgot Password?</Text>
+              <Text style={[styles.text,{fontWeight:"bold"}]}>Forgot Password?</Text>
+           
             </TouchableOpacity>
-              
-            <View style={{ alignItems: "center", justifyContent: 'center', marginTop: 30 }}>
+            <TouchableOpacity
+              style={{}}
+              onPress={() => { this.props.navigation.navigate('CreateAccount') }}
+            >
+              <Text style={[styles.text,{fontWeight:"bold"}]}>Don`t have an account?</Text>
 
-              {!this.state.loading ? <TouchableOpacity style={{ backgroundColor: themeColor, width: width * 0.4, height: height * 0.06, alignItems: 'center', justifyContent: "center", borderRadius: 10 }}
-                onPress={() => { this.login() }}
-              >
-                <Text style={{ color: "#fff" }}>Login </Text>
-              </TouchableOpacity> :
-                <ActivityIndicator size="large" color={themeColor} />
-              }
-            </View>
+            </TouchableOpacity>
+          
+          </View>
+          <View style={{ alignItems: "center", justifyContent: 'center', marginTop: 30 }}>
+
+            {!this.state.loading ? <TouchableOpacity style={{ backgroundColor: themeColor, width: width * 0.4, height: height * 0.06, alignItems: 'center', justifyContent: "center", borderRadius: 10 }}
+              onPress={() => { this.login() }}
+            >
+              <Text style={{ color: "#fff" }}>Login </Text>
+            </TouchableOpacity> :
+              <ActivityIndicator size="large" color={themeColor} />
+            }
           </View>
           </View>
       {/* <View style={{flex:1,backgroundColor:themeColor}}> 
@@ -238,7 +253,6 @@ const styles=StyleSheet.create({
     marginTop:10,
     borderBottomWidth:1,
     borderBottomColor:"#f2f2f2",
-    paddingBottom:5
   },
   textInput:{
     flex:1,

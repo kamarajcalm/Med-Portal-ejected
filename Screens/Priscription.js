@@ -15,7 +15,6 @@ import {
     ActivityIndicator,
     TextInput
 } from "react-native";
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { AntDesign } from '@expo/vector-icons';
 import * as Animatable from 'react-native-animatable';
 import settings from '../AppSettings';

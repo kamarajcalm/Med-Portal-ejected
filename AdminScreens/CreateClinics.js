@@ -149,6 +149,7 @@ class CreateClinics extends Component {
         const post = await HttpsClient.post(api,sendData)
         console.log(post,"pppp")
        if(post.type=="success"){
+           this.showSimpleMessage("Added SuccessFully", "#00A300", "success")
         return  this.props.navigation.navigate('UpdateTimings', { clinicPk: post.data.clinicPk})
        }else{
            this.showSimpleMessage("Try again", "#B22222", "danger")
