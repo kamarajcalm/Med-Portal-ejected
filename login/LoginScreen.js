@@ -7,6 +7,9 @@ import { AntDesign, Entypo } from '@expo/vector-icons';
 import * as Animatable from 'react-native-animatable';
 import { NavigationContainer, CommonActions } from '@react-navigation/native';
 import axios from 'axios';
+import HttpsClient from '../api/HttpsClient';
+import SimpleToast from 'react-native-simple-toast';
+import FlashMessage, { showMessage, hideMessage } from "react-native-flash-message";
 const { height, width } = Dimensions.get("window");
 const themeColor = settings.themeColor;
 const fontFamily = settings.fontFamily;
@@ -20,16 +23,20 @@ const url = settings.url
     };
   }
    login =async()=>{
-  // this.setState({loading:true})
+  this.setState({loading:true})
    let api = `${url}/api/HR/login/?mode=api`
-   let sendData= new FormData();
-   sendData.append('username',this.state.username)
-   sendData.append('password',this.state.password)
+  //  let sendData= new FormData();
+  //  sendData.append('username',this.state.username)
+  //  sendData.append('password',this.state.password)
   //  console.log(sendData,"jjj")
-   let login = await axios.post(api,sendData)
-console.log(login.data,"ggggggg")
-
-   if(login.status==200){
+let sendData ={
+  username: this.state.username,
+  password: this.state.password,
+  bodyType:"formData"
+}
+     let login  =await HttpsClient.post(api,sendData)
+     console.log(login)
+   if(login.type=="success"){
      AsyncStorage.setItem('csrf', login.data.csrf_token)
      AsyncStorage.setItem('pk', login.data.pk)
      AsyncStorage.setItem('login', "true")
@@ -74,10 +81,24 @@ console.log(login.data,"ggggggg")
        )
      }
    }
-
+    else{
+     this.setState({ loading: false})
+     return this.showSimpleMessage(`${login.error.toString()}${url}`, "#dd7030")
+    }
  
 
 }
+   showSimpleMessage(content, color, type = "info", props = {}) {
+     const message = {
+       message: content,
+       backgroundColor: color,
+       icon: { icon: "auto", position: "left" },
+       type,
+       ...props,
+     };
+
+     showMessage(message);
+   }
   render() {
     return (
       <KeyboardAvoidingView
