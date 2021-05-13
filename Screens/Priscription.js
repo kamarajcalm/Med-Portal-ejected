@@ -27,6 +27,7 @@ import authAxios from '../api/authAxios';
 import HttpsClient from "../api/HttpsClient";
 import Modal from 'react-native-modal';
 import { Ionicons, Entypo, Feather, MaterialCommunityIcons, FontAwesome, FontAwesome5, EvilIcons} from '@expo/vector-icons';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 const url =settings.url
 const fontFamily = settings.fontFamily;
 const themeColor =settings.themeColor
@@ -70,7 +71,27 @@ class Priscription extends React.Component {
             textRef2:React.createRef(),
 
         };
-    }
+    } 
+showDatePicker = () => {
+       this.setState({show:true})
+    };
+
+hideDatePicker = () => {
+    this.setState({ show: false })
+    };
+
+ handleConfirm = (date) => {
+        console.warn("A date has been picked: ", date);
+     this.setState({ today: moment(date).format('YYYY-MM-DD'), show: false, date: new Date(date) }, () => {
+         if (this.state.isDoctor) {
+             this.getPrescription()
+         } else {
+             this.getClinicPrescription()
+         }
+
+     })
+        this.hideDatePicker();
+    };
     onChange = (selectedDate) => {
         if (selectedDate.type == "set") {
             this.setState({ today: moment(new Date(selectedDate.nativeEvent.timestamp)).format('YYYY-MM-DD'), show: false, date: new Date(selectedDate.nativeEvent.timestamp) }, () => {
@@ -399,7 +420,7 @@ class Priscription extends React.Component {
                     >
                         <Fontisto name="date" size={24} color={themeColor} />
                     </TouchableOpacity>
-                    {this.state.show && (
+                    {/* {this.state.show && (
                         <DateTimePicker
                             testID="dateTimePicker1"
                             value={this.state.date}
@@ -408,7 +429,14 @@ class Priscription extends React.Component {
                             display="default"
                             onChange={(time) => { this.onChange(time) }}
                         />
-                    )}
+                    )} */}
+
+                    <DateTimePickerModal
+                        isVisible={this.state.show}
+                        mode="date"
+                        onConfirm={this.handleConfirm}
+                        onCancel={this.hideDatePicker}
+                    />
                 </View>
                 <View>
                     <Text style={[styles.text,]}> Total:{this.state.prescriptions.length}</Text>

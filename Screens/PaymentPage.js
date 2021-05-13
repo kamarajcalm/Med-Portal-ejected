@@ -14,7 +14,6 @@ const themeColor = settings.themeColor;
 import RazorpayCheckout from 'react-native-razorpay';
 const url = settings.url;
 import axios from 'axios';
-
 class PaymentPage extends Component {
     constructor(props) {
 
@@ -104,7 +103,7 @@ class PaymentPage extends Component {
                                                         currency: 'INR',
                                                         key: 'rzp_test_qlBHML4RDDiVon',
                                                         name: 'Acme Corp',
-                                                        order_id:'order_H9o4idkggm3qMG',//Replace this with an order_id created using Orders API. Learn more at https://razorpay.com/docs/api/orders.
+                                                        order_id:'order_H9w9vvMx5mbktd',//Replace this with an order_id created using Orders API. Learn more at https://razorpay.com/docs/api/orders.
                                                         prefill: {
                                                             email: 'kamraj089@gmail.com',
                                                             contact: '9191919191',
