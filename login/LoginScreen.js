@@ -10,6 +10,8 @@ import axios from 'axios';
 import HttpsClient from '../api/HttpsClient';
 import SimpleToast from 'react-native-simple-toast';
 import FlashMessage, { showMessage, hideMessage } from "react-native-flash-message";
+import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
 const { height, width } = Dimensions.get("window");
 const themeColor = settings.themeColor;
 const fontFamily = settings.fontFamily;
@@ -20,6 +22,7 @@ const url = settings.url
     this.state = {
       username:"",
       password:'',
+      token:null,
     };
   }
    login =async()=>{
@@ -32,10 +35,14 @@ const url = settings.url
 let sendData ={
   username: this.state.username,
   password: this.state.password,
+  notificationId:this.state?.token,
   bodyType:"formData"
 }
+
+
      let login  =await HttpsClient.post(api,sendData)
      console.log(login)
+    
    if(login.type=="success"){
      AsyncStorage.setItem('csrf', login.data.csrf_token)
      AsyncStorage.setItem('login', "true")
@@ -82,7 +89,7 @@ let sendData ={
    }
     else{
      this.setState({ loading: false})
-     return this.showSimpleMessage(`${login.error.toString()}${url}`, "#dd7030")
+     return this.showSimpleMessage(`${login?.error?.toString()}`, "#dd7030")
     }
  
 
@@ -97,6 +104,39 @@ let sendData ={
      };
 
      showMessage(message);
+   }
+   componentDidMount(){
+     this.registerForPushNotificationsAsync().then(token => this.setState({ token }));
+   }
+   registerForPushNotificationsAsync = async function () {
+     let token;
+     if (Constants.isDevice) {
+       const { status: existingStatus } = await Notifications.getPermissionsAsync();
+       let finalStatus = existingStatus;
+       if (existingStatus !== 'granted') {
+         const { status } = await Notifications.requestPermissionsAsync();
+         finalStatus = status;
+       }
+       if (finalStatus !== 'granted') {
+         alert('Failed to get push token for push notification!');
+         return;
+       }
+       token = (await Notifications.getExpoPushTokenAsync()).data;
+       console.log(token);
+     } else {
+       alert('Must use physical device for Push Notifications');
+     }
+
+     if (Platform.OS === 'android') {
+       Notifications.setNotificationChannelAsync('default', {
+         name: 'default',
+         importance: Notifications.AndroidImportance.MAX,
+         vibrationPattern: [0, 250, 250, 250],
+         lightColor: '#FF231F7C',
+       });
+     }
+
+     return token;
    }
   render() {
     return (

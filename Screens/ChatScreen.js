@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StatusBar, Dimensions, TouchableOpacity, StyleSheet, FlatList, Image, TextInput, SafeAreaView } from 'react-native';
+import { View, Text, StatusBar, Dimensions, TouchableOpacity, StyleSheet, FlatList, Image, TextInput, SafeAreaView, ActivityIndicator } from 'react-native';
 import settings from '../AppSettings';
 import { connect } from 'react-redux';
 import { selectTheme } from '../actions';
@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Entypo } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
 import * as Animatable from 'react-native-animatable';
 import * as ImagePicker from 'expo-image-picker';
@@ -15,6 +16,8 @@ import Modal from 'react-native-modal';
 import wamp from 'wamp.js2';
 import HttpsClient from '../api/HttpsClient';
 import moment from 'moment';
+import FlashMessage, { showMessage, hideMessage } from "react-native-flash-message";
+
 const fontFamily = settings.fontFamily;
 const themeColor = settings.themeColor;
 const wampServer = settings.wampServer;
@@ -31,10 +34,73 @@ class ChatScreen extends Component {
         showRecordMessage:false,
         recording:false,
         Messages:[],
-        chatType:""
+        chatType:"",
+        loading:false,
+        audioStatus:null,
+        currentAudio:null,
+        images:[]
     };
   }
+  validatePlayButton =(item)=>{
+      if (this.state?.currentAudio?.attachment == item.attachment) {
+          if (this.state?.audioStatus?.isPlaying){
+          return    <MaterialCommunityIcons name="pause" size={24} color="#fff" />
+          }else{
+              return <Entypo name="controller-play" size={24} color="#fff" />
+          }
+      }
+      return   <Entypo name="controller-play" size={24} color="#fff" />
+  
+      
+  }
+    validateGif = (item)=>{
+        if (this.state?.currentAudio?.attachment == item.attachment) {
+            if (this.state?.audioStatus?.isPlaying) {
+            return (
+                <Image
+                    style={{ height: 30, width: width * 0.4, resizeMode: "stretch" }}
+                    source={require('../assets/sound.gif')}
+                />
 
+            )
+            }
+        }
+        return (
+            <Image
+                style={{ height: 30, width: width * 0.4, resizeMode: "stretch" }}
+                source={require('../assets/sound.png')}
+            />
+        )
+      
+  }
+  validateSeconds =(item) =>{
+      if (this.state?.currentAudio?.attachment == item.attachment){
+          return(
+              <Text style={[styles.text, { color: "#fff", fontSize: 8 }]}>{this.milliconverter(this.state?.audioStatus?.positionMillis)}/{this.milliconverter(this.state?.audioStatus?.durationMillis)}</Text>
+
+          )
+      }
+
+  }
+    milliconverter = (millis)=>{
+        if (millis){
+            var minutes = Math.floor(millis / 60000);
+            var seconds = ((millis % 60000) / 1000).toFixed(0);
+            return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+        }
+      
+    }
+    showSimpleMessage(content, color, type = "info", props = {}) {
+        const message = {
+            message: content,
+            backgroundColor: color,
+            icon: { icon: "auto", position: "left" },
+            type,
+            ...props,
+        };
+
+        showMessage(message);
+    }
     messageHandler = (args) => {
         var details = args[0]
         // console.log(details, 'socket');
@@ -44,6 +110,17 @@ class ChatScreen extends Component {
             }
        
             let list = this.state.Messages
+            if(details.msgType=="image"){
+                console.log("here")
+            
+                let pushObj = {
+                    index:this.state.Messages.length,
+                    url: details.attachment,
+                    message:details.message
+            }
+               this.state.images.push(pushObj)
+            }
+         
             list.push(details)
          
             this.setState({Messages:list})
@@ -76,23 +153,34 @@ class ChatScreen extends Component {
         console.log(api)
         const data = await HttpsClient.get(api)
         if(data.type =="success"){
-            this.setState({Messages:data.data})
+            let arr =this.state.images
+            data.data.forEach((i,index)=>{
+                if(i.msgType=="image") {
+                   let pushObj ={
+                       index,
+                       url:i.attachment,
+                       message:i.message
+                   }
+                    arr.push(pushObj)
+                }  
+            })
+            this.setState({Messages:data.data,images:arr})
         }
         this.setConnection()
     }
     setConnection = () => {
 
-        var connection = new wamp.Connection({ url: wampServer, realm: 'default' });
+        this.connection = new wamp.Connection({ url: wampServer, realm: 'default' });
         // console.log(this.state.item.uid, "jhu")
-        if (connection != null ) {
-            connection.onopen = (session, details) => {
+        if (this.connection != null ) {
+            this.connection.onopen = (session, details) => {
                 session.subscribe(this.state.item.uid, this.messageHandler).then(
                     (sub) => {
                     },
                     (err) => {
                     });
             }
-            connection.open();
+            this.connection.open();
             
    
         } 
@@ -140,21 +228,27 @@ class ChatScreen extends Component {
   
   }
  componentWillUnmount(){
-  
+   this.connection.close()
  }
     playAudio =async(uri)=>{
+        console.log(uri,"uuu")
         const source = { uri: uri }
         const initialStatus = {}
-        const onPlaybackStatusUpdate = null
-       
+        let onPlaybackStatusUpdate =(status)=>{
+            this.setState({audioStatus:status})
+        }
+    
         const { sound } = await Audio.Sound.createAsync(
             source,
             initialStatus,
-            onPlaybackStatusUpdate,
+     
             
         );
         console.log('Playing Sound');
+        sound.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
         await sound.playAsync();
+      
+        console.log(onPlaybackStatusUpdate,"ppppp");
     }
 
     showMessage =()=>{
@@ -222,9 +316,14 @@ stopRecording =async()=>{
             sendData.doctorThread = this.state.item.groupPk
         }
     //    console.log(sendData,"kkk")
-      
+        this.setState({loading:true})
         var data = await HttpsClient.post(url + '/api/prescription/chats/', sendData)
-        console.log(data)
+        if(data.type="success"){
+            this.setState({loading:false})
+        }else{
+            this.setState({ loading: false })
+            return this.showSimpleMessage("Something Went wrong", "#dd7030")
+        }
    
     }catch(err){
              console.log(err)
@@ -233,13 +332,15 @@ stopRecording =async()=>{
     }   
 
     _pickImage = async () => {
+        this.setState({ openImageModal: false })
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsMultipleSelection: true
         });
         if (result.cancelled == true) {
+         
             return
         }
+        console.log(result,"jjj")
         let filename = result.uri.split('/').pop();
         let match = /\.(\w+)$/.exec(filename);
         var type = match ? `image/${match[1]}` : `image`;
@@ -248,11 +349,10 @@ stopRecording =async()=>{
             type: type,
             name: filename,
         };
-
-        this.setState({ openImageModal: false })
         this.setState({ selectedFile: photo, selectedType: 'image' })
     };
 sendMessage =async()=>{
+    this.setState({loading:true})
     var sendData = {
         message: this.state.message,
         bodyType: 'formData',
@@ -278,10 +378,13 @@ sendMessage =async()=>{
     let api = `${url}/api/prescription/chats/`
  
     var data = await HttpsClient.post(api,sendData)
-    // console.log(data,"pooo")
+    console.log(data,"pooo")
     // console.log(data,sendData,api)
     if(data.type =="success"){
-        this.setState({ message: "", selectedFile: null, selectedType:null})
+        this.setState({ message: "", selectedFile: null, selectedType:null,loading:false})
+    }else{
+        this.setState({loading:false})
+        return this.showSimpleMessage("Something Went wrong", "#dd7030")
     }
    
 }
@@ -350,6 +453,45 @@ sendMessage =async()=>{
             </Modal>
         )
     }
+    renderSendIcon =()=>{
+        if(this.state.loading){
+            return(
+                <ActivityIndicator size ="large" color={themeColor}/>
+            )
+        }
+        if (this.state.message.length > 0||this.state.sel){
+            return(
+                <TouchableOpacity style={{ alignItems: "center", justifyContent: "center", height: height * 0.07, backgroundColor: themeColor, borderRadius: 30, height: height * 0.05, width: 40, margin: 10 }}
+                    onPress={() => { this.sendMessage() }}
+                >
+                    <Feather name="send" size={24} color="#fff" />
+                </TouchableOpacity>
+            )
+        }
+        return(
+            <TouchableOpacity style={{ alignItems: "center", justifyContent: "center", height: height * 0.07, backgroundColor: themeColor, borderRadius: 30, height: height * 0.05, width: 40, margin: 10 }}
+                onPress={() => { this.showMessage() }}
+                onPressOut={() => { this.stopRecording() }}
+                onLongPress={() => { this.startRecording() }}
+            >
+                <FontAwesome name="microphone" size={24} color="#fff" />
+            </TouchableOpacity>
+        )
+                {this.state.message.length > 0 ? <TouchableOpacity style={{ alignItems: "center", justifyContent: "center", height: height * 0.07, backgroundColor: themeColor, borderRadius: 30, height: height * 0.05, width: 40, margin: 10 }}
+                    onPress={() => { this.sendMessage() }}
+                >
+                    <Feather name="send" size={24} color="#fff" />
+                </TouchableOpacity> :
+                    <TouchableOpacity style={{ alignItems: "center", justifyContent: "center", height: height * 0.07, backgroundColor: themeColor, borderRadius: 30, height: height * 0.05, width: 40, margin: 10 }}
+                        onPress={() => { this.showMessage() }}
+                        onPressOut={() => { this.stopRecording() }}
+                        onLongPress={() => { this.startRecording() }}
+                    >
+                        <FontAwesome name="microphone" size={24} color="#fff" />
+                    </TouchableOpacity>}
+            
+        
+    }
   render() {
       console.log(this.props.user.profile.occupation)
       const{ item }=this.state
@@ -358,7 +500,7 @@ sendMessage =async()=>{
           chatTitle =this.state.item.clinictitle||this.state.item.doctortitle
       }
       if (this.props.user.profile.occupation == "Doctor") {
-
+          console.log(this.state.item,"opop")
           chatTitle = this.state.item?.customertitle
       }
       if (this.props.user.profile.occupation == "ClinicRecoptionist") {
@@ -447,16 +589,31 @@ sendMessage =async()=>{
                           if (item.msgType == "voice") {
                               return (
                                   <View style={{ alignSelf: "flex-start", backgroundColor: '#eeee', padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
-                                      <TouchableOpacity
-                                          onPress={() => { this.playAudio(item.attachment) }}
-                                      >
+                                      <View style={{ flexDirection: "row" }}>
+                                          <TouchableOpacity
+                                              onPress={() => {
+                                                  this.setState({ currentAudio: item })
+                                                  this.playAudio(item.attachment)
+
+                                              }}
+
+                                          >
+                                              {
+                                                  this.validatePlayButton(item)
+                                              }
 
 
-                                          <Text>voice</Text>
-                                          <View style={{ alignSelf: "flex-end" }}>
-                                              <Text style={[styles.text, { color: "#1f1f1f", fontSize: 8 }]}>{moment(item?.created).format("hh:mm a")}</Text>
+                                          </TouchableOpacity>
+                                          {
+                                              this.validateGif(item)
+                                          }
+                                          <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                              {
+                                                  this.validateSeconds(item)
+
+                                              }
                                           </View>
-                                      </TouchableOpacity>
+                                      </View>
                                       <View style={styles.leftArrow}></View>
 
                                       <View style={styles.leftArrowOverlap}></View>
@@ -508,11 +665,31 @@ sendMessage =async()=>{
 
                           return (
                               <View style={{ alignSelf: "flex-end", backgroundColor: themeColor, padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
-                                  <TouchableOpacity
-                                      onPress={() => { this.playAudio(item.attachment) }}
-                                  >
-                                      <Text style={[styles.text, { color: "#fff" }]}>Play</Text>
-                                  </TouchableOpacity>
+                                  <View style={{ flexDirection: "row" }}>
+                                      <TouchableOpacity
+                                          onPress={() => {
+                                              this.setState({ currentAudio: item })
+                                              this.playAudio(item.attachment)
+
+                                          }}
+
+                                      >
+                                          {
+                                              this.validatePlayButton(item)
+                                          }
+
+
+                                      </TouchableOpacity>
+                                      {
+                                          this.validateGif(item)
+                                      }
+                                      <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                          {
+                                              this.validateSeconds(item)
+
+                                          }
+                                      </View>
+                                  </View>
                                   <View style={{ alignSelf: "flex-end" }}>
                                       <Text style={[styles.text, { color: "#fff", fontSize: 8 }]}>{moment(item?.created).format("hh:mm a")}</Text>
                                   </View>
@@ -565,16 +742,31 @@ sendMessage =async()=>{
                           if (item.msgType == "voice") {
                               return (
                                   <View style={{ alignSelf: "flex-start", backgroundColor: '#eeee', padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
-                                      <TouchableOpacity
-                                          onPress={() => { this.playAudio(item.attachment) }}
-                                      >
+                                      <View style={{ flexDirection: "row" }}>
+                                          <TouchableOpacity
+                                              onPress={() => {
+                                                  this.setState({ currentAudio: item })
+                                                  this.playAudio(item.attachment)
+
+                                              }}
+
+                                          >
+                                              {
+                                                  this.validatePlayButton(item)
+                                              }
 
 
-                                          <Text>voice</Text>
-                                          <View style={{ alignSelf: "flex-end" }}>
-                                              <Text style={[styles.text, { color: "#1f1f1f", fontSize: 8 }]}>{moment(item?.created).format("hh:mm a")}</Text>
+                                          </TouchableOpacity>
+                                          {
+                                              this.validateGif(item)
+                                          }
+                                          <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                              {
+                                                  this.validateSeconds(item)
+
+                                              }
                                           </View>
-                                      </TouchableOpacity>
+                                      </View>
                                       <View style={styles.leftArrow}></View>
 
                                       <View style={styles.leftArrowOverlap}></View>
@@ -604,11 +796,15 @@ sendMessage =async()=>{
                       if (item.msgType == "image") {
 
                           return (
-                              <View style={{ alignSelf: 'flex-end', backgroundColor: themeColor, padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
+                              <TouchableOpacity style={{ alignSelf: 'flex-end', backgroundColor: themeColor, padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}
+                               onPress ={()=>{
+                                   this.props.navigation.navigate('ImageViewer',{images:this.state.images,index:index})
+                               }}
+                              >
                                   <Image
                                       resizeMethod="scale"
                                       source={{ uri: item.attachment }}
-                                      style={{ height: height * 0.15, width: width * 0.4, resizeMode: "contain" }}
+                                      style={{ height: height * 0.2, width: width * 0.5, resizeMode:"cover" }}
                                   />
 
                                   <Text style={[styles.text, { color: "#fff" }]}>{item.message}</Text>
@@ -618,19 +814,40 @@ sendMessage =async()=>{
                                   <View style={styles.rightArrow}></View>
 
                                   <View style={styles.rightArrowOverlap}></View>
-                              </View>
+                              </TouchableOpacity>
                           )
 
                       }
                       if (item.msgType == "voice") {
 
                           return (
-                              <View style={{ alignSelf: "flex-end", backgroundColor: themeColor, padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
-                                  <TouchableOpacity
-                                      onPress={() => { this.playAudio(item.attachment) }}
-                                  >
-                                      <Text style={[styles.text, { color: "#fff" }]}>Play</Text>
-                                  </TouchableOpacity>
+                              <View style={{ alignSelf: "flex-end", backgroundColor: themeColor, padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.7 }}>
+                                  <View style={{flexDirection:"row"}}>
+                                      <TouchableOpacity
+                                          onPress={() => {
+                                              this.setState({currentAudio:item})
+                                              this.playAudio(item.attachment) 
+                                            
+                                            }}
+
+                                      >
+                                      {
+                                        this.validatePlayButton(item)
+                                      }
+
+                                          
+                                      </TouchableOpacity>
+                                    {
+                                        this.validateGif(item)
+                                    }
+                                      <View style={{alignItems:"center",justifyContent:"center"}}>
+                                          {
+                                              this.validateSeconds(item)
+
+                                          }
+                                      </View>
+                                  </View>
+                 
                                   <View style={{ alignSelf: "flex-end" }}>
                                       <Text style={[styles.text, { color: "#fff", fontSize: 8 }]}>{moment(item?.created).format("hh:mm a")}</Text>
                                   </View>
@@ -649,7 +866,7 @@ sendMessage =async()=>{
             
               }}
             />
-            <View style={{flexDirection:'row',alignItems:"center",justifyContent:"center",minHeight:height*0.07,elevation:5,backgroundColor:"#ffff"}}> 
+            <View style={{flexDirection:'row',alignItems:"center",justifyContent:"center",minHeight:height*0.07,elevation:5,backgroundColor:"#eee"}}> 
                 <View style={{ backgroundColor: "#fafafa",minHeight: height * 0.05, maxHeight: height * 0.2, borderRadius: 15,flex:1,marginLeft:20,flexDirection:"row",alignItems:"center",justifyContent:"center"}}>
                     <View style={{ flex:0.8 ,alignItems:"center",justifyContent:"center"}}>
                         {!this.state.recording?
@@ -678,18 +895,9 @@ sendMessage =async()=>{
                 </View>
 
                 <View style={{height:height*0.05,alignItems:'center',justifyContent:"center",}}>
-                    {this.state.message .length>0? <TouchableOpacity style={{ alignItems: "center", justifyContent: "center", height: height * 0.07, backgroundColor: themeColor, borderRadius: 30, height: height * 0.05, width: 40, margin: 10 }}
-                                onPress={() => { this.sendMessage()}}
-                    >
-                        <Feather name="send" size={24} color="#fff" />
-                    </TouchableOpacity> : 
-                    <TouchableOpacity style={{ alignItems: "center", justifyContent: "center", height: height * 0.07, backgroundColor: themeColor, borderRadius: 30,  height:height*0.05, width: 40,margin:10 }}
-                            onPress={()=>{this.showMessage()}}
-                            onPressOut={() => {this.stopRecording()}}
-                            onLongPress={() => {this.startRecording()}}
-                    >
-                        <FontAwesome name="microphone" size={24} color="#fff" />
-                    </TouchableOpacity>}
+                    {
+                        this.renderSendIcon()
+                    }
                 </View>
                 {this.state.showRecordMessage&&<View 
                 

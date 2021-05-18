@@ -225,21 +225,21 @@ class Appointments extends Component {
     validateInformation =(item)=>{
         if (item.status =="Pending"){
             return(
-                <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-around"}}>
+                <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between"}}>
                     <View style={{flexDirection:"row",marginTop:5}}>
                         <Text style={[styles.text, { color: "gray" }]}>Requseted date:</Text>
-                        <Text style={[styles.text, ]}>{item.requesteddate}</Text>
+                        <Text style={[styles.text,{fontWeight:"bold"} ]}>{item.requesteddate}</Text>
                     </View>
                     <View style={{flexDirection:'row',marginTop:5}}>
                         <Text style={[styles.text, { color: "gray" }]}> Time:</Text>
-                        <Text style={[styles.text, ]}>{item.requestedtime}</Text>
+                        <Text style={[styles.text, { fontWeight: "bold" }  ]}>{item.requestedtime}</Text>
                     </View>
                 </View>
             )
         }
         if (item.status == "Accepted") {
             return (
-                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-around" }}>
+                <View style={{ flexDirection: "row", alignItems: "center", justifyContent:"space-between" }}>
                     <View style={{ flexDirection: "row", marginTop: 5 }}>
                         <Text style={[styles.text, { color: "gray" }]}>Accepted date:</Text>
                         <Text style={[styles.text,]}>{item.accepteddate}</Text>
@@ -329,8 +329,13 @@ class Appointments extends Component {
 
                         <View style={{ flex: 0.4, flexDirection: "row", alignItems: "center", justifyContent: 'center',}}>
                             <View style={{ alignItems: 'center', justifyContent: "center" }}>
-                                <Text style={[styles.text]}>Status:</Text>
-                                <Text style={[styles.text,{color:this.validateColor(item.status)}]}>{item.status}</Text>
+                                <View style={{alignItems:"center",justifyContent:"center"}}>
+                                        <Text style={[styles.text]}>Status:</Text>
+                                </View>
+                                <View style={{alignItems:"center",justifyContent:"center"}}>
+                                        <Text style={[styles.text, { color: this.validateColor(item.status) }]}>{item.status}</Text>
+
+                                </View>
                             </View>
 
                         </View>
@@ -484,34 +489,66 @@ class Appointments extends Component {
                                     backgroundColor: "#eee",
                                     marginHorizontal: 10,
                                     borderRadius: 10,
-                                    flexDirection: "row"
                                 }}
 
                             >
                                
-                                <View style={{ flex: 0.6, justifyContent: "center" }}>
-                                    <View style={{ flexDirection: "row", margin: 5, flex: 0.5 }}>
 
-                                        <Text style={[styles.text, { fontWeight: "bold" }]}>Clinic   :</Text>
-                                        <Text style={[styles.text, { marginLeft: 10 }]}>{item.clinicname}</Text>
+                                <View
+
+                                    style={{
+
+                                        flexDirection: "row"
+                                    }}
+
+                                >
+
+                                    <View style={{ flex: 0.6, justifyContent: "center" }}>
+                                        <View style={{ flexDirection: "row", margin: 5, flex: 0.5 }}>
+
+                                            <Text style={[styles.text, { fontWeight: "bold" }]}>Clinic   :</Text>
+                                            <Text style={[styles.text, { marginLeft: 10 }]}>{item.clinicname}</Text>
+                                        </View>
+                                        <View style={{ flexDirection: "row", margin: 5, flex: 0.5 }}>
+                                            <Text style={[styles.text, { fontWeight: "bold" }]}>Reason:</Text>
+                                            <View style={{ justifyContent: 'center', flex: 1 }}>
+                                                <Text style={[styles.text, { marginLeft: 10 }]}>{item.reason}</Text>
+
+                                            </View>
+
+                                        </View>
                                     </View>
-                                    <View style={{ flexDirection: "row", margin: 5, flex: 0.5 }}>
-                                        <Text style={[styles.text, { fontWeight: "bold" }]}>Reason:</Text>
-                                        <View style={{ justifyContent: 'center', flex: 1 }}>
-                                            <Text style={[styles.text, { marginLeft: 10 }]}>{item.reason}</Text>
 
+                                    {/* TABS */}
+
+                                    <View style={{ flex: 0.4, flexDirection: "row", alignItems: "center", justifyContent: 'center', }}>
+                                        <View style={{ alignItems: 'center', justifyContent: "center" }}>
+                                            <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                                <Text style={[styles.text]}>Status:</Text>
+                                            </View>
+                                            <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                                <Text style={[styles.text, { color: this.validateColor(item.status) }]}>{item.status}</Text>
+
+                                            </View>
                                         </View>
 
                                     </View>
+
                                 </View>
 
-                                {/* TABS */}
+                                <View style={{
+                                    margin: 10,
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    flexDirection: "row"
+                                }}>
 
-                                <View style={{ flex: 0.4, flexDirection: "row", alignItems: "center", justifyContent: 'center' }}>
-                                    <View style={{ alignItems: 'center', justifyContent: "center" }}>
-                                        <Text style={[styles.text]}>Status:</Text>
-                                        <Text style={[styles.text, { color: this.validateColor(item.status) }]}>{item.status}</Text>
+                                    <View style={{ flex: 1 }}>
+                                        {
+                                            this.validateInformation(item)
+                                        }
                                     </View>
+
 
                                 </View>
                             </TouchableOpacity>
@@ -519,7 +556,7 @@ class Appointments extends Component {
                         )
                     } else {
                         return (
-                            <TouchableOpacity
+                             <TouchableOpacity
                                 onPress={() => { this.viewAppointments(item) }}
                                 style={{
                                     marginTop: 10,
@@ -527,12 +564,22 @@ class Appointments extends Component {
                                     backgroundColor: "#eee",
                                     marginHorizontal: 10,
                                     borderRadius: 10,
-                                    flexDirection: "row"
                                 }}
 
                             >
-                                <View style={{ flex: 0.6, justifyContent: "center" }}>
-                                    <View style={{ flexDirection: "row", margin: 5, flex: 0.5 }}>
+                               
+
+                                <View
+
+                                    style={{
+
+                                        flexDirection: "row"
+                                    }}
+
+                                >
+
+                                    <View style={{ flex: 0.6, justifyContent: "center" }}>
+                                                     <View style={{ flexDirection: "row", margin: 5, flex: 0.5 }}>
 
                                         <Text style={[styles.text, { fontWeight: "bold" }]}>Name   :</Text>
                                         <Text style={[styles.text, { marginLeft: 10 }]}>{item.patientname.name}</Text>
@@ -545,18 +592,43 @@ class Appointments extends Component {
                                         </View>
 
                                     </View>
+                                    </View>
+
+                                    {/* TABS */}
+
+                                    <View style={{ flex: 0.4, flexDirection: "row", alignItems: "center", justifyContent: 'center', }}>
+                                        <View style={{ alignItems: 'center', justifyContent: "center" }}>
+                                            <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                                <Text style={[styles.text]}>Status:</Text>
+                                            </View>
+                                            <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                                <Text style={[styles.text, { color: this.validateColor(item.status) }]}>{item.status}</Text>
+
+                                            </View>
+                                        </View>
+
+                                    </View>
+
                                 </View>
 
+                                <View style={{
+                                    margin: 10,
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    flexDirection: "row"
+                                }}>
 
-
-                                <View style={{ flex: 0.4, flexDirection: "row", alignItems: "center", justifyContent: 'center' }}>
-                                   
-                                <View style={{ alignItems: 'center', justifyContent: "center" }}>
-                                        
-                                        <Octicons name="primitive-dot" size={24} color={this.validateStatus(item.status)} />
+                                    <View style={{ flex: 1 }}>
+                                        {
+                                            this.validateInformation(item)
+                                        }
                                     </View>
+
+
                                 </View>
                             </TouchableOpacity>
+
+                           
                         )
                     }
                 }}

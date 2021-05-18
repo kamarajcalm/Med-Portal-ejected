@@ -189,7 +189,7 @@ if(type=="clinic"){
     itemArrange = {
       groupPk: item.threadpk,
       uid: item.uid,
-      doctortitle: item.title||"doctor"
+      customertitle: item.title||"doctor"
     }
   }
 

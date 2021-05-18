@@ -46,6 +46,7 @@ class ProfileEdit extends Component {
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsMultipleSelection: true
         });
+        console.log(result)
         if (result.cancelled == true) {
             return
         }

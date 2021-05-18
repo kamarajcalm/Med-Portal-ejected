@@ -44,10 +44,14 @@ class TabNavigator extends Component {
             return false
         }
     
+        if (routeName == "PrescriptionView") {
+            return false
+        }
+
         if (routeName == "showCard") {
             return false
         }
-       
+
         return true
     }
     getTabBarVisibility2 = (route) => {

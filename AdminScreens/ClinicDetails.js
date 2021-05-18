@@ -93,16 +93,20 @@ class ClinicDetails extends Component {
     getTodayTimings =(item)=>{
       let  days =["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
       let today =days[date.getDay()]
+
       return(
           item.clinicShits[today].map((i,index)=>{
-              return(
-                  <View style={{flexDirection:"row",marginTop:5}}>
-                      <Text>{index+1}.</Text>
-                      <Text style={{marginLeft:5}}>{i.timings[0][0]}</Text>
+          if(i?.timings?.length>0){
+              return (
+                  <View style={{ flexDirection: "row", marginTop: 5 }}>
+                      <Text>{index + 1}.</Text>
+                      <Text style={{ marginLeft: 5 }}>{i?.timings[0][0]}</Text>
                       <Text>-</Text>
-                      <Text>{i.timings[0][1]}</Text>
+                      <Text>{i?.timings[0][1]}</Text>
                   </View>
               )
+          }
+          
           })
       )
 
@@ -181,10 +185,10 @@ class ClinicDetails extends Component {
                                         <Text style={[styles.text, { fontWeight: "bold", fontSize: 18, color: "gray" }]}>Today:</Text>
                                     </View>
 
-                                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>{this.state?.item?.working_hours[date?.getDay()][0]}</Text>
+                                    { this.state?.item?.working_hours?.length>0&& <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>{this.state?.item?.working_hours[date?.getDay()][0]}</Text>}
                                 </View>
                                 <View>
-                                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>{this.state?.item?.working_hours[date?.getDay()][1]}</Text>
+                                    {this.state?.item?.working_hours?.length > 0&&<Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>{this.state?.item?.working_hours[date?.getDay()][1]}</Text>}
                                 </View>
                                
                             </View>
@@ -195,7 +199,7 @@ class ClinicDetails extends Component {
                                     <Text>{this.state.showAll?"showLess":"showAll"}</Text>
                                 </TouchableOpacity>
                             </View>
-                           {this.state.showAll&&
+                            {this.state.showAll && this.state.item.working_hours?.length>0&&
                                     this.state.item.working_hours.map((i)=>{
                                      let day= ""
                                      if(i[2]=="0"){

@@ -11,7 +11,7 @@ const themeColor = settings.themeColor;
 const fontFamily = settings.fontFamily;
 const url =settings.url;
 import { connect } from 'react-redux';
-import { selectTheme ,selectClinic} from '../actions';
+import { selectTheme, selectClinic,selectUser} from '../actions';
 import { NavigationContainer, CommonActions } from '@react-navigation/native';
 import DoctorProfile from './DoctorProfile';
 import HttpsClient from '../api/HttpsClient';
@@ -75,9 +75,23 @@ const DATA =["clinic 1","clinic 2","clinic3","clinic4"]
 
    
    }
+   getDetails =async()=>{
+     const data = await HttpsClient.get(`${url}/api/HR/users/?mode=mySelf&format=json`);
+     console.log(data)
+     if (data.type == "success"){
+       this.props.selectUser(data.data[0]);
+     }
+   }
 componentDidMount(){
   this.findUser()
+  this._unsubscribe = this.props.navigation.addListener('focus', () => {
+      this.getDetails()
 
+  });
+
+}
+componentWillUnmount(){
+  this._unsubscribe()
 }
    setActiveClinic = async (item) => {
      const api = `${url}/api/prescription/doctorActive/`
@@ -176,7 +190,9 @@ componentDidMount(){
             </View>
 
 
-            <View style={{flex:1}}>
+            <ScrollView 
+             
+            >
                  <View style={{alignItems:"center",justifyContent:'center',flexDirection:"row",}}>
                   <View>
                   <View style={{ alignItems: "center", justifyContent: "center" ,marginTop:20,flexDirection:"row",marginLeft:10}}>
@@ -206,7 +222,7 @@ componentDidMount(){
                           this.diffrentiateUsers()
                         }
                 
-            </View>
+            </ScrollView>
                          {/* Modal */}
                   <View>
                     <Modal
@@ -298,4 +314,4 @@ const mapStateToProps = (state) => {
     clinic:state.selectedClinic
   }
 }
-export default connect(mapStateToProps, { selectTheme, selectClinic })(Profile)
+export default connect(mapStateToProps, { selectTheme, selectClinic, selectUser })(Profile)

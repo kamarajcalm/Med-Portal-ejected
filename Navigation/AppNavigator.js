@@ -26,6 +26,7 @@ import DefaultScreen from '../Screens/DefaultScreen';
 import MediacalTab from './MediacalTab';
 import ViewClinicDetails from '../Screens/ViewClinicDetails';
 import PaymentPage from '../Screens/PaymentPage';
+import ImageViewer from '../Screens/ImageViewer';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -77,8 +78,6 @@ export default class AppNavigator extends Component {
                         <Stack.Screen name={name} component={component} options={{ headerShown: false }} />
                     ))} */}
                     <Stack.Screen name="DefaultScreen" component={DefaultScreen} options={{ headerShown: false }} />
-                    
-
                     <Stack.Screen name="MainTab" component={TabNavigator} options={{ headerShown: false }} />
                     <Stack.Screen name="Login" component={LoginStack} options={{ headerShown: false }} />
                     <Stack.Screen name="ProfileEdit" component={ProfileEdit} options={{ headerShown: false }} />
@@ -86,6 +85,7 @@ export default class AppNavigator extends Component {
                     <Stack.Screen name="MedicalTab" component={MediacalTab} options={{ headerShown: false }} />
                     <Stack.Screen name="ViewClinicDetails" component={ViewClinicDetails} options={{ headerShown: false }} />
                     <Stack.Screen name="PaymentPage" component={PaymentPage} options={{ headerShown: false }} />
+                    <Stack.Screen name="ImageViewer" component={ImageViewer} options={{ headerShown: false }} />
 
                  </Stack.Navigator>
                 

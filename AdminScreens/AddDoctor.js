@@ -394,7 +394,7 @@ class AddDoctor extends Component {
         let post  =await HttpsClient.post(api,sendData)
         console.log(post,"jkjjj")
         if(post.type=="success"){
-            this.showSimpleMessage("requested SuccessFully", "#00A300", "success")
+            this.showSimpleMessage("Added SuccessFully", "#00A300", "success")
               setTimeout(()=>{
                   this.props.navigation.goBack()
               })

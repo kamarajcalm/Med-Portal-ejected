@@ -7,6 +7,7 @@ import AddPrescription from '../Screens/AddPrescription';
 import SearchMedicines from '../Screens/SearchMedicines';
 import LoginScreen from '../login/OnboardingScreen';
 import ProfileView from '../Screens/ProfileView';
+import PrescriptionView from '../Screens/PrescriptionView';
 
 const Stack = createStackNavigator();
 export default class PriscriptionStack extends Component {
@@ -25,6 +26,7 @@ export default class PriscriptionStack extends Component {
                 <Stack.Screen name="addPriscription" component={AddPrescription} options={{ headerShown: false }} />
                 <Stack.Screen name="SearchMedicines" component={SearchMedicines} options={{ headerShown: false }} />
                 <Stack.Screen name="ProfileView" component={ProfileView} options={{ headerShown: false }} />
+                <Stack.Screen name="PrescriptionView" component={PrescriptionView} options={{ headerShown: false }} />
             </Stack.Navigator>
         );
     }

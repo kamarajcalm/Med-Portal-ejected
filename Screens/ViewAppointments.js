@@ -68,11 +68,12 @@ class ViewAppointments extends Component {
         if (this.state.item.doctordetails.dp){
             dp = `${url}${this.state.item.doctordetails.dp}`
         }
+        console.log(this.state.item)
         return (
             <>
                 <SafeAreaView style={styles.topSafeArea} />
                 <SafeAreaView style={styles.bottomSafeArea}>
-
+                                  {/* HEADERS */}
                     <View style={{ height: height * 0.1, backgroundColor: themeColor, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, flexDirection: 'row', alignItems: "center" }}>
                         <TouchableOpacity style={{ flex: 0.2, alignItems: "center", justifyContent: 'center' }}
                             onPress={() => { this.props.navigation.goBack() }}
@@ -84,25 +85,45 @@ class ViewAppointments extends Component {
                         </View>
 
                     </View>
+
                    <View style={{}}>
                                  {/* Clinic Details */}
 
-                      <View>
-                            <Text style={[styles.text,{marginTop:20,textAlign:'center',fontWeight:"bold",fontSize:18}]}>{this.state.item.clinicname}</Text>
-                            <View style={{alignSelf:"flex-end",flexDirection:"row",marginTop:10}}>
-                             
-                                    <Image 
-                                      style={{height:60,width:60,borderRadius:30,marginRight:10}}
-                                        source={{ uri: dp ||"https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"}}
-                                    />
-                                <View style={{ alignItems: "center", justifyContent: "center", height: 60,marginRight:10}}>
-                                    <Text style={[styles.text]}>{this.state.item.doctordetails.name}</Text>
+                      <View style={{margin:20}}>
+                          <View style={{flexDirection:'row'}}>
+                              <View>
+                                    <Text style={{ fontWeight: "bold", fontSize: 18 }}>Clinic Name:</Text>
+                              </View>
+                              <View style={{alignItems:"center",justifyContent:"center"}}>
+                                 <Text style={[styles.text, { marginLeft:10 }]}>{this.state.item.clinicname}</Text>
+                                  
+                              </View>
+
+                          </View>
+                            <View style={{ marginTop:10 }}>
+                                <View>
+                                    <Text style={{ fontWeight: "bold", fontSize: 18 }}>Address:</Text>
                                 </View>
-                           
+                                <View style={{  justifyContent: "center" }}>
+                                    <Text style={[styles.text, { marginLeft: 10 }]}>{this.state.item.clinicname}</Text>
+
+                                </View>
+
+                            </View>
+                            <View style={{ marginTop: 10 ,flexDirection:"row"}}>
+
+                                <View style={{justifyContent:"center"}}>
+                                    <Text style={{ fontWeight: "bold", fontSize: 18 }}>Doctor Name:</Text>
+                                </View>
+                                <View style={{justifyContent:"center"}}>
+                                    <Text style={[styles.text, { marginLeft: 10}]}>{this.state.item.doctordetails.name}</Text>
+                                </View>
+
                             </View>
                       </View>
+                       
                         {/* Appointment Details */}
-                        <View style={{margin:20}}>
+                        <View style={{marginHorizontal:20}}>
                             <View style={{flexDirection:"row"}}>
                                 <Text style={[styles.text]}>Appointment Status:</Text>
                                 <Text style={[styles.text, { marginLeft: 10, color: this.validateColor(this.state.item.status)}]}>{this.state.item.status}</Text>

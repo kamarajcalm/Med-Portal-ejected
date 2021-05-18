@@ -168,7 +168,7 @@ class AddPrescription extends Component {
           sendData.appointment =this.state.appointmentId
         }
        const post = await HttpsClient.post(api,sendData)
-       console.log(post)
+    
        if(post.type=="success"){
            this.showSimpleMessage("Added SuccessFully","#00A300","success")
            setTimeout(()=>{
@@ -187,10 +187,10 @@ class AddPrescription extends Component {
         this.setState({ show: false })
     };
     handleConfirm = (date) => {
-          if (selectedDate.type == "set") {
+          
         let nextVisit =  moment(date).format('YYYY-MM-DD')
         this.setState({ nextVisit,show1:false})
-        }
+        
         this.hideDatePicker();
     };
     // onChange1 = (selectedDate) => {
