@@ -19,7 +19,7 @@ const day = date.getDay();
 class ViewClinic extends Component {
     constructor(props) {
         let item = props.route.params.item
-
+ console.log(item,"iiii")
         super(props);
         this.state = {
             item,
@@ -58,9 +58,9 @@ class ViewClinic extends Component {
                 return (
                     <View style={{ flexDirection: "row", marginTop: 5 }}>
                         <Text style={[styles.text, { fontWeight: "bold" }]}>{index + 1}.</Text>
-                        <Text style={[styles.text, { marginLeft: 5 }]}>{i.timings[0][0]}</Text>
+                        {i.timings.length>0&&<Text style={[styles.text, { marginLeft: 5 }]}>{i.timings[0][0]}</Text>}
                         <Text style={[styles.text]}>-</Text>
-                        <Text style={[styles.text]}>{i.timings[0][1]}</Text>
+                        {i.timings.length > 0 && <Text style={[styles.text]}>{i.timings[0][1]}</Text>}
                     </View>
                 )
             })
@@ -74,9 +74,9 @@ class ViewClinic extends Component {
                 return (
                     <View style={{ flexDirection: "row", marginTop: 5 }}>
                         <Text>{index + 1}.</Text>
-                        <Text style={{ marginLeft: 5 }}>{i.timings[0][0]}</Text>
+                        {i.timings.length>0&&<Text style={{ marginLeft: 5 }}>{i.timings[0][0]}</Text>}
                         <Text>-</Text>
-                        <Text>{i.timings[0][1]}</Text>
+                        {i.timings.length > 0&&<Text>{i.timings[0][1]}</Text>}
                     </View>
                 )
             })
@@ -472,44 +472,46 @@ class ViewClinic extends Component {
                                 />
                             </View>
                           
-                             
-                         
-                          
+                            <View style={{ alignItems: "center", justifyContent: "space-around", flexDirection: "row", width }}>
+                                <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center' }}
+                                    onPress={() => { this.chatClinic() }}
+                                >
+                                    <MaterialIcons name="chat" size={24} color="black" />
+                                    <Text>with clinic</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center' }}
+                                    onPress={() => {
+
+                                        Linking.openURL(
+                                            `https://www.google.com/maps/dir/?api=1&destination=` +
+                                            this.state.item.lat +
+                                            `,` +
+                                            this.state.item.long +
+                                            `&travelmode=driving`
+                                        );
+                                    }}
+                                >
+                                    <FontAwesome5 name="directions" size={24} color="black" />
+                                    <Text>get Directions</Text>
+                                </TouchableOpacity>
+                            </View>
+                         <View style={{alignItems:"center",justifyContent:'center',marginTop:40}}>
+                                <TouchableOpacity style={{ height: height * 0.07, width: width * 0.6, backgroundColor: themeColor, borderRadius: 20, alignItems: "center", justifyContent: "center", flexDirection: "row" }}
+                                    onPress={() => { this.props.navigation.navigate('makeAppointmentClinic', { item: this.state.item, }) }}
+                                >
+                                    <Text style={[styles.text, { color: "#fff" }]}>Book Appointment</Text>
+                                    <View style={{ marginLeft: 20 }}>
+                                        <AntDesign name="right" size={20} color="#fff" />
+                                    </View>
+
+                                </TouchableOpacity>
+                         </View>
+             
                         </ScrollView>
                     </View>
                     
-                        <TouchableOpacity style={{ height: height * 0.07, position: 'absolute', width: width * 0.6, backgroundColor: themeColor, bottom: 30, left: 70, borderRadius: 20, alignItems: "center", justifyContent: "center", flexDirection: "row" }}
-                        onPress={() => { this.props.navigation.navigate('makeAppointmentClinic', { item: this.state.item ,}) }}
-                        >
-                            <Text style={[styles.text, { color: "#fff" }]}>Book Appointment</Text>
-                            <View style={{ marginLeft: 20 }}>
-                                <AntDesign name="right" size={20} color="#fff" />
-                            </View>
-
-                        </TouchableOpacity>
-                    <View style={{ alignItems: "center", justifyContent: "space-around", flexDirection: "row", position: "absolute", bottom: 100,width }}>
-                        <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center' }}
-                            onPress={() => { this.chatClinic() }}
-                        >
-                            <MaterialIcons name="chat" size={24} color="black" />
-                            <Text>with clinic</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center' }}
-                            onPress={() => {
-
-                                Linking.openURL(
-                                    `https://www.google.com/maps/dir/?api=1&destination=` +
-                                    this.state.item.lat +
-                                    `,` +
-                                    this.state.item.long +
-                                    `&travelmode=driving`
-                                );
-                            }}
-                        >
-                            <FontAwesome5 name="directions" size={24} color="black" />
-                            <Text>get Directions</Text>
-                        </TouchableOpacity>
-                    </View>
+                        
+              
                 </SafeAreaView>
             </>
         );

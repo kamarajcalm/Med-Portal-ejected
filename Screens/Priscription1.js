@@ -77,32 +77,13 @@ hideDatePicker = () => {
 
  handleConfirm = (date) => {
         console.warn("A date has been picked: ", date);
-     this.setState({ today: moment(date).format('YYYY-MM-DD'), show: false, date: new Date(date) }, () => {
-         if (this.state.isDoctor) {
-             this.getPrescription()
-         } else {
-             this.getClinicPrescription()
-         }
+     this.setState({ dob: moment(date).format('YYYY-MM-DD'), show: false, date: new Date(date) }, () => {
+         
 
      })
         this.hideDatePicker();
     };
-    onChange = (selectedDate) => {
-        if (selectedDate.type == "set") {
-            this.setState({ today: moment(new Date(selectedDate.nativeEvent.timestamp)).format('YYYY-MM-DD'), show: false, date: new Date(selectedDate.nativeEvent.timestamp) }, () => {
-                if(this.state.isDoctor){
-                    this.getPrescription()
-                }else{
-                    this.getClinicPrescription()
-                }
-             
-            })
 
-        } else {
-            return null
-        }
-
-    }
     getPateintPrescription = async()=>{
         let api = `${url}/api/prescription/prescriptions/?forUser=${this.props.user.id}`
         let data =await HttpsClient.get(api)

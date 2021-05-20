@@ -26,6 +26,12 @@ const url = settings.url
     };
   }
    login =async()=>{
+     if(this.state.username==""){
+       return this.showSimpleMessage(`please enter username`, "#dd7030")
+     }
+     if (this.state.password == "") {
+       return this.showSimpleMessage(`please enter password`, "#dd7030")
+     }
   this.setState({loading:true})
    let api = `${url}/api/HR/login/?mode=api`
   //  let sendData= new FormData();

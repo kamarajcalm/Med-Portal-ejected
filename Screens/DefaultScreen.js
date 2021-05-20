@@ -28,6 +28,7 @@ Notifications.setNotificationHandler({
     };
   }
      getUserDetails = async () => {
+     
       //  return this.props.navigation.dispatch(
       //    CommonActions.reset({
       //      index: 0,
@@ -44,8 +45,10 @@ Notifications.setNotificationHandler({
      
      
          if (login) {
+          
               const data = await HttpsClient.get(`${url}/api/HR/users/?mode=mySelf&format=json`);
               console.log(data)
+           console.log(data.data[0].profile,"ppp")
               if(data.type =="success"){
                  
                 this.props.selectUser(data.data[0]);

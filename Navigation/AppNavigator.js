@@ -27,7 +27,14 @@ import MediacalTab from './MediacalTab';
 import ViewClinicDetails from '../Screens/ViewClinicDetails';
 import PaymentPage from '../Screens/PaymentPage';
 import ImageViewer from '../Screens/ImageViewer';
-
+import Editclinic from '../Screens/Editclinic';
+import CreateReceptionist from '../AdminScreens/CreateReceptionist';
+import AddDoctor from '../AdminScreens/AddDoctor';
+import UpdateTimings from '../Screens/UpdateTimings';
+import ViewDoctor from '../AdminScreens/ViewDoctor';
+import EditDoctorTimings from '../AdminScreens/EditDoctorTimings';
+import EditClinicDetails from '../AdminScreens/EditClinicDetails';
+import SearchDoctors from '../AdminScreens/SearchDoctors';
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
@@ -86,7 +93,14 @@ export default class AppNavigator extends Component {
                     <Stack.Screen name="ViewClinicDetails" component={ViewClinicDetails} options={{ headerShown: false }} />
                     <Stack.Screen name="PaymentPage" component={PaymentPage} options={{ headerShown: false }} />
                     <Stack.Screen name="ImageViewer" component={ImageViewer} options={{ headerShown: false }} />
-
+                                 {/* DOCTOR EDIT */}
+                    <Stack.Screen name="SearchDoctors" component={SearchDoctors} options={{ headerShown: false }} />
+                    <Stack.Screen name="CreateReceptionist" component={CreateReceptionist} options={{ headerShown: false }} />
+                    <Stack.Screen name="AddDoctor" component={AddDoctor} options={{ headerShown: false }} />
+                    <Stack.Screen name="UpdateTimings" component={UpdateTimings} options={{ headerShown: false }} />
+                    <Stack.Screen name="ViewDoctor" component={ViewDoctor} options={{ headerShown: false }} />
+                    <Stack.Screen name="EditDoctorTimings" component={EditDoctorTimings} options={{ headerShown: false }} />
+                    <Stack.Screen name="EditClinicDetails" component={EditClinicDetails} options={{ headerShown: false }} />
                  </Stack.Navigator>
                 
             </NavigationContainer>

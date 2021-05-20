@@ -43,10 +43,7 @@ const screenHeight = Dimensions.get('screen').height;
 const { diffClamp } = Animated;
 const headerHeight = height*0.2;
 const Date1 = new Date()
-const day = Date1.getDate()
-const month = Date1.getMonth() + 1
-const year = Date1.getFullYear()
-const today1 = `${year}-${month}-${day}`
+const today1 = moment(Date1).format("YYYY-MM-DD")
 const getCloser = (value, checkOne, checkTwo) =>
 Math.abs(value - checkOne) < Math.abs(value - checkTwo) ? checkOne : checkTwo;
 const Priscription = (props) => {
@@ -55,6 +52,7 @@ const Priscription = (props) => {
     const[check,setChecked] =useState(false)
     const [showList,setShowList] =useState(true)
     const [today, setToday] = useState(today1)
+    const stateRef = useRef("");
     const [mode, setMode] = useState("date")
     const [date, setDate] = useState(new Date())
     const [show, setShow] = useState(false)
@@ -148,10 +146,10 @@ const Priscription = (props) => {
     }
   const  getPrescription = async () => {
     
-        let api = `${url}/api/prescription/prescriptions/?doctor=${props.user.id}&date=${moment(date).format("YYYY-MM-DD")}`
+      let api = `${url}/api/prescription/prescriptions/?doctor=${props.user.id}&date=${stateRef.current}`
         console.log(api,"prescription api")
         let data = await HttpsClient.get(api)
-  
+//   console.log(data.data)
         if (data.type == 'success') {
             setPrescriptions(data.data)
             setLoading(false)
@@ -212,7 +210,19 @@ const Priscription = (props) => {
 
     }
     useEffect(()=>{
+        stateRef.current =today1
        findUser();
+        const unsubscribe = props.navigation.addListener('focus', () => {
+            
+        
+            if (props.user.profile.occupation == "Doctor"){
+                getPrescription()
+            }
+      
+       
+
+        });
+      
         Keyboard.addListener("keyboardDidShow", _keyboardDidShow);
         Keyboard.addListener("keyboardDidHide", _keyboardDidHide);
 
@@ -220,6 +230,7 @@ const Priscription = (props) => {
         return () => {
             Keyboard.removeListener("keyboardDidShow", _keyboardDidShow);
             Keyboard.removeListener("keyboardDidHide", _keyboardDidHide);
+            unsubscribe
         };
     },[])
   const  showDatePicker = () => {
@@ -231,14 +242,8 @@ const Priscription = (props) => {
   
     };
     useEffect(()=>{
-        const unsubscribe = props.navigation.addListener('focus', () => {
-            console.log("called")
-            if (isDoctor) {
-                getPrescription()
-            }
-        });
-        return unsubscribe
-    },[props.navigation])
+     
+    },[])
 useEffect (()=>{
 if(isDoctor){
     getPrescription()
@@ -259,7 +264,7 @@ const _keyboardDidShow =()=>{
         setToday(moment(date).format('YYYY-MM-DD'))
         setShow(false)
         setDate(new Date(date))
-        
+       stateRef.current = moment(date).format('YYYY-MM-DD')
         // this.setState({ , show: false, date:  }, () => {
         //     if (this.state.isDoctor) {
         //         this.getPrescription()
@@ -304,6 +309,7 @@ const _keyboardDidShow =()=>{
     }
 
  const   validateHeaders =()=>{
+     console.log(props?.clinic?.name)
    if(isDoctor||isReceptionist){
        return (
            <View>
@@ -378,8 +384,8 @@ const _keyboardDidShow =()=>{
 
             return (
                 <TouchableOpacity style={[styles.card, { flexDirection: "row", borderRadius: 5 }]}
-                    onPress={() => { props.navigation.navigate('showCard', { item }) }}
-                //   onPress={() => { props.navigation.navigate('PrescriptionView', { item }) }}
+                    // onPress={() => { props.navigation.navigate('showCard', { item }) }}
+                  onPress={() => { props.navigation.navigate('PrescriptionView', { item, }) }}
                 >
                     <View style={{ flex: 0.7 }}>
                         <View style={{ justifyContent: "space-around", flex: 1 }}>

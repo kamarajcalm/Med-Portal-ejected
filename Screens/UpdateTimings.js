@@ -18,7 +18,8 @@ import { StackActions, CommonActions} from '@react-navigation/native';
 
 class UpdateTimings extends Component {
     constructor(props) {
-        let clinicPk = props.route.params.clinicPk
+        let clinicPk = props.route.params.item.id
+        let item = props.route.params.item
         super(props);
         this.state = {
             isMedical:this.props.route.params.medical||false,
@@ -30,45 +31,46 @@ class UpdateTimings extends Component {
             Sun: {
                 day: "Sun",
                 index: 0,
-                starttime: "6:00 am",
-                endtime: "7:00 pm"
+                starttime: "",
+                endtime: ""
             },
             Mon: {
                 day: "Mon",
                 index: 1,
-                starttime: "6:00 am",
-                endtime: "7:00 pm"
+                starttime: "",
+                endtime: ""
             },
             Tue: {
                 day: "Tue",
-                starttime: "6:00 am",
-                endtime: "7:00 pm",
+                starttime: "",
+                endtime: "",
                 index: 2,
             },
             Wed: {
                 day: "Wed",
-                starttime: "6:00 am",
-                endtime: "7:00 pm",
+                starttime: "",
+                endtime: "",
                 index: 3,
             },
             Thu: {
                 day: "Thu",
-                starttime: "6:00 am",
-                endtime: "7:00 pm",
+                starttime: "",
+                endtime: "",
                 index: 4,
             },
             Fri: {
                 day: "Fri",
-                starttime: "6:00 am",
-                endtime: "7:00 pm",
+                starttime: "",
+                endtime: "",
                 index: 5,
             },
             Sat: {
                 day: "Sat",
-                starttime: "6:00 am",
-                endtime: "7:00 pm",
+                starttime: "",
+                endtime: "",
                 index: 6,
             },
+            item
         };
     }
     showSimpleMessage(content, color, type = "info", props = {}) {
@@ -82,8 +84,64 @@ class UpdateTimings extends Component {
 
         showMessage(message);
     }
+    setTimings =()=>{
+        this.state.item.working_hours
+        let Sun ={
+            day: "Sun",
+            starttime: this.state.item.working_hours[0][0],
+            endtime: this.state.item.working_hours[0][1],
+            index:0
+        }
+        let Mon = {
+            day: "Mon",
+            starttime: this.state.item.working_hours[1][0],
+            endtime: this.state.item.working_hours[1][1],
+            index: 1
+        }
+        let Tue = {
+            day: "Tue",
+            starttime: this.state.item.working_hours[2][0],
+            endtime: this.state.item.working_hours[2][1],
+            index: 2
+        }
+        let Wed = {
+            day: "Wed",
+            starttime: this.state.item.working_hours[3][0],
+            endtime: this.state.item.working_hours[3][1],
+            index: 3
+        }
+        let Thu = {
+            day: "Thu",
+            starttime: this.state.item.working_hours[4][0],
+            endtime: this.state.item.working_hours[4][1],
+            index: 4
+        }
+        let Fri = {
+            day: "Fri",
+            starttime: this.state.item.working_hours[5][0],
+            endtime: this.state.item.working_hours[5][1],
+            index: 5
+        }
+        let Sat = {
+            day: "Fri",
+            starttime: this.state.item.working_hours[6][0],
+            endtime: this.state.item.working_hours[6][1],
+            index: 6
+        }
+        this.setState({
+            Sun,
+            Mon,
+            Tue,
+            Wed,
+            Thu,
+            Fri,
+            Sat
+        })
+        
+    }
     componentDidMount() {
-       
+        this.setTimings()
+        console.log()
     }
     componentWillUnmount() {
        
@@ -115,36 +173,12 @@ class UpdateTimings extends Component {
             clinic:this.state.clinicPk,
             times
         }
+      
         let post =  await HttpsClient.post(api,sendData)
           console.log(post,"hjj")
         if(post.type =="success"){
             this.showSimpleMessage("Updated SuccessFully", "#00A300", "success")
-                if(this.state.isMedical){
-                    return this.props.navigation.dispatch(
-                        CommonActions.reset({
-                            index: 0,
-                            routes: [
-                                {
-                                    name: 'Medicals',
-
-                                },
-
-                            ],
-                        })
-                    )
-                }
-              return this.props.navigation.dispatch(
-                CommonActions.reset({
-                    index: 0,
-                    routes: [
-                        {
-                            name: 'Clinics',
-
-                        },
-
-                    ],
-                })
-            )
+          return this.props.navigation.goBack()
         }
         else{
 

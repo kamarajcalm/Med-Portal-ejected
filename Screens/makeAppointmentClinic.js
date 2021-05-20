@@ -152,9 +152,9 @@ class makeAppointmentClinic extends Component {
                 return (
                     <View style={{ flexDirection: "row", marginTop: 5 }}>
                         <Text style={[styles.text, { fontWeight: "bold" }]}>{index + 1}.</Text>
-                        <Text style={[styles.text, { marginLeft: 5 }]}>{i.timings[0][0]}</Text>
+                        { i.timings.length>0&&<Text style={[styles.text, { marginLeft: 5 }]}>{i.timings[0][0]}</Text>}
                         <Text style={[styles.text]}>-</Text>
-                        <Text style={[styles.text]}>{i.timings[0][1]}</Text>
+                        {i.timings.length > 0 &&<Text style={[styles.text]}>{i.timings[0][1]}</Text>}
                     </View>
                 )
             })

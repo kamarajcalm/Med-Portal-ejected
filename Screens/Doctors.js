@@ -30,7 +30,7 @@ const url =settings.url
             all:"true"
           }
          const data =await HttpsClient.post(api,sendData)
-       console.log()
+     console.log(data.data.clinics,"uuuoiuio")
         if(data.type=="success"){
          
           this.setState({ markers: data.data.clinics})
@@ -43,6 +43,7 @@ const url =settings.url
        return;
      }
      let location = await Location.getCurrentPositionAsync({});
+     console.log(location,"hjhj")
      this.getMarkers(location.coords.latitude,location.coords.longitude)
      this.setState({ location: {
         latitude: location.coords.latitude,
@@ -92,7 +93,7 @@ const url =settings.url
                           tooltip={true}
                           onPress={() => { this.navigate(item) }}
                         >
-                          <View style={{ height: height * 0.2, backgroundColor: "#fff", width: width * 0.4, alignItems: "center",  }}>
+                          <View style={{ height: height * 0.2, backgroundColor: "#fff", width: width * 0.4, alignItems: "center", borderRadius:5 }}>
                             <Text style={{ height: 80 }}>
                               <Image
                                 source={{
@@ -101,8 +102,11 @@ const url =settings.url
                                 style={{ width: 60, height: 60, resizeMode: "cover" }}
                               />
                             </Text>
-                             <View style={{alignItems:'center',justifyContent:'center'}}>
+                             <View style={{alignItems:'center',justifyContent:'center',flexDirection:"row"}}>
                               <Text style={[styles.text]}>{item.title}</Text>
+                              <View style={{marginLeft:5,backgroundColor:'green',height:10,width:10,borderRadius:5}}>
+                                  
+                              </View>
                              </View>
                             <View style={{alignItems:'center',justifyContent:"center"}}>
                               <Text style={[styles.text, { color: "gray" }]}>{item.type}</Text>
@@ -114,9 +118,11 @@ const url =settings.url
 
 
                           </View>
+                          <View style={styles.triangle}>
 
+                          </View>
                         </MapView.Callout>
-
+                     
                       </Marker>
                     )
                 })
@@ -166,6 +172,20 @@ const styles = StyleSheet.create({
   bottomSafeArea: {
     flex: 1,
     backgroundColor: "#fff"
+  },
+  triangle: {
+    width: 0,
+    height: 0,
+    backgroundColor: "transparent",
+    borderStyle: "solid",
+    borderLeftWidth: 10,
+    borderRightWidth: 10,
+    borderBottomWidth: 10,
+    borderLeftColor: "transparent",
+    borderRightColor: "transparent",
+    borderBottomColor: "#fff",
+    transform: [{ rotate: "180deg" }],
+    alignSelf:'center'
   },
 });
 const mapStateToProps = (state) => {

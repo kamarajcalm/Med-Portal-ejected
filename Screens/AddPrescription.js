@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Dimensions, TextInput, TouchableOpacity, Image, SafeAreaView, ToastAndroid, Pressable, ActivityIndicator} from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TextInput, TouchableOpacity, Image, SafeAreaView, ToastAndroid, Pressable, ActivityIndicator, TouchableWithoutFeedback} from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { connect } from 'react-redux';
 import { selectTheme } from '../actions';
@@ -35,6 +35,8 @@ class AddPrescription extends Component {
           },
     ]
     super(props);
+      let appoinment = props?.route?.params?.appoinment||null
+  console.log(appoinment,"popop")
     this.state = {
                 mode: 'date',
                 date: new Date(),
@@ -50,14 +52,20 @@ class AddPrescription extends Component {
                 Age:"",
                 selectedSex:sex[0].value,
                 nextVisit:null,
-               show1:false,
-               appointment_taken:false,
-               appointmentId:null,
-               Address:""
+                show1:false,
+                appointment_taken:false,
+                appointmentId:null,
+                Address:"",
+                Diseases:[],
+                Disease:"",
+                appoinment,
+                creating:false,
     };
   }
   componentDidMount(){
-      
+    if(this.state.appoinment){
+        this.searchUser(this.state?.appoinment?.patientname.mobile, this.state?.appoinment?.requesteddate, this.state?.appoinment?.clinic)
+    }
   }
     changeFunction = (type, value, index)=>{
         let duplicate = this.state.medicines
@@ -112,16 +120,24 @@ class AddPrescription extends Component {
         this.setState({ medicines:this.state.medicines.concat(medicines)})
     }
  addPriscription = async()=>{
+     this.setState({creating:true})
         let api =`${url}/api/prescription/addPrescription/`
+     if (this.state.Disease == ""){
+         this.setState({ creating: false })
+         return this.showSimpleMessage("Please fill Disease", "#dd7030",)
+     }
         if(this.state.medicines.length == 0){
+            this.setState({ creating: false })
             return this.showSimpleMessage("Please add medicine", "#dd7030",)
         
         }
         if (this.state.doctorFees =="") {
+            this.setState({ creating: false })
             return this.showSimpleMessage("Please fill doctorFees", "#dd7030",)
             
         }
         if (this.state.Reason =="") {
+            this.setState({ creating: false })
             return this.showSimpleMessage("Please fill Reason", "#dd7030",)
        
         }
@@ -156,25 +172,50 @@ class AddPrescription extends Component {
             health_issues:this.state.healthIssues,
             username:this.state.patientsName,
             usermobile:this.state.mobileNo,
-            ongoing_treatment:this.state.onGoingTreatMent,
+            ongoing_treatment: this.state.Reason,
             doctor_fees:this.state.doctorFees,
-            clinic: this.props.clinic.clinicpk,
+            clinic: this.state?.appoinment?.clinic||this.props.clinic.clinicpk,
             age:this.state.Age,
             sex:this.state.selectedSex,
             next_visit:this.state.nextVisit,
-            address:this.state.Address
+            address:this.state.Address,
+            new_disease:this.state.Disease
         }
+   
         if(this.state.appointmentId){
           sendData.appointment =this.state.appointmentId
         }
        const post = await HttpsClient.post(api,sendData)
     
        if(post.type=="success"){
-           this.showSimpleMessage("Added SuccessFully","#00A300","success")
-           setTimeout(()=>{
-             this.props.navigation.goBack()
-           },1500)
+           if(this.state.appoinment){
+               
+               let api = `${url}/api/prescription/appointments/${this.state.appoinment.id}/`
+                let sendData = {
+                    status: "Completed"
+                }
+                console.log(sendData)
+                let post = await HttpsClient.patch(api, sendData)
+                if (post.type == "success") {
+                    this.setState({ creating: false })
+                    this.showSimpleMessage("Completed SuccessFully", "#00A300", "success")
+
+                   return this.props.navigation.goBack()
+                } else {
+                    this.showSimpleMessage("Try again", "#B22222", "danger")
+                    this.setState({ modal: false })
+                }
+           }else{
+               this.setState({ creating: false })
+               this.showSimpleMessage("Added SuccessFully", "#00A300", "success")
+               setTimeout(() => {
+                   this.props.navigation.goBack()
+               }, 1500)
+           }
+          
+
        }else{
+           this.setState({ creating: false })
            this.showSimpleMessage("Try again", "#B22222", "danger")
        }
        
@@ -199,9 +240,10 @@ class AddPrescription extends Component {
     //     this.setState({ nextVisit,show1:false})
     //     }
     // }
-    searchUser = async(mobileNo)=>{
-        let api = `${url}/api/prescription/getAppointmentUser/?doctor=${this.props.user.id}&user=${mobileNo}&clinic=${this.props.clinic.clinicpk}&requesteddate=${moment(new Date()).format('YYYY-MM-DD')}`
-        this.setState({ mobileNo })
+    searchUser = async(mobileNo,date,clinic)=>{
+        let api = `${url}/api/prescription/getAppointmentUser/?doctor=${this.props.user.id}&user=${mobileNo}&clinic=${clinic||this.props.clinic.clinicpk}&requesteddate=${date||moment(new Date()).format('YYYY-MM-DD')}`
+       console.log(api,'ppppppp')
+        this.setState({mobileNo})
         if(mobileNo.length>9){
             this.setState({loading:true})
            const data = await HttpsClient.get(api)
@@ -211,6 +253,7 @@ class AddPrescription extends Component {
                if (data.data.user.mobile == mobileNo){
                   
                    this.setState({ 
+                       Age:data.data.user.age.toString(),
                        patientsName: data.data.user.name, 
                        healthIssues: data.data.user.health_issues,
                        Reason: data.data.user.appointment_reason,
@@ -253,6 +296,16 @@ class AddPrescription extends Component {
        duplicate.splice(index,1)
        this.setState({healthIssues:duplicate})
     }
+    searchDiseases = async(Disease)=>{
+        this.setState({ Disease})
+        let api = `${url}/api/prescription/disease/?search=${Disease}`
+        let data = await HttpsClient.get(api)
+        console.log(data,"jjj")
+        if(data.type =="success"){
+            this.setState({ Diseases:data.data })
+        }
+        
+    }
   render() {
       const { loading } = this.state;
    
@@ -260,6 +313,11 @@ class AddPrescription extends Component {
         <>
             <SafeAreaView style={styles.topSafeArea} />
             <SafeAreaView style={styles.bottomSafeArea}>
+                <TouchableWithoutFeedback
+                    onPress={() => { this.setState({ Diseases:[]})}}
+                >
+
+               
         <View style={{flex:1}}>
                     {/* HEADERS */}
             <View style={{ height: height * 0.1, backgroundColor: themeColor, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, flexDirection:'row',alignItems:"center"}}>
@@ -407,7 +465,30 @@ class AddPrescription extends Component {
                                 style={{ width: width * 0.9, height: height * 0.15, backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10, textAlignVertical:"top"}}
                             />
                         </View>
-              
+                        <View style={{ marginTop: 20 }}>
+                            <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>Diseases</Text>
+                            <TextInput
+                                value={this.state.Disease}
+                                onChangeText={(Disease) => { this.searchDiseases(Disease) }}
+                                selectionColor={themeColor}
+                                multiline={true}
+                                style={{ width: width * 0.9, height: height * 0.07, backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10, textAlignVertical: "top" }}
+                            />
+                        </View>
+                        {this.state.Diseases.length>0&&<ScrollView style={{ position: "relative", width: width * 0.9, height: height * 0.2,backgroundColor:"#eee",bottom:0,elevation:5}}>
+                           {
+                               this.state.Diseases.map((i)=>{
+                                   return(
+                                       <TouchableOpacity 
+                                         style={{margin:20}}
+                                           onPress={() => { this.setState({ Disease: i.title,Diseases:[]})}}
+                                       >
+                                           <Text style={[styles.text,{color:themeColor}]}>{i.title}</Text>
+                                       </TouchableOpacity>
+                                   )
+                               })
+                           }
+                        </ScrollView>}
                 <View style={{ marginTop: 20 }}>
                     <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 }}>Add Medicines</Text>
                     <TouchableOpacity style={{marginTop:20,alignItems:"center",justifyContent:'center',flexDirection:"row"}}
@@ -455,7 +536,7 @@ class AddPrescription extends Component {
                     <TouchableOpacity style={{height:height*0.06,alignItems:"center",justifyContent:'center',backgroundColor:themeColor,width:width*0.3,borderRadius:15}}
                       onPress={()=>{this.addPriscription()}}
                     >
-                           <Text style={[styles.text,{color:"#fff"}]}>CREATE</Text>
+                           {this.state.creating?<ActivityIndicator color="#fff" size="large"/>:<Text style={[styles.text,{color:"#fff"}]}>CREATE</Text>}
                     </TouchableOpacity>
                 </View>
                         <View style={styles.centeredView}>
@@ -491,6 +572,7 @@ class AddPrescription extends Component {
                         onCancel={this.hideDatePicker}
                     />
         </View>
+    </TouchableWithoutFeedback>
      </SafeAreaView>
        </>
         

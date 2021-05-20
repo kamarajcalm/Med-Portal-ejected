@@ -26,7 +26,7 @@ const url = settings.url
 class EditDoctorTimings extends Component {
     constructor(props) {
         let clinic = props.route.params.clinic
-        console.log(clinic)
+     
         super(props);
         this.state = {
             openingTime: null,
@@ -355,7 +355,7 @@ class EditDoctorTimings extends Component {
 
     // }
     addDoctor = async () => {
-        let api = `${url}/api/prescription/addDoctors/`
+        let api = `${url}/api/prescription/clinicDoctors/?clinic=${this.state.pk.clinicpk}`
         let timings = [
             {
                 type: "Monday",
@@ -404,8 +404,90 @@ class EditDoctorTimings extends Component {
             this.showSimpleMessage("Try again", "#B22222", "danger")
         }
     }
-    componentDidMount() {
+    setTimings =()=>{
+        if (this.state.clinic.clinicShits.Sunday.length > 0) {
+            this.state.clinic.clinicShits.Sunday[0].timings.forEach((i) => {
+                let arr = this.state.SunArray
+                let pushObject = {
+                    starttime: i[0],
+                    endtime: i[1]
+                }
+                arr.push(pushObject)
+                this.setState({ SunArray: arr })
+            })
+        }
+        if (this.state.clinic.clinicShits.Monday.length>0){
+            this.state.clinic.clinicShits.Monday[0].timings.forEach((i)=>{
+                let arr =this.state.MonArray
+                let pushObject ={
+                    starttime:i[0],
+                    endtime:i[1]
+                }
+                arr.push(pushObject)
+                this.setState({ MonArray:arr})
+            })
+        }
+   
+        if (this.state.clinic.clinicShits.Tuesday.length > 0) {
+            this.state.clinic.clinicShits.Tuesday[0].timings.forEach((i) => {
+                let arr = this.state.TueArray
+                let pushObject = {
+                    starttime: i[0],
+                    endtime: i[1]
+                }
+                arr.push(pushObject)
+                this.setState({ TueArray: arr })
+            })
+        }
+      
+        if (this.state.clinic.clinicShits.Wednesday.length > 0) {
+            this.state.clinic.clinicShits.Wednesday[0].timings.forEach((i) => {
+                let arr = this.state.WedArray
+                let pushObject = {
+                    starttime: i[0],
+                    endtime: i[1]
+                }
+                arr.push(pushObject)
+                this.setState({ WedArray: arr })
+            })
+        }
 
+        if (this.state.clinic.clinicShits.Thursday.length > 0) {
+            this.state.clinic.clinicShits.Thursday[0].timings.forEach((i) => {
+                let arr = this.state.ThuArray
+                let pushObject = {
+                    starttime: i[0],
+                    endtime: i[1]
+                }
+                arr.push(pushObject)
+                this.setState({ ThuArray: arr })
+            })
+        }
+        if (this.state.clinic.clinicShits.Friday.length > 0) {
+            this.state.clinic.clinicShits.Friday[0].timings.forEach((i) => {
+                let arr = this.state.FriArray
+                let pushObject = {
+                    starttime: i[0],
+                    endtime: i[1]
+                }
+                arr.push(pushObject)
+                this.setState({ FriArray: arr })
+            })
+        }
+        if (this.state.clinic.clinicShits.Saturday.length > 0) {
+            this.state.clinic.clinicShits.Saturday[0].timings.forEach((i) => {
+                let arr = this.state.SatArray
+                let pushObject = {
+                    starttime: i[0],
+                    endtime: i[1]
+                }
+                arr.push(pushObject)
+                this.setState({ SatArray: arr })
+            })
+        }
+    }
+    componentDidMount() {
+       this.setTimings()
     }
     pushSun = () => {
         let duplicate = this.state.SunArray
@@ -544,7 +626,7 @@ class EditDoctorTimings extends Component {
                                 <Ionicons name="chevron-back-circle" size={30} color="#fff" />
                             </TouchableOpacity>
                             <View style={{ flex: 0.6, alignItems: 'center', justifyContent: "center" }}>
-                                <Text style={[styles.text, { color: "#fff" }]}>Add Doctor</Text>
+                                <Text style={[styles.text, { color: "#fff" }]}>Edit Timings</Text>
                             </View>
                             <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
 
@@ -557,15 +639,7 @@ class EditDoctorTimings extends Component {
                                 showsVerticalScrollIndicator={false}
                             >
 
-                                <View >
-                                    <Text style={styles.text}>Name</Text>
-                                    <TouchableOpacity
-                                        style={{ width: width * 0.8, height: height * 0.05, borderRadius: 15, backgroundColor: "#eeee", margin: 10, paddingLeft: 10, justifyContent: "center" }}
-                                        onPress={() => { this.props.navigation.navigate('SearchDoctors', { backFunction: (item) => { this.backFunction(item) } }) }}
-                                    >
-                                        <Text>{this.state?.doctor?.name}</Text>
-                                    </TouchableOpacity>
-                                </View>
+                                
                                 {/* TIMINGS... */}
 
                                 <View style={{ padding: 20 }}>
@@ -1023,7 +1097,7 @@ class EditDoctorTimings extends Component {
                                     <TouchableOpacity style={{ width: width * 0.4, height: height * 0.05, borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: themeColor }}
                                         onPress={() => { this.addDoctor() }}
                                     >
-                                        <Text style={[styles.text, { color: "#fff" }]}>Add</Text>
+                                        <Text style={[styles.text, { color: "#fff" }]}>Update</Text>
                                     </TouchableOpacity>
                                 </View>
 

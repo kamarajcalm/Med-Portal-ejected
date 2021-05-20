@@ -133,10 +133,11 @@ class ClinicDetails extends Component {
                             <View style={{ flex: 0.6, alignItems: "center", justifyContent: "center" }}>
                                 <Text style={[styles.text, { color: '#fff', fontWeight: 'bold', fontSize: 18 }]}>{this.state.item.companyName}</Text>
                             </View>
-                            <TouchableOpacity style={{ flex: 0.2 }}
-                                
+                            <TouchableOpacity style={{ flex: 0.2, flexDirection: "row", alignItems: "center", justifyContent: 'center' }}
+                                onPress={() => { this.props.navigation.navigate('EditClinicDetails', { clinic: this.state.item }) }}
                             >
-                        
+                                <Entypo name="back-in-time" size={24} color="#fff" />
+                                <Text style={[styles.text, { marginLeft: 10, color: "#fff" }]}>Edit </Text>
                             </TouchableOpacity>
                         </View>
                     

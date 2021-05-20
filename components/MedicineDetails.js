@@ -257,12 +257,15 @@ export default class MedicineDetails extends Component {
                     />
                 </View>}
                 <View style={{flexDirection:'row'}}>
-                    <Text>No of days</Text>
+                    <View style={{alignItems:'center',justifyContent:'center'}}>
+                        <Text>No of days</Text>
+                    </View>
+                  
                     <TextInput 
                        value={this.state.days}
                        selectionColor={themeColor}
                        keyboardType="numeric"
-                       style={{height:"80%",width: 50,backgroundColor:'#eee',borderRadius:5,marginLeft:5,paddingLeft:5}}
+                       style={{height:35,width: 50,backgroundColor:'#eee',borderRadius:5,marginLeft:5,paddingLeft:5}}
                        onChangeText ={(text)=>{this.changeDays(text)}}
                     
                     />
@@ -369,7 +372,7 @@ export default class MedicineDetails extends Component {
                           <TextInput
                               keyboardType={"numeric"}
                               selectionColor ={themeColor}
-                              style={{ height: 30, width: 50, backgroundColor: '#eee', borderRadius: 5, marginLeft: 5, paddingLeft: 5 }}
+                              style={{ height: 35, width: 50, backgroundColor: '#eee', borderRadius: 5, marginLeft: 5, paddingLeft: 5 }}
                               onChangeText={(text) => {this.changeQty(text)}}
                           />
                     </View>
@@ -382,7 +385,7 @@ export default class MedicineDetails extends Component {
                           <TextInput
                               keyboardType ={"numeric"}
                               selectionColor={themeColor}
-                              style={{ height: 30, width: 50, backgroundColor: '#eee', borderRadius: 5, marginLeft: 5, paddingLeft: 5 }}
+                              style={{ height: 35, width: 50, backgroundColor: '#eee', borderRadius: 5, marginLeft: 5, paddingLeft: 5 }}
                               value={this.state.days}
                               onChangeText={(text) => { this.changeDays(text) }}
                           />
@@ -512,7 +515,7 @@ export default class MedicineDetails extends Component {
                           <TextInput
                               keyboardType={"numeric"}
                               selectionColor={themeColor}
-                              style={{ height: 30, width: 50, backgroundColor: '#eee', borderRadius: 5, marginLeft: 5, paddingLeft: 5 }}
+                              style={{ height: 35, width: 50, backgroundColor: '#eee', borderRadius: 5, marginLeft: 5, paddingLeft: 5 }}
                            
                               onChangeText={(text) => { this.changeQty(text) }}
                           />
@@ -568,7 +571,7 @@ export default class MedicineDetails extends Component {
                           <TextInput
                               keyboardType={"numeric"}
                               selectionColor={themeColor}
-                              style={{ height: 30, width: 50, backgroundColor: '#eee', borderRadius: 5, marginLeft: 5, paddingLeft: 5 }}
+                              style={{ height: 35, width: 50, backgroundColor: '#eee', borderRadius: 5, marginLeft: 5, paddingLeft: 5 }}
                               value={this.state.qty}
                               onChangeText={(text) => { this.changeQty(text) }}
                           />
@@ -616,7 +619,7 @@ export default class MedicineDetails extends Component {
                       <TextInput
                           keyboardType={"numeric"}
                           selectionColor={themeColor}
-                          style={{ height: 30, width: 50, backgroundColor: '#eee', borderRadius: 5, marginLeft: 5, paddingLeft: 5 }}
+                          style={{ height: 35, width: 50, backgroundColor: '#eee', borderRadius: 5, marginLeft: 5, paddingLeft: 5 }}
                           value={this.state.qty}
                           onChangeText={(text) => { this.changeQty(text) }}
                       />

@@ -11,7 +11,7 @@ const { height, width } = Dimensions.get("window");
 const fontFamily = settings.fontFamily;
 const themeColor = settings.themeColor;
 const url = settings.url;
-
+import axios from 'axios';
  class SearchMedicines extends Component {
   constructor(props) {
     super(props);
@@ -19,8 +19,10 @@ const url = settings.url;
         selected:[],
         medicines:[]
     };
+    this.cancelToken
   }
      selectMedicine =(item)=>{
+
          let data =this.state.selected
          var found = data.find(function (element) {
              return element === item;
@@ -37,13 +39,22 @@ const url = settings.url;
          
      }
      SearchMedicines =async(query)=>{
+      
+      if(typeof this.cancelToken != typeof undefined){
+         this.cancelToken.cancel('cancelling the previous request')
+      }
+      this.cancelToken = axios.CancelToken.source()
       let api= `${url}/api/prescription/medicines/?name=${query}`
-   
-      const data = await HttpsClient.get(api);
+       
+      const data = await axios.get(api,{cancelToken:this.cancelToken.token});
+         this.setState({ medicines: data.data })
+    // const data =await HttpsClient.get(api)
       console.log(data,"kjkjkk")
-        if(data.type=="success"){
-             this.setState({medicines:data.data})
-        }
+      console.log(data.statusText,"sssss")
+
+        // if(data.type=="success"){
+        //      this.setState({medicines:data.data})
+        // }
      }
   render() {
     return (

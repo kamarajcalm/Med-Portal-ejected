@@ -144,7 +144,7 @@ class Appointments extends Component {
       this.getAppointments();
       this.getAppointments2();
         this._unsubscribe = this.props.navigation.addListener('focus', () => {
-            
+                this.setState({ modal:false})
                 this.getAppointments();
                 this.getAppointments2();
             
@@ -192,23 +192,8 @@ class Appointments extends Component {
         }
     }
     completeAppointment =async()=>{
-        let api = `${url}/api/prescription/appointments/${this.state.selectedAppointment.id}/`
-        let sendData = {
-            status: "Completed"
-        }
-        console.log(sendData)
-        let post = await HttpsClient.patch(api, sendData)
-        if (post.type == "success") {
-            let duplicate = this.state.Appointments
-            duplicate.splice(this.state.selectedIndex,1)
-            this.showSimpleMessage("Completed SuccessFully", "#00A300", "success")
-      
-            this.setState({ modal: false, Appointments: duplicate })
-            this.getAppointments2();
-        } else {
-            this.showSimpleMessage("Try again", "#B22222", "danger")
-            this.setState({ modal: false })
-        }
+        this.props.navigation.navigate('addPriscription', { appoinment: this.state.selectedAppointment})
+        
     }
     onChange = (selectedDate) => {
         if (selectedDate.type == "set"){
@@ -263,12 +248,15 @@ class Appointments extends Component {
             return "green"
         }
         if (status == "Accepted") {
-            return "green"
+            return "blue"
         }
         if (status == "Pending") {
             return "orange"
         }
         if (status == "Rejected") {
+            return "red"
+        }
+        if (status == "Declined") {
             return "red"
         }
     }
