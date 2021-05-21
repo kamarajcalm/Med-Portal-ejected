@@ -228,7 +228,12 @@ class ChatScreen extends Component {
   
   }
  componentWillUnmount(){
-   this.connection.close()
+     try{
+         this.connection.close()
+     }catch(e){
+       console.log(e)
+     }
+
  }
     playAudio =async(uri)=>{
         console.log(uri,"uuu")

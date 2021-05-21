@@ -9,8 +9,11 @@ import {
       Settings,
       SafeAreaView,
       FlatList,
-      TouchableOpacity
+      TouchableOpacity,
+      Linking,
+     Platform
 } from 'react-native';
+
 const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height
 
@@ -250,6 +253,24 @@ export default class PrescriptionView extends Component {
         }
 
     }
+    call =()=>{
+      
+        if (Platform.OS !== 'android') {
+            phoneNumber = `telprompt:${7010117137}`;
+        }
+        else {
+            phoneNumber = `tel:${7010117137}`;
+        }
+        Linking.canOpenURL(phoneNumber)
+            .then(supported => {
+                if (!supported) {
+                    Alert.alert('Phone number is not available');
+                } else {
+                    return Linking.openURL(phoneNumber);
+                }
+            })
+            .catch(err => console.log(err));
+    }
   render() {
       const { item } = this.state
     return (
@@ -343,6 +364,22 @@ export default class PrescriptionView extends Component {
                             resizeMode={"stretch"}
                         />
                        </View>
+                 </View>
+                 <View style={{position:"absolute",width,alignItems:'center',justifyContent:"center",bottom:30}}>
+                     <TouchableOpacity
+                       style={{backgroundColor:themeColor,height:height*0.05,width:width*0.4,alignItems:'center',justifyContent:'center',borderRadius:5}}
+                        onPress={() => {
+                            if (Platform.OS == "android") {
+                                Linking.openURL(`tel:${this.state.item.mobile}`)
+                            } else {
+
+                                Linking.canOpenURL(`telprompt:${this.state.item.mobile}`)
+                            }
+                        }}
+                     >
+                        <Text style={[styles.text,{color:"#fff"}]}>contact</Text>
+                     </TouchableOpacity>
+               
                  </View>
             </SafeAreaView>
 

@@ -53,7 +53,7 @@ class ViewAppointmentDoctors extends Component {
         }
 
         let data = await HttpsClient.get(api)
-        
+        console.log(data,"kkk")
         if (data.type == "success") {
             this.props.navigation.navigate('Chat', { item: data.data })
         }
@@ -75,7 +75,7 @@ class ViewAppointmentDoctors extends Component {
                             <Ionicons name="chevron-back-circle" size={30} color="#fff" />
                         </TouchableOpacity>
                         <View style={{ flex: 0.7, }}>
-                            <Text style={[styles.text, { color: "#fff" }]}> Appointment Details</Text>
+                            <Text style={[styles.text, { color: "#fff" ,fontSize:24,fontWeight:'bold'}]}> Appointment Details</Text>
                         </View>
 
                     </View>

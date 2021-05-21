@@ -120,8 +120,13 @@ class AddPrescription extends Component {
         this.setState({ medicines:this.state.medicines.concat(medicines)})
     }
  addPriscription = async()=>{
+
      this.setState({creating:true})
         let api =`${url}/api/prescription/addPrescription/`
+     if (this.props.clinic?.validtill?.available == false){
+         this.setState({ creating: false })
+       return  this.showSimpleMessage("Please recharge to create Prescription", "#B22222", "danger")
+     }
      if (this.state.Disease == ""){
          this.setState({ creating: false })
          return this.showSimpleMessage("Please fill Disease", "#dd7030",)

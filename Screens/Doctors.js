@@ -5,11 +5,12 @@ import settings from '../AppSettings';
 import { connect } from 'react-redux';
 import { selectTheme } from '../actions';
 import { AntDesign } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import png from '../assets/marker/stethoscope.png'
 import { WebView } from 'react-native-webview';
 import HttpsClient from '../api/HttpsClient';
-
+import mapstyle from '../map.json';
 const { height, width } = Dimensions.get("window");
 const themeColor = settings.themeColor;
 const fontFamily =settings.fontFamily;
@@ -19,7 +20,8 @@ const url =settings.url
     super(props);
     this.state = {
       location:null,
-      markers:[]
+      markers:[],
+      load:false
     };
   }
    getMarkers =async(lat,long)=>{
@@ -30,10 +32,10 @@ const url =settings.url
             all:"true"
           }
          const data =await HttpsClient.post(api,sendData)
-     console.log(data.data.clinics,"uuuoiuio")
+     console.log(api,"uuuoiuio")
         if(data.type=="success"){
-         
-          this.setState({ markers: data.data.clinics})
+          
+          this.setState({ markers: data.data.clinics,load:false})
         }
    }
    getLocation =async()=>{
@@ -60,6 +62,9 @@ const url =settings.url
    }
     return  this.props.navigation.navigate('ViewClinic', { item })
  }
+   changeRegion=(region)=>{
+     this.getMarkers(region.latitude, region.longitude)
+   }
   render() {
     const {location} =this.state
    console.log(this.state.ma)
@@ -70,11 +75,18 @@ const url =settings.url
         <View style={styles.container}>
             <StatusBar backgroundColor={themeColor} />
          {location?<MapView 
+              customMapStyle={mapstyle}
                provider ={PROVIDER_GOOGLE}
                style={styles.map} 
                region={this.state?.location}
-     
+       
+              // onRegionChange={(region)=>{console.log(region)}}
+              // onRegionChangeComplete={(region) => { this.changeRegion(region)}}
             >
+              <Marker 
+                coordinate={{ latitude: this.state.location.latitude, longitude:this.state.location.longitude }}
+              
+              />
               {this.state.markers.length>0&&
                 this.state.markers.map((item,index)=>{
                      let dp =null
@@ -84,7 +96,7 @@ const url =settings.url
                   }
                     return(
                       <Marker
-                      style={{height:100}}
+                         style={{height:100}}
                          key={index}
                         coordinate={{ latitude: Number(item?.lat), longitude: Number(item?.long,)  }}
                         image={require('../assets/marker/custommarker.png')}
@@ -144,6 +156,19 @@ const url =settings.url
                  </View>
                  
             </TouchableOpacity>
+            <View 
+              style={{ position: "absolute", bottom: 150, right: 30 }}
+            >
+              {!this.state.load?<TouchableOpacity 
+                onPress={() => {
+                  this.setState({ load: true })
+                  this.getLocation()
+                }}
+              >
+                <MaterialIcons name="my-location" size={30} color="black" />
+              </TouchableOpacity>:<ActivityIndicator color={themeColor} size="large"/>}
+            </View>
+           
         </View>
         </SafeAreaView>
       </>

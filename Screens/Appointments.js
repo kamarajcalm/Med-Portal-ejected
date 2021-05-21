@@ -15,8 +15,10 @@ const initialLayout = { width: Dimensions.get('window').width };
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import moment from 'moment';
 import HttpsClient from '../api/HttpsClient';
-import { FontAwesome, FontAwesome5, Octicons} from '@expo/vector-icons';
+import { FontAwesome, FontAwesome5, Octicons,Fontisto} from '@expo/vector-icons';
 import FlashMessage, { showMessage, hideMessage } from "react-native-flash-message";
+const Date1 = new Date()
+const today = moment(Date1).format("YYYY-MM-DD")
 const url = settings.url
 class Appointments extends Component {
     constructor(props) {
@@ -70,9 +72,9 @@ class Appointments extends Component {
         else{
             api = `${url}/api/prescription/appointments/?requesteduser=${this.props.user.id}&pending=true&accepted=true`
         }
-        console.log(api)
+        console.log(api,"zzz")
         const data =await HttpsClient.get(api,"lll")
-        console.log(data)
+  
         if(data.type =="success"){
             let Appointments= this.state.Appointments
 
@@ -280,70 +282,57 @@ class Appointments extends Component {
                         onPress={() => { this.viewAppointments(item)}}
                       style={{
                             marginTop: 10,
-                            minHeight: height * 0.1,
+                            minHeight: height * 0.2,
                             backgroundColor: "#eee",
                             marginHorizontal: 10,
                             borderRadius: 10,
                       }}
                     >
-
-                 
-                    <View
-              
-                        style={{
-                           
-                            flexDirection: "row"
-                        }}
-
-                    >
-                       
-                        <View style={{ flex: 0.6,justifyContent:"center"}}>
-                            <View style={{flexDirection:"row",margin:5,flex:0.5}}>
-
-                                    <Text style={[styles.text,{fontWeight:"bold"}]}>Clinic   :</Text>
-                                    <Text style={[styles.text,{marginLeft:10}]}>{item.clinicname}</Text>
-                            </View>
-                            <View style={{ flexDirection: "row", margin: 5 ,flex:0.5}}>
-                                    <Text style={[styles.text,{fontWeight:"bold"}]}>Reason:</Text>
-                                    <View style={{justifyContent:'center',flex:1}}>
-                                        <Text style={[styles.text, { marginLeft: 10}]}>{item.reason}</Text>
-
+                     <View style={{flexDirection:"row",flex:1,}}>
+                          <View style={{flex:0.3,alignItems:"center",justifyContent:"center"}}> 
+                              <Image
+                                style={{height:'80%',width:"95%",borderRadius:5}}
+                                source ={{uri:dp}}
+                                resizeMode ={"cover"}
+                              />
+                          </View>
+                          <View style={{flex:0.7,paddingLeft:10}}>
+                              <View style={{marginTop:20}}>
+                                    <Text style={[styles.text,{color:"#000",fontWeight:"bold"}]}>{item.clinicname}</Text>
+                              </View>
+                                <View style={{ marginTop: 10,flexDirection:"row" }}>
+                                    <Text style={[styles.text, { color: "#000", }]}>Reason :</Text>
+                                    <Text style={[styles.text, { color: "#000",  }]}> {item.reason}</Text>
+                                </View>
+                                <View style={{ flexDirection: "row", marginTop: 10,}}>
+                                    <Text style={[styles.text, { color: "#000", }]}>{item.requesteddate}</Text>
+                                    <Text style={[styles.text, { color: "#000", }]}>|</Text>
+                                    <Text style={[styles.text, { color: "#000", }]}>{item.requestedtime}</Text>
+                                </View>
+                                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 10,}}>
+                                    <View style={{flex:0.7}}>
+                                        <Text style={[styles.text,{color:this.validateColor(item.status)}]}>{item.status}</Text>
                                     </View>
-                                  
-                            </View>
-                        </View>
-
-                        {/* TABS */}
-
-                        <View style={{ flex: 0.4, flexDirection: "row", alignItems: "center", justifyContent: 'center',}}>
-                            <View style={{ alignItems: 'center', justifyContent: "center" }}>
-                                <View style={{alignItems:"center",justifyContent:"center"}}>
-                                        <Text style={[styles.text]}>Status:</Text>
+                                    <View style={{flexDirection:'row',justifyContent:"space-around",alignItems:"center",flex:0.3}}>
+                                         <TouchableOpacity style={[styles.boxWithShadow,{backgroundColor:"#fff",height:30,width:30,borderRadius:15,alignItems:"center",justifyContent:'center'}]}
+                                          onPress ={()=>{}}
+                                         >
+                                            <Ionicons name="md-chatbox" size={20} color="#006DFF" />
+                                         </TouchableOpacity>
+                                        <TouchableOpacity style={[styles.boxWithShadow, { backgroundColor: "#fff", height: 30, width: 30, borderRadius: 15, alignItems: "center", justifyContent: 'center' }]}
+                                            onPress={() => { }}
+                                        >
+                                            <FontAwesome5 name="directions" size={20} color="#006DFF" />
+                                        </TouchableOpacity>
+                                    </View>
                                 </View>
-                                <View style={{alignItems:"center",justifyContent:"center"}}>
-                                        <Text style={[styles.text, { color: this.validateColor(item.status) }]}>{item.status}</Text>
+                          </View>
+                     </View>
+               
+                       
+                   
 
-                                </View>
-                            </View>
-
-                        </View>
-
-                    </View>
-                        <View style={{
-                            margin: 10,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            flexDirection: "row"
-                        }}>
-                           
-                            <View style={{ flex: 1 }}>
-                                {
-                                    this.validateInformation(item)
-                                }
-                            </View>
-
-
-                        </View>
+                
                     </TouchableOpacity>
                 )
                 }else{
@@ -473,72 +462,57 @@ class Appointments extends Component {
                                 onPress={() => { this.viewAppointments(item) }}
                                 style={{
                                     marginTop: 10,
-                                    minHeight: height * 0.1,
+                                    minHeight: height * 0.2,
                                     backgroundColor: "#eee",
                                     marginHorizontal: 10,
                                     borderRadius: 10,
                                 }}
-
                             >
-                               
-
-                                <View
-
-                                    style={{
-
-                                        flexDirection: "row"
-                                    }}
-
-                                >
-
-                                    <View style={{ flex: 0.6, justifyContent: "center" }}>
-                                        <View style={{ flexDirection: "row", margin: 5, flex: 0.5 }}>
-
-                                            <Text style={[styles.text, { fontWeight: "bold" }]}>Clinic   :</Text>
-                                            <Text style={[styles.text, { marginLeft: 10 }]}>{item.clinicname}</Text>
-                                        </View>
-                                        <View style={{ flexDirection: "row", margin: 5, flex: 0.5 }}>
-                                            <Text style={[styles.text, { fontWeight: "bold" }]}>Reason:</Text>
-                                            <View style={{ justifyContent: 'center', flex: 1 }}>
-                                                <Text style={[styles.text, { marginLeft: 10 }]}>{item.reason}</Text>
-
-                                            </View>
-
-                                        </View>
+                                <View style={{ flexDirection: "row", flex: 1, }}>
+                                    <View style={{ flex: 0.3, alignItems: "center", justifyContent: "center" }}>
+                                        <Image
+                                            style={{ height: '80%', width: "95%", borderRadius: 5 }}
+                                            source={{ uri: dp }}
+                                            resizeMode={"cover"}
+                                        />
                                     </View>
-
-                                    {/* TABS */}
-
-                                    <View style={{ flex: 0.4, flexDirection: "row", alignItems: "center", justifyContent: 'center', }}>
-                                        <View style={{ alignItems: 'center', justifyContent: "center" }}>
-                                            <View style={{ alignItems: "center", justifyContent: "center" }}>
-                                                <Text style={[styles.text]}>Status:</Text>
-                                            </View>
-                                            <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                    <View style={{ flex: 0.7, paddingLeft: 10 }}>
+                                        <View style={{ marginTop: 20 }}>
+                                            <Text style={[styles.text, { color: "#000", fontWeight: "bold" }]}>{item.clinicname}</Text>
+                                        </View>
+                                        <View style={{ marginTop: 10, flexDirection: "row" }}>
+                                            <Text style={[styles.text, { color: "#000", }]}>Reason :</Text>
+                                            <Text style={[styles.text, { color: "#000", }]}> {item.reason}</Text>
+                                        </View>
+                                        <View style={{ flexDirection: "row", marginTop: 10, }}>
+                                            <Text style={[styles.text, { color: "#000", }]}>{item.requesteddate}</Text>
+                                            <Text style={[styles.text, { color: "#000", }]}>|</Text>
+                                            <Text style={[styles.text, { color: "#000", }]}>{item.requestedtime}</Text>
+                                        </View>
+                                        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 10, }}>
+                                            <View style={{ flex: 0.7 }}>
                                                 <Text style={[styles.text, { color: this.validateColor(item.status) }]}>{item.status}</Text>
-
+                                            </View>
+                                            <View style={{ flexDirection: 'row', justifyContent: "space-around", alignItems: "center", flex: 0.3 }}>
+                                                <TouchableOpacity style={[styles.boxWithShadow, { backgroundColor: "#fff", height: 30, width: 30, borderRadius: 15, alignItems: "center", justifyContent: 'center' }]}
+                                                    onPress={() => { }}
+                                                >
+                                                    <Ionicons name="md-chatbox" size={20} color="#006DFF" />
+                                                </TouchableOpacity>
+                                                <TouchableOpacity style={[styles.boxWithShadow, { backgroundColor: "#fff", height: 30, width: 30, borderRadius: 15, alignItems: "center", justifyContent: 'center' }]}
+                                                    onPress={() => { }}
+                                                >
+                                                    <FontAwesome5 name="directions" size={20} color="#006DFF" />
+                                                </TouchableOpacity>
                                             </View>
                                         </View>
-
                                     </View>
-
                                 </View>
 
-                                <View style={{
-                                    margin: 10,
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    flexDirection: "row"
-                                }}>
-
-                                    <View style={{ flex: 1 }}>
-                                        {
-                                            this.validateInformation(item)
-                                        }
-                                    </View>
 
 
-                                </View>
+
+
                             </TouchableOpacity>
 
                         )
@@ -824,7 +798,28 @@ class Appointments extends Component {
                             <View style={{ flex: 0.6, alignItems: "center", justifyContent: "center" }}>
                                 <Text style={[styles.text, { color: '#fff', marginLeft: 20, fontWeight: 'bold' ,fontSize:25}]}>Appointments</Text>
                             </View>
-                           
+                   {         <View style={{flex:0.4,alignItems:"center",justifyContent:"center"}}>
+                                <View style={{ flexDirection: "row" }}>
+                                    <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                        <Text style={[styles.text, { color: "#fff" }]}>{today}</Text>
+                                    </View>
+
+                                    <TouchableOpacity
+                                        style={{ marginLeft: 20 }}
+                                        onPress={() => { this.setState({show:true})}}
+                                    >
+                                        <Fontisto name="date" size={24} color={"#fff"} />
+                                    </TouchableOpacity>
+
+
+                                    <DateTimePickerModal
+                                        isVisible={this.state.show}
+                                        mode="date"
+                                        onConfirm={this.handleConfirm}
+                                        onCancel={this.hideDatePicker}
+                                    />
+                                </View>
+                            </View>}
                         </View>
                         <TabView
                             style={{ backgroundColor: "#ffffff" }}
@@ -900,6 +895,13 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "#fff"
     },
+    boxWithShadow: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 5
+    }
 })
 const mapStateToProps = (state) => {
 

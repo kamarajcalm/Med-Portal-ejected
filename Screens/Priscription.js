@@ -24,7 +24,7 @@ import settings from '../AppSettings';
 import { Fontisto } from '@expo/vector-icons';
 import moment from 'moment';
 import { connect } from 'react-redux';
-import { selectTheme, selectClinic } from '../actions';
+import { selectTheme, selectClinic ,selectWorkingClinics,selectOwnedClinics} from '../actions';
 import authAxios from '../api/authAxios';
 import HttpsClient from "../api/HttpsClient";
 import Modal from 'react-native-modal';
@@ -52,7 +52,8 @@ const Priscription = (props) => {
     const[check,setChecked] =useState(false)
     const [showList,setShowList] =useState(true)
     const [today, setToday] = useState(today1)
-    const stateRef = useRef("");
+    const stateRef = useRef("")
+    const clinicRef =useRef("")
     const [mode, setMode] = useState("date")
     const [date, setDate] = useState(new Date())
     const [show, setShow] = useState(false)
@@ -67,6 +68,7 @@ const Priscription = (props) => {
     const [isFetching, setIsFetching] =useState(false)
     const [search,setSearch] =useState(false)
     const [button,setButton] =useState(true)
+    const [expiryModal, setExpiryModal] =useState(false)
 
     //         search:false,
 
@@ -132,21 +134,26 @@ const Priscription = (props) => {
         const api = `${url}/api/prescription/getDoctorClinics/?doctor=${props.user.id}`
         const data = await HttpsClient.get(api)
         console.log(api,"clinic api")
-       
         if (data.type == "success") {
+            props.selectWorkingClinics(data.data.workingclinics)
+            props.selectOwnedClinics(data.data.ownedclinics)
             setClinics(data.data.workingclinics)
             let activeClinic = data.data.workingclinics.filter((i) => {
                 return i.active
             })
             console.log(activeClinic[0],"accc")
             props.selectClinic(activeClinic[0] || data.data.workingclinics[0])
-
+            if (!props?.clinic?.validtill?.available){
+                 setExpiryModal(true)
+            }else{
+                 setExpiryModal(false)
+            }
         }
       
     }
   const  getPrescription = async () => {
     
-      let api = `${url}/api/prescription/prescriptions/?doctor=${props.user.id}&date=${stateRef.current}`
+      let api = `${url}/api/prescription/prescriptions/?doctor=${props.user.id}&date=${stateRef.current}&clinic=${clinicRef.current.clinicpk}`
         console.log(api,"prescription api")
         let data = await HttpsClient.get(api)
 //   console.log(data.data)
@@ -161,7 +168,7 @@ const Priscription = (props) => {
     const findUser =()=>{
         if (props.user.profile.occupation == "Doctor") {
             getClinics()
-            getPrescription()
+         
             setIsDoctor(true)
         } else if (props.user.profile.occupation == "ClinicRecoptionist") {
            getClinicPrescription()
@@ -195,6 +202,15 @@ const Priscription = (props) => {
         }
 
     }
+    useEffect(()=>{
+        clinicRef.current = props.clinic
+        getPrescription()
+        if (props.clinic?.validtill?.available==false) {
+            setExpiryModal(true)
+        } else {
+            setExpiryModal(false)
+        }
+    },[props.clinic])
  const   setActiveClinic = async (item) => {
         const api = `${url}/api/prescription/clinicDoctors/${item.pk}/`
         let sendData = {
@@ -205,9 +221,9 @@ const Priscription = (props) => {
 
             props.selectClinic(item)
             setShowModal(false)
-       
+            
         }
-
+       
     }
     useEffect(()=>{
         stateRef.current =today1
@@ -217,6 +233,7 @@ const Priscription = (props) => {
         
             if (props.user.profile.occupation == "Doctor"){
                 getPrescription()
+       
             }
       
        
@@ -279,9 +296,12 @@ const _keyboardDidShow =()=>{
         if (isDoctor || isReceptionist) {
             return (
 
-                <View style={{ height: height * 0.05, alignItems: "center", justifyContent: "space-around", flexDirection: "row", }}>
+                <View style={{ alignItems: "center", justifyContent:"center" ,width:width*0.32,}}>
                     <View style={{ flexDirection: "row" }}>
-                        <Text style={[styles.text, { color: "#fff" }]}>{today}</Text>
+                        <View style={{alignItems:"center",justifyContent:"center"}}>
+                            <Text style={[styles.text, { color: "#fff" }]}>{today}</Text>
+                        </View>
+                        
                         <TouchableOpacity
                             style={{ marginLeft: 20 }}
                             onPress={()=>{setShow(true)}}
@@ -297,9 +317,7 @@ const _keyboardDidShow =()=>{
                             onCancel={hideDatePicker}
                         />
                     </View>
-                    <View>
-                        <Text style={[styles.text,{color:"#fff"}]}> Total:{prescriptions?.length}</Text>
-                    </View>
+              
                 </View>
 
             )
@@ -313,40 +331,37 @@ const _keyboardDidShow =()=>{
    if(isDoctor||isReceptionist){
        return (
            <View>
-               <View style={{ height: headerHeight / 2, }}>
-                   <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginHorizontal: 20, marginTop: 10 }}>
+               <View style={{ height: headerHeight / 2, flexDirection:"row",flex:1}}>
+                   <TouchableOpacity style={{ flexDirection: "row", alignItems: "center",width:width*0.68,justifyContent:"space-around"}}
+                    onPress ={()=>{setShowModal(true)}}
+                   >
                        <View>
-                           <Text style={[styles.text, { fontSize: 25, color: "#fff", fontWeight: "bold" }]}>{props?.clinic?.name}</Text>
+                           <Text style={[styles.text, { fontSize: 25, color: "#fff", fontWeight: "bold",marginLeft:5 }]} numberOfLines={1}>{props?.clinic?.name}</Text>
                        </View>
-                       <TouchableOpacity
-                           onPress={() => { setShowModal(true) }}
-                           style={{ flexDirection: "row" }}
-
-                       >
-                           {isDoctor && <View style={{ alignItems: "center", justifyContent: "center" }}>
-                               <Text style={[styles.text, { color: "#fff", marginRight: 5 }]}>Edit</Text>
-                           </View>}
-                           {isDoctor && <Feather name="edit" size={24} color="#fff" />}
-                       </TouchableOpacity>
-                   </View>
+                    
+                        <View style={{alignItems:"center",justifyContent:"center"}}>
+                               {isDoctor && <Entypo name="chevron-small-down" size={30} color="#fff" />}
+                        </View>
+                           
+              
+                   </TouchableOpacity>
                    {
                        renderFilter()
                    }
                </View>
 
                <View style={{ marginHorizontal: 20, height: headerHeight / 3, alignItems: 'center', justifyContent: "center", marginBottom: 5 }}>
-                   <View style={{ flexDirection: 'row', borderRadius: 10, backgroundColor: "#eee", width: "100%", height: height * 0.05, }}>
+                   <TouchableOpacity style={{ flexDirection: 'row', borderRadius: 10, backgroundColor: "#eee", width: "100%", height: height * 0.05, }}
+                       onPress={() => { props.navigation.navigate('SearchPatient')}}
+                   >
                        <View style={{ alignItems: 'center', justifyContent: "center", marginLeft: 5, flex: 0.1 }}>
                            <EvilIcons name="search" size={24} color="black" />
                        </View>
-                       <TextInput
-
-                           selectionColor={themeColor}
-                           style={{ height: "90%", flex: 0.8, backgroundColor: "#eee", paddingLeft: 10, marginTop: 3 }}
-                           placeholder="search"
-                           onChangeText={(text) => { searchPriscriptions(text) }}
-                       />
-                   </View>
+                       <View style={{alignItems:"center",justifyContent:"center"}}>
+                           <Text style={[styles.text]}>Search Patient</Text>
+                       </View>
+                     
+                   </TouchableOpacity>
 
                </View>
            </View>
@@ -489,16 +504,18 @@ const _keyboardDidShow =()=>{
          getPateintPrescription()
         }
     }
-   
+//    console.log(props.ownedClinics,"ooooo")
     return (
         <SafeAreaView style={styles.container}>
-            <StatusBar backgroundColor="#1c1c1c" style="light" />
+      
             <Animated.View style={[styles.header, { transform: [{ translateY }] }]}>
                {
                    validateHeaders()
                }
+              
             </Animated.View>
             <Animated.View style={{flex:1,}}>
+                <StatusBar backgroundColor={themeColor} style="light" />
                 <Animated.FlatList
                  
                      refreshControl ={
@@ -568,11 +585,14 @@ const _keyboardDidShow =()=>{
                             keyExtractor={(item, index) => index.toString()}
                             renderItem={({ item, index }) => {
                                 return (
-                                    <TouchableOpacity style={{ flexDirection: "row", marginTop: 20, alignItems: 'center', justifyContent: "space-around", width }}
+                                    <TouchableOpacity style={{ flexDirection: "row", marginTop: 20, alignItems: 'center', justifyContent: "space-around", width:"100%" ,}}
                                         onPress={() => { setActiveClinic(item) }}
                                     >
-                                        <Text style={[styles.text]}>{item.name}</Text>
-                                        <View >
+                                        <View style={{width:"80%",alignItems:"center",justifyContent:'center',}}>
+                                            <Text style={[styles.text]}>{item.name}</Text>
+                                        </View>
+                                       
+                                        <View style={{width:"20%",alignItems:"center",justifyContent:"center",}}>
                                             <FontAwesome name="dot-circle-o" size={24} color={props.clinic == item ? themeColor : "gray"} />
 
                                         </View>
@@ -581,6 +601,32 @@ const _keyboardDidShow =()=>{
                             }}
                         />
 
+                    </View>
+                </View>
+            </Modal>
+            <Modal
+                statusBarTranslucent={true}
+                deviceHeight={screenHeight}
+                animationIn="slideInUp"
+                animationOut="slideOutDown"
+                isVisible={expiryModal}
+                onBackdropPress={()=>{setExpiryModal(false)}}
+            >
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                    <View style={{ height: height * 0.3, width: width * 0.9, backgroundColor: "#fff", borderRadius: 20, alignItems: "center", justifyContent: "space-around" }}>
+                        <View>
+                            <Text style={[styles.text, { fontWeight: "bold", color: themeColor, fontSize: 20 }]}>Your Subscription has been expired!</Text>
+                            <Text style={[styles.text, { fontWeight: "bold", color: themeColor, fontSize: 20 ,textAlign:"center"}]}>Please Recharge to continue</Text>
+                        </View>
+                       <TouchableOpacity
+                            onPress={() => {
+                                setExpiryModal(false)
+                              return  props.navigation.navigate('PaymentPage')
+                            }}
+                         style={{height:height*0.05,width:width*0.4,alignItems:"center",justifyContent:'center',backgroundColor:themeColor,borderRadius:5}}
+                       >
+                            <Text style={[styles.text,{color:"#fff"}]}>Recharge</Text>
+                       </TouchableOpacity>
                     </View>
                 </View>
             </Modal>
@@ -639,12 +685,12 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = (state) => {
-
     return {
         theme: state.selectedTheme,
         user: state.selectedUser,
-        clinic: state.selectedClinic
-
+        clinic: state.selectedClinic,
+        ownedClinics: state.selectedOwnedClinics,
+        workingClinics: state.selectedWorkingClinics,
     }
 }
-export default connect(mapStateToProps, { selectTheme, selectClinic })(Priscription)
+export default connect(mapStateToProps, { selectTheme, selectClinic, selectWorkingClinics, selectOwnedClinics })(Priscription)

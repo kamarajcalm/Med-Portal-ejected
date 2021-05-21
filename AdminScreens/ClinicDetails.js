@@ -4,6 +4,7 @@ import settings from '../AppSettings';
 import { connect } from 'react-redux';
 import { selectTheme } from '../actions';
 const { height, width } = Dimensions.get("window");
+const deviceHeight =Dimensions.get('screen').height
 import { Ionicons } from '@expo/vector-icons';
 import authAxios from '../api/authAxios';
 const fontFamily = settings.fontFamily;
@@ -340,7 +341,7 @@ class ClinicDetails extends Component {
                                         return (
                                             <TouchableOpacity style={{ flexDirection: "row", marginTop:15 }}
                                               onPress={()=>{
-                                                  this.props.navigation.navigate('ViewDoctor',{item})
+                                                  this.props.navigation.navigate('ViewDoctor',{item,owner:true})
                                               }}
                                             >
                                                 <View style={{ alignItems: "center", justifyContent: "center",flex:0.2 }}>
@@ -394,6 +395,7 @@ class ClinicDetails extends Component {
                        </ScrollView>
                         <View>
                             <Modal
+                                deviceHeight={deviceHeight}
                                 animationIn="slideInUp"
                                 animationOut="slideOutDown"
                                 isVisible={this.state.showModal}
@@ -420,6 +422,7 @@ class ClinicDetails extends Component {
                                 </View>
                             </Modal>
                             <Modal
+                                 deviceHeight={deviceHeight}
                                 animationIn="slideInUp"
                                 animationOut="slideOutDown"
                                 isVisible={this.state.showModal2}

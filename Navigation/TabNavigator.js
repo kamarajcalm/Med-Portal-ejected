@@ -82,6 +82,9 @@ class TabNavigator extends Component {
         if (routeName == "SearchMedicines") {
             return false
         }
+        if (routeName == "Chat") {
+            return false
+        }
         return true
     }
     getTabBarVisibility3 = (route) => {

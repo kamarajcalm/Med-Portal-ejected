@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StatusBar, Dimensions, Image, StyleSheet, TouchableOpacity, AsyncStorage, SafeAreaView, ScrollView } from 'react-native';
+import { View, Text, StatusBar, Dimensions, Image, StyleSheet, TouchableOpacity, AsyncStorage, SafeAreaView, ScrollView, ActivityIndicator } from 'react-native';
 import settings from '../AppSettings';
 import axios from 'axios';
 import Modal from 'react-native-modal';
@@ -14,10 +14,10 @@ import { NavigationContainer, CommonActions } from '@react-navigation/native';
 import * as  ImagePicker from 'expo-image-picker';
 import { TextInput } from 'react-native-gesture-handler';
 import * as Location from 'expo-location';
-
 import moment from 'moment';
 import HttpsClient from '../api/HttpsClient';
 import authAxios from '../api/authAxios';
+import FlashMessage, { showMessage, hideMessage } from "react-native-flash-message";
 const url = settings.url
 class CreateReceptionist extends Component {
     constructor(props) {
@@ -85,7 +85,7 @@ class CreateReceptionist extends Component {
             return this.showSimpleMessage("Please fill City", "#dd7030",)
         }
        
-
+        this.setState({load:true})
         let sendData = {
             name: this.state.Name,
             displayPicture: this.state.image,
@@ -111,12 +111,14 @@ class CreateReceptionist extends Component {
         let post = await HttpsClient.post(api, sendData)
         console.log(post, "hhh")
         if (post.type == "success") {
+            this.setState({ load: false })
             this.showSimpleMessage("Created SuccessFully", "#00A300", "success")
             setTimeout(() => {
                 this.props.navigation.goBack();
             }, 2000)
 
         } else {
+            this.setState({ load: false })
             this.showSimpleMessage("Try again", "#B22222", "danger")
         }
     }
@@ -246,6 +248,7 @@ class CreateReceptionist extends Component {
 
 
                             <ScrollView style={{ margin: 20 }}
+                                keyboardShouldPersistTaps={"handled"}
                                 showsVerticalScrollIndicator={false}
                             >
                                 <View style={{ height: height * 0.12, alignItems: "center", justifyContent: 'center' }}>
@@ -384,11 +387,15 @@ class CreateReceptionist extends Component {
                               
 
                                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                                    <TouchableOpacity style={{ width: width * 0.4, height: height * 0.05, borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: themeColor }}
-                                        onPress={() => { this.CreateReceptionist() }}
+                                    {!this.state.load?<TouchableOpacity style={{ width: width * 0.4, height: height * 0.05, borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: themeColor }}
+                                        onPress={() => { 
+                                            this.CreateReceptionist() 
+                                        }}
                                     >
                                         <Text style={[styles.text, { color: "#fff" }]}>Create</Text>
-                                    </TouchableOpacity>
+                                    </TouchableOpacity>:
+                                     <ActivityIndicator  color={themeColor} size="large"/>
+                                    }
                                 </View>
 
                             </ScrollView>

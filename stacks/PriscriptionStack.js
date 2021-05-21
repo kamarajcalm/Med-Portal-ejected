@@ -8,12 +8,16 @@ import SearchMedicines from '../Screens/SearchMedicines';
 import LoginScreen from '../login/OnboardingScreen';
 import ProfileView from '../Screens/ProfileView';
 import PrescriptionView from '../Screens/PrescriptionView';
+import SearchPatient from '../Screens/SearchPatient';
+import ListPatientPriscription from '../Screens/ListPatientPriscription';
+
 
 const Stack = createStackNavigator();
 export default class PriscriptionStack extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            
         };
     }
 
@@ -27,6 +31,8 @@ export default class PriscriptionStack extends Component {
                 <Stack.Screen name="SearchMedicines" component={SearchMedicines} options={{ headerShown: false }} />
                 <Stack.Screen name="ProfileView" component={ProfileView} options={{ headerShown: false }} />
                 <Stack.Screen name="PrescriptionView" component={PrescriptionView} options={{ headerShown: false }} />
+                <Stack.Screen name="SearchPatient" component={SearchPatient} options={{ headerShown: false }} />
+                <Stack.Screen name="ListPatientPriscription" component={ListPatientPriscription} options={{ headerShown: false }} />
             </Stack.Navigator>
         );
     }

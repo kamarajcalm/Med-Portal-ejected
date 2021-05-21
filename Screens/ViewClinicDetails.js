@@ -19,7 +19,8 @@ import Toast from 'react-native-simple-toast';
 class ViewClinicDetails extends Component {
     constructor(props) {
         let item = props.route.params.item
-        console.log(item, "cccc")
+        let owner = props?.route?.params?.owner||false
+     
         super(props);
         this.state = {
             item:null,
@@ -31,7 +32,8 @@ class ViewClinicDetails extends Component {
             deleteReceptionIndex: null,
             deleteReceptionist: null,
             showAll: false,
-            pk:item
+            pk:item,
+            owner
         };
     }
     getReceptionList = async () => {
@@ -84,7 +86,7 @@ class ViewClinicDetails extends Component {
     getClinicDetails =async()=>{
         let api = `${url}/api/prescription/clinics/${this.state.pk.clinicpk}/`
         const data =await HttpsClient.get(api)
-        console.log(data,"JKLJLJ")
+        console.log(data,"JK")
         if(data.type =="success"){
             this.setState({item:data.data})
         }
@@ -142,12 +144,12 @@ class ViewClinicDetails extends Component {
                             <View style={{ flex: 0.6, alignItems: "center", justifyContent: "center" }}>
                                 <Text style={[styles.text, { color: '#fff', fontWeight: 'bold', fontSize: 18 }]}>{this.state?.item?.companyName}</Text>
                             </View>
-                            <TouchableOpacity style={{ flex: 0.2, flexDirection: "row", alignItems: "center", justifyContent: 'center' }}
+                           {this.state.owner&&<TouchableOpacity style={{ flex: 0.2, flexDirection: "row", alignItems: "center", justifyContent: 'center' }}
                                 onPress={() => { this.props.navigation.navigate('EditClinicDetails', { clinic: this?.state?.item }) }}
                             >
                                 <Entypo name="back-in-time" size={24} color="#fff" />
                                 <Text style={[styles.text, { marginLeft: 10, color: "#fff" }]}>Edit </Text>
-                            </TouchableOpacity>
+                            </TouchableOpacity>}
                         </View>
 
 
@@ -330,11 +332,11 @@ class ViewClinicDetails extends Component {
                                                 <View style={{ alignItems: 'center', justifyContent: "center", flex: 0.33 }}>
                                                     <Text>{item.user.first_name}</Text>
                                                 </View>
-                                                <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', flex: 0.33 }}
+                                             {this.state.owner&&<TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', flex: 0.33 }}
                                                     onPress={() => { this.setState({ showModal2: true, deleteReceptionist: item, deleteReceptionIndex: index }) }}
                                                 >
                                                     <Entypo name="circle-with-cross" size={24} color={themeColor} />
-                                                </TouchableOpacity>
+                                                </TouchableOpacity>}
                                             </View>
                                         )
                                     }}
@@ -349,7 +351,7 @@ class ViewClinicDetails extends Component {
                                         return (
                                             <TouchableOpacity style={{ flexDirection: "row", marginTop: 15 }}
                                                 onPress={() => {
-                                                    this.props.navigation.navigate('ViewDoctor', { item })
+                                                    this.props.navigation.navigate('ViewDoctor', { item ,owner:this.state.owner})
                                                 }}
                                             >
                                                 <View style={{ alignItems: "center", justifyContent: "center", flex: 0.2 }}>
@@ -372,17 +374,17 @@ class ViewClinicDetails extends Component {
 
                                                 </View>
 
-                                                <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', flex: 0.1 }}
+                                               {this.state.owner&& <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', flex: 0.1 }}
                                                     onPress={() => { this.setState({ showModal: true, deleteDoctor: item, deleteDocorIndex: index }) }}
                                                 >
                                                     <Entypo name="circle-with-cross" size={24} color={themeColor} />
-                                                </TouchableOpacity>
+                                                </TouchableOpacity>}
                                             </TouchableOpacity>
                                         )
                                     }}
                                 />
                             </View>
-                            <View style={{ flexDirection: "row", alignItems: 'center', justifyContent: 'space-around', height: height * 0.2 }}>
+                           {this.state.owner&& <View style={{ flexDirection: "row", alignItems: 'center', justifyContent: 'space-around', height: height * 0.2 }}>
 
 
                                 <View style={{ flexDirection: "row", alignItems: 'center', justifyContent: "center", marginTop: 20 }}>
@@ -399,7 +401,7 @@ class ViewClinicDetails extends Component {
                                         <Text style={[styles.text, { color: "#fff" }]}>Add Doctors</Text>
                                     </TouchableOpacity>
                                 </View>
-                            </View>
+                            </View>}
                         </ScrollView>
                         <View>
                             <Modal

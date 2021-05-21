@@ -13,9 +13,11 @@ const themeColor = settings.themeColor;
 class ViewDoctor extends Component {
     constructor(props) {
         let item =props.route.params.item
+        let owner =props.route.params.owner
         super(props);
         this.state = {
-            item
+            item,
+            owner
         };
     }
     componentDidMount() {
@@ -56,12 +58,12 @@ class ViewDoctor extends Component {
                             <View style={{ flex: 0.6, alignItems: "center", justifyContent: "center" }}>
                                 <Text style={[styles.text, { color: '#fff', fontWeight: 'bold', fontSize: 18 }]}>{this.state.item?.doctor?.profile?.name}</Text>
                             </View>
-                            <TouchableOpacity style={{ flex: 0.2, flexDirection:"row",alignItems:"center",justifyContent:'center' }}
+                           {this.state.owner&&<TouchableOpacity style={{ flex: 0.2, flexDirection:"row",alignItems:"center",justifyContent:'center' }}
                                 onPress={() => { this.props.navigation.navigate('EditDoctorTimings',{clinic:this.state.item})}}
                             >
                                 <Entypo name="back-in-time" size={24} color="#fff" />
                                 <Text style={[styles.text, { marginLeft: 10, color: "#fff" }]}>Edit </Text>
-                            </TouchableOpacity>
+                            </TouchableOpacity>}
                   
                         
                         </View>

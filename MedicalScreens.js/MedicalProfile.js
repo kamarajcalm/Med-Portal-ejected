@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { View, Text, StatusBar, Dimensions, TouchableOpacity, StyleSheet, FlatList, Image, SafeAreaView, AsyncStorage, ScrollView } from 'react-native';
+import { View, Text, StatusBar, Dimensions, TouchableOpacity, StyleSheet, FlatList, Image, SafeAreaView, AsyncStorage, ScrollView, ImageBackground} from 'react-native';
 import settings from '../AppSettings';
 import { connect } from 'react-redux';
 import { selectTheme } from '../actions';
 const { height, width } = Dimensions.get("window");
-import { Ionicons, AntDesign ,Entypo} from '@expo/vector-icons';
+import { Ionicons, AntDesign, Entypo, MaterialCommunityIcons} from '@expo/vector-icons';
 import Modal from 'react-native-modal';
 import { NavigationContainer, CommonActions } from '@react-navigation/native';
 const fontFamily = settings.fontFamily;
@@ -43,117 +43,96 @@ class MedicalProfile extends Component {
                 <SafeAreaView style={styles.bottomSafeArea}>
                     <View style={{ flex: 1, backgroundColor: "#fff" }}>
                         <StatusBar backgroundColor={themeColor} />
-                        {/* HEADERS */}
-                        <View style={{ height: height * 0.1, backgroundColor: themeColor, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, justifyContent: "center", flexDirection: "row" }}>
+                        <ImageBackground
+                            blurRadius={1}
+                            style={{ height: height * 0.3, alignItems: "center", }}
+                            source={require('../assets/Doctor.png')}
 
-                            <View style={{ flex: 0.5, alignItems: 'center', justifyContent: "center" }}>
-                                <Text style={[styles.text, { color: "#fff", fontSize: 25, fontWeight: "bold" }]}>Profile</Text>
-                            </View>
-                            <TouchableOpacity style={{ flex: 0.5, marginLeft: 20, alignItems: "center", justifyContent: 'center', flexDirection: "row" }}
-                                onPress={() => { this.setState({ showModal: true }) }}
-                            >
-                                <AntDesign name="logout" size={24} color="#fff" />
-                                <Text style={[styles.text, { marginLeft: 10, color: "#fff" }]}>Log out</Text>
-                            </TouchableOpacity>
-                        </View>
-
-
-              
-                     <View style={{ alignItems: "center", justifyContent: 'center', flexDirection: "row", }}>
-                                <View>
-                                    <View style={{ alignItems: "center", justifyContent: "center", marginTop: 20, flexDirection: "row", marginLeft: 10 }}>
-                                        <Image
-                                            source={{ uri: this.props.user.profile.displayPicture || "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
-                                            style={{ height: 60, width: 60, borderRadius: 30 }}
-                                        />
-                                        <TouchableOpacity style={{}}
-                                            onPress={() => { this.props.navigation.navigate('ProfileEdit') }}
-                                        >
-                                            <Entypo name="edit" size={20} color={themeColor} />
-                                        </TouchableOpacity>
-                                    </View>
-                                    <View style={{ alignItems: 'center', justifyContent: "center", marginTop: 20 }}>
-                                        <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>{this.props.user.first_name}</Text>
-                                    </View>
-                                </View>
-
-                        
-                                 
-                   
-                        </View>
-                        <ScrollView 
-                        
-                          style={{marginTop:10}}
                         >
-                            <View style={{ marginHorizontal: 10 }}>
+                            {/* headers */}
+                            <View style={{ alignSelf: "flex-end", marginRight: 10, marginTop: 10 }}>
+                                <TouchableOpacity style={{ marginLeft: 20, alignItems: "center", justifyContent: 'center', flexDirection: "row" }}
+                                    onPress={() => { this.setState({ showModal: true }) }}
+                                >
 
-                                <View style={{ backgroundColor: "gray", borderRadius: 10, elevation: 5 }}>
-                                    <View style={{ flexDirection: "row", minHeight: height * 0.05, borderBottomColor: "#fff", borderBottomWidth: 0.185 }}
+                                    <MaterialCommunityIcons name="logout" size={30} color="black" />
+                                </TouchableOpacity>
+                            </View>
+                            <View style={{ alignItems: "center", justifyContent: "center", flex: 1 }}>
 
+                                <View style={{ alignItems: "center", justifyContent: "center", flexDirection: "row", marginLeft: 20 }}>
+                                    <Image
+                                        source={{ uri: this.props.user.profile.displayPicture || "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
+                                        style={{ height: 60, width: 60, borderRadius: 30 }}
+                                    />
+                                    <TouchableOpacity style={{}}
+                                        onPress={() => { this.props.navigation.navigate('ProfileEdit') }}
                                     >
-                                        <View style={{ flex: 0.5, justifyContent: "center" }}>
-                                            <Text style={[styles.text, { fontWeight: "bold", color: "#fff", marginLeft: 10 }]}>Age:</Text>
-                                        </View>
-                                        <View style={{ flex: 0.5, alignItems: 'flex-end', marginRight: 10, justifyContent: "center" }}>
-                                            <Text style={[styles.text, { color: "#fff" }]}>90</Text>
-                                        </View>
-
-                                    </View>
-
-                                    <View style={{ flexDirection: "row", minHeight: height * 0.05, borderBottomColor: "#fff", borderBottomWidth: 0.185 }}
-
-                                    >
-                                        <View style={{ flex: 0.5, justifyContent: "center" }}>
-                                            <Text style={[styles.text, { fontWeight: "bold", color: "#fff", marginLeft: 10 }]}>height:</Text>
-                                        </View>
-                                        <View style={{ flex: 0.5, alignItems: 'flex-end', marginRight: 10, justifyContent: "center" }}>
-                                            <Text style={[styles.text, { color: "#fff" }]}>{this.props.user.profile?.height}</Text>
-                                        </View>
-
-
-                                    </View>
-                                    <View style={{ flexDirection: "row", minHeight: height * 0.05, borderBottomColor: "#fff", borderBottomWidth: 0.185 }}
-
-                                    >
-                                        <View style={{ flex: 0.5, justifyContent: "center" }}>
-                                            <Text style={[styles.text, { fontWeight: "bold", color: "#fff", marginLeft: 10 }]}>Weight:</Text>
-                                        </View>
-                                        <View style={{ flex: 0.5, alignItems: 'flex-end', marginRight: 10, justifyContent: "center" }}>
-                                            <Text style={[styles.text, { color: "#fff" }]}>{this.props.user.profile?.weight}</Text>
-                                        </View>
-
-
-                                    </View>
-                                    <View style={{ flexDirection: "row", minHeight: height * 0.05, borderBottomColor: "#fff", borderBottomWidth: 0.185 }}
-
-                                    >
-                                        <View style={{ flex: 0.5, justifyContent: "center" }}>
-                                            <Text style={[styles.text, { fontWeight: "bold", color: "#fff", marginLeft: 10 }]}>Mobile:</Text>
-                                        </View>
-                                        <View style={{ flex: 0.5, alignItems: 'flex-end', marginRight: 10, justifyContent: "center" }}>
-                                            <Text style={[styles.text, { color: "#fff" }]}>{this.props.user.profile.mobile}</Text>
-                                        </View>
-
-
-                                    </View>
-                                    <View style={{ flexDirection: "row", minHeight: height * 0.05, borderBottomColor: "#fff", borderBottomWidth: 0.185 }}
-
-                                    >
-                                        <View style={{ flex: 0.5, justifyContent: "center" }}>
-                                            <Text style={[styles.text, { fontWeight: "bold", color: "#fff", marginLeft: 10 }]}>Blood Group:</Text>
-                                        </View>
-                                        <View style={{ flex: 0.5, alignItems: 'flex-end', marginRight: 10, justifyContent: "center" }}>
-                                            <Text style={[styles.text, { color: "#fff" }]}>{this.props.user.profile?.bloodGroup}</Text>
-                                        </View>
-
-
-                                    </View>
+                                        <Entypo name="edit" size={20} color={themeColor} />
+                                    </TouchableOpacity>
+                                </View>
+                                <View style={{ alignItems: 'center', justifyContent: "center", }}>
+                                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 18, color: "#000" }]}>{this.props.user.first_name}</Text>
+                                </View>
+                                <View style={{ alignItems: 'center', justifyContent: "center", }}>
+                                    <Text style={[styles.text, { fontWeight: "bold", fontSize: 18, color: "gray" }]}>{this.props.user.profile.specialization}</Text>
                                 </View>
                             </View>
-                        </ScrollView>
+
+                        </ImageBackground>
+                        <View style={{ marginHorizontal: 20, elevation: 5, backgroundColor: "#fafafa", borderRadius: 15 }}>
+                            <View style={{ borderWidth: 2, alignSelf: 'center', borderColor: "gray", width: width * 0.3, marginVertical: 10, borderRadius: 10 }}>
+
+                            </View>
+                            <View style={{}}>
+                                <View style={{ margin: 20 }}>
+                                    <View>
+                                        <Text style={[styles.text, { color: "gray" }]}>Personal Info</Text>
+                                    </View>
+                                    <View style={{ flexDirection: "row", marginTop: 15, alignItems: "center", justifyContent: 'space-between' }}>
+                                        <View style={{ flex: 0.6 }}>
+                                            <Text style={[styles.text, { color: "gray" }]}>Age</Text>
+                                            <Text style={[styles.text, { marginTop: 5, color: "#000", }]}>{this.props.user.profile.age}</Text>
+                                        </View>
+                                        <View style={{ flex: 0.4 }}>
+                                            <Text style={[styles.text, { color: "gray" }]}>Blood Group</Text>
+                                            <Text style={[styles.text, { marginTop: 5, color: "#000", }]}>{this.props.user.profile.blood_group}</Text>
+                                        </View>
+                                    </View>
+
+                                    <View style={{ flexDirection: "row", marginTop: 15, alignItems: "center", justifyContent: 'space-between' }}>
+                                        <View style={{ flex: 0.6 }}>
+                                            <Text style={[styles.text, { color: "gray" }]}>Height</Text>
+                                            <Text style={[styles.text, { marginTop: 5, color: "#000", }]}>{this.props.user.profile.height}</Text>
+                                        </View>
+                                        <View style={{ flex: 0.4 }}>
+                                            <Text style={[styles.text, { color: "gray" }]}>Weight</Text>
+                                            <Text style={[styles.text, { marginTop: 5, color: "#000", }]}>{this.props.user.profile.weight}</Text>
+                                        </View>
+                                    </View>
+                                    <View style={{ flexDirection: "row", marginTop: 15, }}>
+                                        <View >
+                                            <Text style={[styles.text, { color: "gray" }]}>Mobile</Text>
+                                            <Text style={[styles.text, { marginTop: 5, color: "#000", }]}>{this.props.user.profile.mobile}</Text>
+                                        </View>
+
+                                    </View>
+                                    <View style={{ flexDirection: "row", marginTop: 15, }}>
+                                        <View >
+                                            <Text style={[styles.text, { color: "gray" }]}>Address</Text>
+                                            <Text style={[styles.text, { marginTop: 5, color: "#000", }]}>{this.props.user.profile.address}</Text>
+                                            <Text style={[styles.text, { marginTop: 5, color: "#000", }]}>{this.props.user.profile.city}-{this.props.user.profile.pincode}</Text>
+                                        </View>
+
+                                    </View>
+
+                                </View>
 
 
 
+                            </View>
+                        </View>
+                        
 
 
                         <View>

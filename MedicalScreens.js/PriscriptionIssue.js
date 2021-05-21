@@ -251,7 +251,11 @@ class PriscriptionIssue extends Component {
                         onBackdropPress={() => { this.setState({ showModal: false }) }}
                     >
                         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                           
                             <View style={{ height: height * 0.3, width: width * 0.9, backgroundColor: "#fff", borderRadius: 20, alignItems: "center", justifyContent: "center" }}>
+                                <View style={{marginTop:5}}>
+                                    <Text style={[styles.text,{color:"#000",fontSize:18}]}>Select Clinic</Text>
+                                </View>
                                 <FlatList
                                     data={this.state.medicals}
                                     keyExtractor={(item, index) => index.toString()}

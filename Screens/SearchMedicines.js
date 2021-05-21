@@ -17,9 +17,10 @@ import axios from 'axios';
     super(props);
     this.state = {
         selected:[],
-        medicines:[]
+        medicines:[],
+        cancelToken: undefined
     };
-    this.cancelToken
+   
   }
      selectMedicine =(item)=>{
 
@@ -40,13 +41,13 @@ import axios from 'axios';
      }
      SearchMedicines =async(query)=>{
       
-      if(typeof this.cancelToken != typeof undefined){
-         this.cancelToken.cancel('cancelling the previous request')
+      if(typeof this.state.cancelToken != typeof undefined){
+         this.state.cancelToken.cancel('cancelling the previous request')
       }
-      this.cancelToken = axios.CancelToken.source()
+      this.state.cancelToken = axios.CancelToken.source()
       let api= `${url}/api/prescription/medicines/?name=${query}`
        
-      const data = await axios.get(api,{cancelToken:this.cancelToken.token});
+      const data = await axios.get(api,{cancelToken:this.state.cancelToken.token});
          this.setState({ medicines: data.data })
     // const data =await HttpsClient.get(api)
       console.log(data,"kjkjkk")

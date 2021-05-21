@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StatusBar, Dimensions, Image, StyleSheet, TouchableOpacity, AsyncStorage, SafeAreaView, ScrollView, FlatList} from 'react-native';
+import { View, Text, StatusBar, Dimensions, Image, StyleSheet, TouchableOpacity, AsyncStorage, SafeAreaView, ScrollView, FlatList, ImageBackground} from 'react-native';
 import settings from '../AppSettings';
 import axios from 'axios';
 import Modal from 'react-native-modal';
@@ -11,6 +11,7 @@ const themeColor = settings.themeColor;
 const fontFamily = settings.fontFamily;
 const url =settings.url;
 import { connect } from 'react-redux';
+
 import { selectTheme, selectClinic,selectUser} from '../actions';
 import { NavigationContainer, CommonActions } from '@react-navigation/native';
 import DoctorProfile from './DoctorProfile';
@@ -106,12 +107,27 @@ componentWillUnmount(){
      }
 
    }
-
+validateExpiry =()=>{
+  if (this.props?.clinic?.validtill?.validTill){
+    return (
+      <View style={{ flexDirection: "row", marginTop: 5 }}>
+        <Feather name="calendar" size={24} color={"gray"} />
+        <Text style={[styles.text, { color: themeColor, fontSize: 20 }]}>{this.props?.clinic?.validtill?.validTill || "Recharge"}</Text>
+      </View>
+    )
+  }
+  return(
+    <View style={{ flexDirection: "row", marginTop: 5 }}>
+           <Text style={[styles.text,{color:"red"}]}> expired Recharge</Text>
+    </View>
+  )
+  
+}
    diffrentiateUsers =()=>{
      if(this.state.isDoctor){
        return (
          <>
-           <View style={{ height: height * 0.15, alignItems: "center", justifyContent: "space-around", flexDirection: "row" }}>
+           {/* <View style={{ height: height * 0.15, alignItems: "center", justifyContent: "space-around", flexDirection: "row" }}>
              <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                <Text style={[styles.text]}>Total patients</Text>
                <Text style={[styles.text, { fontWeight: "bold", fontSize: 20 }]}>100</Text>
@@ -123,13 +139,13 @@ componentWillUnmount(){
              
              >
                <Text style={[styles.text]}>Subscription Valid Till</Text>
-               <View style={{ flexDirection: "row" ,marginTop:5}}>
-                 <Feather name="calendar" size={24} color={"gray"} />
-                 <Text style={[styles.text, { color:themeColor, fontSize: 20 }]}>11-10-2091</Text>
-               </View>
+               {
+
+                 this.validateExpiry()
+               }
 
              </TouchableOpacity>
-           </View>
+           </View> */}
            <DoctorProfile ClinicSelect={() => { this.ClinicSelect() }} clinics ={this.state.clinics} navigation={this.props.navigation}/>
          </>
        )
@@ -137,20 +153,19 @@ componentWillUnmount(){
      if(this.state.isReceptionist){
        return(
          <>
-           <View style={{ height: height * 0.15, alignItems: "center", justifyContent: "space-around", flexDirection: "row" }}>
+           {/* <View style={{ height: height * 0.15, alignItems: "center", justifyContent: "space-around", flexDirection: "row" }}>
              <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                <Text style={[styles.text]}>Total patients</Text>
                <Text style={[styles.text, { fontWeight: "bold", fontSize: 20 }]}>100</Text>
              </View>
              <TouchableOpacity style={{ alignItems: "center", justifyContent: "center" }}>
                <Text style={[styles.text]}>Priscription Valid Till</Text>
-               <View style={{ flexDirection: "row", marginTop: 5 }}>
-                 <Feather name="calendar" size={24} color={"gray"} />
-                 <Text style={[styles.text, { color: themeColor, fontSize: 20 }]}>11-10-2091</Text>
-               </View>
+              {
+                this.validateExpiry()
+              }
 
              </TouchableOpacity>
-           </View>
+           </View> */}
            <ReceptionistsProfile />
          </>
        )
@@ -168,60 +183,68 @@ componentWillUnmount(){
   render() {
     console.log(this.props.user.profile.displayPicture)
     return (
-        <>
+      
+     <>
         <SafeAreaView style={styles.topSafeArea} />
         <SafeAreaView style={styles.bottomSafeArea}>
-        <View style={{ flex:1,}}>
-            <StatusBar backgroundColor={themeColor} />
-
-                             {/* headers */}
-
-            <View style={{ height: height * 0.1, backgroundColor: themeColor, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, justifyContent: "center", flexDirection: "row" }}>
-              
-              <View style={{ flex: 0.5, alignItems: 'center', justifyContent: "center" }}>
-                <Text style={[styles.text, { color: "#fff" ,fontSize:25,fontWeight:"bold"}]}>Profile</Text>
-              </View>
-              <TouchableOpacity style={{ flex: 0.5, marginLeft: 20, alignItems: "center", justifyContent: 'center' ,flexDirection:"row"}}
-                onPress={() => { this.setState({showModal:true})}}
-              >
-                <AntDesign name="logout" size={24} color="#fff" />
-                <Text style={[styles.text,{marginLeft:10,color:"#fff"}]}>Log out</Text>
-              </TouchableOpacity>
-            </View>
+        <View style={{ flex:1,backgroundColor:"#fefefe"}}>
+           
 
 
-            <ScrollView 
+        <ScrollView
+          contentContainerStyle={{ paddingBottom: 90 }}
+         showsVerticalScrollIndicator={false}
+        >
              
+            <ImageBackground 
+              blurRadius={1}
+              style ={{height:height*0.3,alignItems:"center",}}
+              source={require('../assets/Doctor.png')}
+              
+          >
+                 {/* headers */}
+           <View style={{alignSelf:"flex-end",marginRight:10,marginTop:10}}>
+            <TouchableOpacity style={{  marginLeft: 20, alignItems: "center", justifyContent: 'center', flexDirection: "row" }}
+              onPress={() => { this.setState({ showModal: true }) }}
             >
-                 <View style={{alignItems:"center",justifyContent:'center',flexDirection:"row",}}>
-                  <View>
-                  <View style={{ alignItems: "center", justifyContent: "center" ,marginTop:20,flexDirection:"row",marginLeft:10}}>
-                    <Image
-                      source={{ uri: this.props.user.profile.displayPicture || "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
-                      style={{ height: 60, width: 60, borderRadius: 30 }}
-                    />
-                    <TouchableOpacity style={{}}
-                      onPress={() => { this.props.navigation.navigate('ProfileEdit') }}
-                    >
-                      <Entypo name="edit" size={20} color={themeColor} />
-                    </TouchableOpacity>
-                  </View>
-                  <View style={{alignItems:'center',justifyContent:"center",marginTop:20}}>
-                    <Text style={[styles.text,{fontWeight:"bold",fontSize:18}]}>{this.props.user.first_name}</Text>
-                  </View>
-                  </View>
-                        
+          
+              <MaterialCommunityIcons name="logout" size={30} color="black" />
+            </TouchableOpacity>
+           </View>
+         <View style={{alignItems:"center",justifyContent:"center",flex:1}}>
 
-                   
-                    
-            
-               
-                 </View>
+              <View style={{ alignItems: "center", justifyContent: "center", flexDirection: "row", marginLeft: 20 }}>
+                <Image
+                  source={{ uri: this.props.user.profile.displayPicture || "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
+                  style={{ height: 60, width: 60, borderRadius: 30 }}
+                />
+                <TouchableOpacity style={{}}
+                  onPress={() => { this.props.navigation.navigate('ProfileEdit') }}
+                >
+                  <Entypo name="edit" size={20} color={themeColor} />
+                </TouchableOpacity>
+              </View>
+              <View style={{ alignItems: 'center', justifyContent: "center", }}>
+                <Text style={[styles.text, { fontWeight: "bold", fontSize: 18, color: "#000" }]}>{this.props.user.first_name}</Text>
+              </View>
+              <View style={{ alignItems: 'center', justifyContent: "center", }}>
+                <Text style={[styles.text, { fontWeight: "bold", fontSize: 18, color: "gray" }]}>{this.props.user.profile.specialization}</Text>
+              </View>
+           </View>  
+       
+          </ImageBackground>
+
+
                                {/* STATISTICS */}
-                        {
-                          this.diffrentiateUsers()
-                        }
-                
+                      
+                <View style={{marginHorizontal:20,elevation:5,backgroundColor:"#fafafa",borderRadius:15}}>
+                    <View style={{borderWidth:2,alignSelf:'center',borderColor:"gray",width:width*0.3,marginVertical:10,borderRadius:10}}>
+
+                    </View>
+                    {
+                        this.diffrentiateUsers()
+                    }
+                </View>
             </ScrollView>
                          {/* Modal */}
                   <View>
@@ -285,11 +308,11 @@ componentWillUnmount(){
                   </View>
                 </View>
               </Modal>
+              
                   </View>
-        
       </View>
-        </SafeAreaView>
 
+        </SafeAreaView>
       </>
     );
   }
