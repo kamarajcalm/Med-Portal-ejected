@@ -18,7 +18,7 @@ import { StackActions, CommonActions} from '@react-navigation/native';
 
 class UpdateTimings extends Component {
     constructor(props) {
-        let clinicPk = props.route.params.clinicPk
+        let clinicPk = props.route.params.item.id
         super(props);
         this.state = {
             isMedical:this.props.route.params.medical||false,
@@ -115,6 +115,7 @@ class UpdateTimings extends Component {
             clinic:this.state.clinicPk,
             times
         }
+        console.log(this.state.clinicPk,"pppppppppp")
         let post =  await HttpsClient.post(api,sendData)
           console.log(post,"hjj")
         if(post.type =="success"){

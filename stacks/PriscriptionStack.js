@@ -10,6 +10,7 @@ import ProfileView from '../Screens/ProfileView';
 import PrescriptionView from '../Screens/PrescriptionView';
 import SearchPatient from '../Screens/SearchPatient';
 import ListPatientPriscription from '../Screens/ListPatientPriscription';
+import ChatScreen from '../Screens/ChatScreen';
 
 
 const Stack = createStackNavigator();
@@ -33,6 +34,7 @@ export default class PriscriptionStack extends Component {
                 <Stack.Screen name="PrescriptionView" component={PrescriptionView} options={{ headerShown: false }} />
                 <Stack.Screen name="SearchPatient" component={SearchPatient} options={{ headerShown: false }} />
                 <Stack.Screen name="ListPatientPriscription" component={ListPatientPriscription} options={{ headerShown: false }} />
+                <Stack.Screen name="Chat" component={ChatScreen} options={{ headerShown: false }} />
             </Stack.Navigator>
         );
     }

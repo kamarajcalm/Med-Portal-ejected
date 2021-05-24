@@ -148,16 +148,28 @@ class makeAppointmentClinic extends Component {
     getTodayTimings = (today) => {
 
         return (
-            this.state.selectedDoctor?.clinicShits[today].map((i, index) => {
+            this.state.selectedDoctor?.clinicShits[today][0].timings.map((i, index) => {
                 return (
-                    <View style={{ flexDirection: "row", marginTop: 5 }}>
+                    <View
+                        key={ index}
+                        style={{ flexDirection: "row", marginTop: 5 }}>
                         <Text style={[styles.text, { fontWeight: "bold" }]}>{index + 1}.</Text>
-                        { i.timings.length>0&&<Text style={[styles.text, { marginLeft: 5 }]}>{i.timings[0][0]}</Text>}
+                        <Text style={[styles.text, { marginLeft: 5 }]}>{i[0]}</Text>
                         <Text style={[styles.text]}>-</Text>
-                        {i.timings.length > 0 &&<Text style={[styles.text]}>{i.timings[0][1]}</Text>}
+                        <Text style={[styles.text]}>{i[1]}</Text>
                     </View>
                 )
             })
+            // this.state.selectedDoctor?.clinicShits[today].map((i, index) => {
+            //     return (
+            //         <View style={{ flexDirection: "row", marginTop: 5 }}>
+            //             <Text style={[styles.text, { fontWeight: "bold" }]}>{index + 1}.</Text>
+            //             { i.timings.length>0&&<Text style={[styles.text, { marginLeft: 5 }]}>{i.timings[0][0]}</Text>}
+            //             <Text style={[styles.text]}>-</Text>
+            //             {i.timings.length > 0 &&<Text style={[styles.text]}>{i.timings[0][1]}</Text>}
+            //         </View>
+            //     )
+            // })
         )
 
 

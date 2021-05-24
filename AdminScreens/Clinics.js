@@ -58,7 +58,7 @@ class Clinics extends Component {
     componentDidMount() {
       this.getClinics()
         this._unsubscribe = this.props.navigation.addListener('focus', () => {
-
+             
             this.getClinics()
         });
     }

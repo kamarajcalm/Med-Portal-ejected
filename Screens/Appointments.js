@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StatusBar, Dimensions, TouchableOpacity, StyleSheet, FlatList, Image, SafeAreaView, ToastAndroid } from 'react-native';
+import { View, Text, StatusBar, Dimensions, TouchableOpacity, StyleSheet, Linking, FlatList, Image, SafeAreaView, ToastAndroid } from 'react-native';
 import settings from '../AppSettings';
 import { connect } from 'react-redux';
 import { selectTheme } from '../actions';
@@ -17,6 +17,7 @@ import moment from 'moment';
 import HttpsClient from '../api/HttpsClient';
 import { FontAwesome, FontAwesome5, Octicons,Fontisto} from '@expo/vector-icons';
 import FlashMessage, { showMessage, hideMessage } from "react-native-flash-message";
+import { color } from 'react-native-reanimated';
 const Date1 = new Date()
 const today = moment(Date1).format("YYYY-MM-DD")
 const url = settings.url
@@ -39,19 +40,29 @@ class Appointments extends Component {
             selectedAppointment:null,
             selectedIndex:null,
             Appointments2:[],
-            today:"jhj"
+            today
         };
+    }
+    chatClinic = async (item) => {
+   
+        let api = `${url}/api/prescription/createClinicChat/?clinic=${item.clinic}&customer=${this.props.user.id}`
+
+        let data = await HttpsClient.get(api)
+        console.log(data)
+
+        if (data.type == "success") {
+            this.props.navigation.navigate('Chat', { item: data.data })
+        }
     }
     getAppointments2 = async () => {
         let api = ""
         if (this.props.user.profile.occupation == "Doctor") {
-            api = `${url}/api/prescription/appointments/?doctor=${this.props.user.id}`
+            api = `${url}/api/prescription/appointments/?doctor=${this.props.user.id}&date=${this.state.today}`
         } else if (this.props.user.profile.occupation == "ClinicRecoptionist") {
-            api = `${url}/api/prescription/appointments/?clinic=${this.props.user.profile.recopinistclinics[0].clinicpk}`
+            api = `${url}/api/prescription/appointments/?clinic=${this.props.user.profile.recopinistclinics[0].clinicpk}&date=${this.state.today}`
         }
-        
         else {
-            api = `${url}/api/prescription/appointments/?requesteduser=${this.props.user.id}`
+            api = `${url}/api/prescription/appointments/?requesteduser=${this.props.user.id}&date=${this.state.today}`
         }
 
         const data = await HttpsClient.get(api)
@@ -93,7 +104,7 @@ class Appointments extends Component {
 
     handleConfirm = (date) => {
         this.setState({ today: moment(date).format('YYYY-MM-DD'), show: false, date: new Date(date) }, () => {
-
+          this.getAppointments2()
 
         })
         this.hideDatePicker();
@@ -210,35 +221,59 @@ class Appointments extends Component {
 
     }
     validateInformation =(item)=>{
-        if (item.status =="Pending"){
+        console.log(item.status)
+        if (item.status == "Pending" || item.status == "Rejected") {
             return(
-                <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between"}}>
-                    <View style={{flexDirection:"row",marginTop:5}}>
-                        <Text style={[styles.text, { color: "gray" }]}>Requseted date:</Text>
-                        <Text style={[styles.text,{fontWeight:"bold"} ]}>{item.requesteddate}</Text>
-                    </View>
-                    <View style={{flexDirection:'row',marginTop:5}}>
-                        <Text style={[styles.text, { color: "gray" }]}> Time:</Text>
-                        <Text style={[styles.text, { fontWeight: "bold" }  ]}>{item.requestedtime}</Text>
-                    </View>
+                <View style={{marginTop:10}}>
+                    <Text style={[styles.text]}>{item.requestedtime}</Text>
                 </View>
             )
-        }
+    }
         if (item.status == "Accepted") {
             return (
-                <View style={{ flexDirection: "row", alignItems: "center", justifyContent:"space-between" }}>
-                    <View style={{ flexDirection: "row", marginTop: 5 }}>
-                        <Text style={[styles.text, { color: "gray" }]}>Accepted date:</Text>
-                        <Text style={[styles.text,]}>{item.accepteddate}</Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', marginTop: 5 }}>
-                        <Text style={[styles.text, { color: "gray" }]}> Time:</Text>
-                        <Text style={[styles.text,]}>{item.acceptedtime}</Text>
-                    </View>
+                <View style={{ marginTop: 10 }}>
+                    <Text style={[styles.text]}>{item.acceptedtime}</Text>
                 </View>
             )
         }
-    }
+        if (item.status == "Completed") {
+            return (
+                <View style={{ marginTop: 10 }}>
+                    <Text style={[styles.text]}>{item.acceptedtime}</Text>
+                </View>
+            )
+        }
+}
+    // validateInformation =(item)=>{
+    //     if (item.status =="Pending"){
+    //         return(
+    //             <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between"}}>
+    //                 <View style={{flexDirection:"row",marginTop:5}}>
+    //                     <Text style={[styles.text, { color: "gray" }]}>Requseted date:</Text>
+    //                     <Text style={[styles.text,{fontWeight:"bold"} ]}>{item.requesteddate}</Text>
+    //                 </View>
+    //                 <View style={{flexDirection:'row',marginTop:5}}>
+    //                     <Text style={[styles.text, { color: "gray" }]}> Time:</Text>
+    //                     <Text style={[styles.text, { fontWeight: "bold" }  ]}>{item.requestedtime}</Text>
+    //                 </View>
+    //             </View>
+    //         )
+    //     }
+    //     if (item.status == "Accepted") {
+    //         return (
+    //             <View style={{ flexDirection: "row", alignItems: "center", justifyContent:"space-between" }}>
+    //                 <View style={{ flexDirection: "row", marginTop: 5 }}>
+    //                     <Text style={[styles.text, { color: "gray" }]}>Accepted date:</Text>
+    //                     <Text style={[styles.text,]}>{item.accepteddate}</Text>
+    //                 </View>
+    //                 <View style={{ flexDirection: 'row', marginTop: 5 }}>
+    //                     <Text style={[styles.text, { color: "gray" }]}> Time:</Text>
+    //                     <Text style={[styles.text,]}>{item.acceptedtime}</Text>
+    //                 </View>
+    //             </View>
+    //         )
+    //     }
+    // }
     viewAppointments =(item)=>{
         if(this.props.user.profile.occupation =="Customer"){
            return   this.props.navigation.navigate('ViewAppointment',{item})
@@ -298,7 +333,7 @@ class Appointments extends Component {
                           </View>
                           <View style={{flex:0.7,paddingLeft:10}}>
                               <View style={{marginTop:20}}>
-                                    <Text style={[styles.text,{color:"#000",fontWeight:"bold"}]}>{item.clinicname}</Text>
+                                    <Text style={[styles.text,{color:"#000",fontWeight:"bold"}]}>{item.clinicname.name}</Text>
                               </View>
                                 <View style={{ marginTop: 10,flexDirection:"row" }}>
                                     <Text style={[styles.text, { color: "#000", }]}>Reason :</Text>
@@ -315,14 +350,22 @@ class Appointments extends Component {
                                     </View>
                                     <View style={{flexDirection:'row',justifyContent:"space-around",alignItems:"center",flex:0.3}}>
                                          <TouchableOpacity style={[styles.boxWithShadow,{backgroundColor:"#fff",height:30,width:30,borderRadius:15,alignItems:"center",justifyContent:'center'}]}
-                                          onPress ={()=>{}}
+                                          onPress ={()=>{this.chatClinic(item)}}
                                          >
-                                            <Ionicons name="md-chatbox" size={20} color="#006DFF" />
+                                            <Ionicons name="md-chatbox" size={20} color="#63BCD2" />
                                          </TouchableOpacity>
                                         <TouchableOpacity style={[styles.boxWithShadow, { backgroundColor: "#fff", height: 30, width: 30, borderRadius: 15, alignItems: "center", justifyContent: 'center' }]}
-                                            onPress={() => { }}
+                                            onPress={() => {
+                                                Linking.openURL(
+                                                    `https://www.google.com/maps/dir/?api=1&destination=` +
+                                                    item.clinicname.lat +
+                                                    `,` +
+                                                    item.clinicname.long +
+                                                    `&travelmode=driving`
+                                                );
+                                            }}
                                         >
-                                            <FontAwesome5 name="directions" size={20} color="#006DFF" />
+                                            <FontAwesome5 name="directions" size={20} color="#63BCD2" />
                                         </TouchableOpacity>
                                     </View>
                                 </View>
@@ -339,9 +382,9 @@ class Appointments extends Component {
                     return(
                         <TouchableOpacity
                             onPress={() => { this.viewAppointments(item)}}
-                         style={{
+                            style={{
                                 marginTop: 10,
-                                minHeight: height * 0.1,
+                                minHeight: height * 0.17,
                                 backgroundColor: "#eee",
                                 marginHorizontal: 10,
                                 borderRadius: 10,
@@ -351,12 +394,72 @@ class Appointments extends Component {
                  
                         <View
                             style={{
-                               
-                                flexDirection: "row"
+                                
+                                flexDirection: "row",
                             }}
 
                         >
-                                <View style={{ flex: 0.6, justifyContent: "center" }}>
+                            <View style={{flex:0.6}}>
+                                    <View style={{ paddingLeft:10 ,paddingTop:10}}>
+                                        <Text style={[styles.text, {fontWeight:"bold",color:"#000"}]}>{item.patientname.name}</Text>
+                                    </View>
+                                    <View style={{ paddingLeft: 10, paddingTop: 10 ,flexDirection:"row"}}>
+                                        <View>
+                                            <Text style={[styles.text, { fontWeight: "bold" }]}>Reason : </Text>
+                                        </View>
+                                        <View>
+                                            <Text style={[styles.text, { fontWeight: "bold" }]}>{item.reason}</Text>
+                                        </View>
+                                     
+                                    </View>
+                                    <View style={{ paddingLeft: 10, paddingTop: 10 ,flexDirection:"row"}}>
+                                        <View>
+                                            <Text style={[styles.text, {}]}>{item.requesteddate}</Text>
+                                        </View>
+                                        <View>
+                                            <Text style={[styles.text]}> | </Text>
+                                        </View>
+                                        <View>
+                                            <Text style={[styles.text]}> {item.requestedtime} </Text>
+                                        </View>
+                                    </View>
+                                    <View style={{ paddingLeft: 10, paddingTop: 10 ,}}>
+                                        <Text style={[styles.text, { fontWeight: "bold", color: this.validateColor(item.status) }]}>{item.status}</Text>
+                                    </View>
+                               </View>
+                               <View style={{flex:0.4}}>
+
+                                    <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
+
+                                        {item.status == "Pending" ? <TouchableOpacity style={{ height: height * 0.05, width: "80%", borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: "#32CD32" }}
+                                            onPress={() => { this.setState({ modal: true, selectedAppointment: item, selectedIndex: index, today: item.requesteddate, time: item.requestedtime }) }}
+                                        >
+                                            <Text style={[styles.text, { color: "#fff" }]}>Accept</Text>
+                                        </TouchableOpacity> : <TouchableOpacity style={{ height: height * 0.05, width: "70%", borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: "orange" }}
+                                            onPress={() => {
+
+                                                this.setState({ selectedAppointment: item, selectedIndex: index, }, () => {
+                                                    this.completeAppointment()
+                                                })
+                                            }}
+                                        >
+                                            <Text style={[styles.text, { color: "#fff" }]}>finish</Text>
+                                        </TouchableOpacity>}
+                                    </View>
+
+                                    {item.status != "Completed" && <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
+                                        <TouchableOpacity style={{ height: height * 0.05, width: "80%", borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: "#B22222" }}
+                                            onPress={() => {
+                                                this.setState({ selectedAppointment: item, selectedIndex: index }, () => {
+                                                    this.RejectAppointment()
+                                                })
+                                            }}
+                                        >
+                                            <Text style={[styles.text, { color: "#fff" }]}>Reject</Text>
+                                        </TouchableOpacity>
+                                    </View>}
+                               </View>
+                                {/* <View style={{ flex: 0.6, justifyContent: "center" }}>
                                     <View style={{ flexDirection: "row", margin: 5, flex: 0.5 }}>
 
                                         <Text style={[styles.text, { fontWeight: "bold" }]}>Name   :</Text>
@@ -370,12 +473,12 @@ class Appointments extends Component {
                                         </View>
 
                                     </View>
-                                </View>
+                                </View> */}
 
 
 
-                            <View style={{ flex: 0.4, flexDirection: "row", alignItems: "center", justifyContent: 'center' }}>
-                                   {/* this */}
+                            {/* <View style={{ flex: 0.4, flexDirection: "row", alignItems: "center", justifyContent: 'center' }}>
+                               
                               
 
 
@@ -407,10 +510,10 @@ class Appointments extends Component {
                             <Text style={[styles.text, { color: "#fff" }]}>Reject</Text>
                         </TouchableOpacity>
                     </View>}
-                            </View>
+                            </View> */}
                             
                         </View>
-                        <View style ={{
+                        {/* <View style ={{
                             margin:10,
                             alignItems:"center",
                             justifyContent:"center",
@@ -424,7 +527,7 @@ class Appointments extends Component {
                             </View>
                        
                         
-                        </View>
+                        </View> */}
                         </TouchableOpacity>
                     )
                 }
@@ -478,7 +581,7 @@ class Appointments extends Component {
                                     </View>
                                     <View style={{ flex: 0.7, paddingLeft: 10 }}>
                                         <View style={{ marginTop: 20 }}>
-                                            <Text style={[styles.text, { color: "#000", fontWeight: "bold" }]}>{item.clinicname}</Text>
+                                            <Text style={[styles.text, { color: "#000", fontWeight: "bold" }]}>{item.clinicname.name}</Text>
                                         </View>
                                         <View style={{ marginTop: 10, flexDirection: "row" }}>
                                             <Text style={[styles.text, { color: "#000", }]}>Reason :</Text>
@@ -495,14 +598,22 @@ class Appointments extends Component {
                                             </View>
                                             <View style={{ flexDirection: 'row', justifyContent: "space-around", alignItems: "center", flex: 0.3 }}>
                                                 <TouchableOpacity style={[styles.boxWithShadow, { backgroundColor: "#fff", height: 30, width: 30, borderRadius: 15, alignItems: "center", justifyContent: 'center' }]}
-                                                    onPress={() => { }}
+                                                    onPress={() => { this.chatClinic(item) }}
                                                 >
-                                                    <Ionicons name="md-chatbox" size={20} color="#006DFF" />
+                                                    <Ionicons name="md-chatbox" size={20} color="#63BCD2"/>
                                                 </TouchableOpacity>
                                                 <TouchableOpacity style={[styles.boxWithShadow, { backgroundColor: "#fff", height: 30, width: 30, borderRadius: 15, alignItems: "center", justifyContent: 'center' }]}
-                                                    onPress={() => { }}
+                                                    onPress={() => {
+                                                        Linking.openURL(
+                                                            `https://www.google.com/maps/dir/?api=1&destination=` +
+                                                            item.clinicname.lat +
+                                                            `,` +
+                                                            item.clinicname.long +
+                                                            `&travelmode=driving`
+                                                        );
+                                                    }}
                                                 >
-                                                    <FontAwesome5 name="directions" size={20} color="#006DFF" />
+                                                    <FontAwesome5 name="directions" size={20} color="#63BCD2"/>
                                                 </TouchableOpacity>
                                             </View>
                                         </View>
@@ -522,7 +633,7 @@ class Appointments extends Component {
                                 onPress={() => { this.viewAppointments(item) }}
                                 style={{
                                     marginTop: 10,
-                                    minHeight: height * 0.1,
+                                    minHeight: height * 0.15,
                                     backgroundColor: "#eee",
                                     marginHorizontal: 10,
                                     borderRadius: 10,
@@ -534,13 +645,50 @@ class Appointments extends Component {
                                 <View
 
                                     style={{
-
+                                        flex:1,
                                         flexDirection: "row"
                                     }}
 
                                 >
+                                    <View style={{ flex: 0.6 }}>
+                                        <View style={{flex:0.6}}>
 
-                                    <View style={{ flex: 0.6, justifyContent: "center" }}>
+                                        
+                                        <View style={{ paddingLeft: 10, paddingTop: 10 }}>
+                                            <Text style={[styles.text, { fontWeight: "bold", color: "#000" }]}>{item.patientname.name}</Text>
+                                        </View>
+                                        <View style={{ paddingLeft: 10, paddingTop: 10, flexDirection: "row" }}>
+                                            <View>
+                                                <Text style={[styles.text, { fontWeight: "bold" }]}>Reason : </Text>
+                                            </View>
+                                            <View>
+                                                <Text style={[styles.text, { fontWeight: "bold" }]}>{item.reason}</Text>
+                                            </View>
+
+                                        </View>
+                                        </View>
+                                        <View style={{ flexDirection: 'row',  alignItems: "center", flex:0.4,}}>
+                                            <TouchableOpacity style={[styles.boxWithShadow, { backgroundColor: "#fff", height: 30, width: 30, borderRadius: 15, alignItems: "center", justifyContent: 'center',marginLeft:10 }]}
+                                                onPress={() => { }}
+                                            >
+                                                <Ionicons name="md-chatbox" size={20} color="#63BCD2" />
+                                            </TouchableOpacity>
+                                            <TouchableOpacity style={[styles.boxWithShadow, { backgroundColor: "#fff", height: 30, width: 30, borderRadius: 15, alignItems: "center", justifyContent: 'center' ,marginLeft:10}]}
+                                                onPress={() => { }}
+                                            >
+                                                <Ionicons name="call" size={20} color="#63BCD2" />
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
+                                     <View style={{flex:0.4,alignItems:'center',justifyContent:"center"}}>
+                                         {
+                                             this.validateInformation(item)
+                                         }
+                                         <View style={{marginTop:5}}>
+                                             <Text style={[styles.text,{color:this.validateColor(item.status)}]}>{item.status}</Text>
+                                         </View>
+                                     </View>
+                                    {/* <View style={{ flex: 0.6, justifyContent: "center" }}>
                                                      <View style={{ flexDirection: "row", margin: 5, flex: 0.5 }}>
 
                                         <Text style={[styles.text, { fontWeight: "bold" }]}>Name   :</Text>
@@ -554,10 +702,10 @@ class Appointments extends Component {
                                         </View>
 
                                     </View>
-                                    </View>
+                                    </View> */}
 
                                     {/* TABS */}
-
+{/* 
                                     <View style={{ flex: 0.4, flexDirection: "row", alignItems: "center", justifyContent: 'center', }}>
                                         <View style={{ alignItems: 'center', justifyContent: "center" }}>
                                             <View style={{ alignItems: "center", justifyContent: "center" }}>
@@ -569,11 +717,11 @@ class Appointments extends Component {
                                             </View>
                                         </View>
 
-                                    </View>
+                                    </View> */}
 
                                 </View>
 
-                                <View style={{
+                                {/* <View style={{
                                     margin: 10,
                                     alignItems: "center",
                                     justifyContent: "center",
@@ -587,7 +735,7 @@ class Appointments extends Component {
                                     </View>
 
 
-                                </View>
+                                </View> */}
                             </TouchableOpacity>
 
                            
@@ -798,10 +946,10 @@ class Appointments extends Component {
                             <View style={{ flex: 0.6, alignItems: "center", justifyContent: "center" }}>
                                 <Text style={[styles.text, { color: '#fff', marginLeft: 20, fontWeight: 'bold' ,fontSize:25}]}>Appointments</Text>
                             </View>
-                   {         <View style={{flex:0.4,alignItems:"center",justifyContent:"center"}}>
+                   {this.state.index ==1&&<View style={{flex:0.4,alignItems:"center",justifyContent:"center"}}>
                                 <View style={{ flexDirection: "row" }}>
                                     <View style={{ alignItems: "center", justifyContent: "center" }}>
-                                        <Text style={[styles.text, { color: "#fff" }]}>{today}</Text>
+                                        <Text style={[styles.text, { color: "#fff" }]}>{this.state.today}</Text>
                                     </View>
 
                                     <TouchableOpacity

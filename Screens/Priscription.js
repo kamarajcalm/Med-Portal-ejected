@@ -16,7 +16,8 @@ import {
     TextInput,
     BackHandler,
     RefreshControl,
-    Keyboard
+    Keyboard,
+    Linking
 } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import * as Animatable from 'react-native-animatable';
@@ -47,6 +48,7 @@ const today1 = moment(Date1).format("YYYY-MM-DD")
 const getCloser = (value, checkOne, checkTwo) =>
 Math.abs(value - checkOne) < Math.abs(value - checkTwo) ? checkOne : checkTwo;
 const Priscription = (props) => {
+    
           //   STATES
     const[collapsed,setCollapsed] =useState(false)
     const[check,setChecked] =useState(false)
@@ -69,6 +71,8 @@ const Priscription = (props) => {
     const [search,setSearch] =useState(false)
     const [button,setButton] =useState(true)
     const [expiryModal, setExpiryModal] =useState(false)
+    const [offset, setOffset] =useState(0)
+    const [loadMore, setLoadMore] =useState(true)
 
     //         search:false,
 
@@ -89,7 +93,10 @@ const Priscription = (props) => {
     
         translateYNumber.current = value;
     });
-
+const getIndex =(index) =>{
+    let value =prescriptions.length-index
+    return value
+}
     const handleScroll = Animated.event(
         [
             {
@@ -124,11 +131,14 @@ const Priscription = (props) => {
             }
         }
     };
-   const searchPriscriptions = (text) => {
-        let filter =prescriptions.filter((i) => {
-            return i.clinicname.name.includes(text)
-        })
-       setPrescriptions(filter)
+   const searchPriscriptions = async(text) => {
+       let api = `${url}/api/prescription/prescriptions/?forUser=${props.user.id}&usersearch=${text}`
+       const data =await HttpsClient.get(api)
+       console.log(data)
+       if(data.type=="success"){
+           setPrescriptions(data.data)
+       }
+       
     }
    const getClinics = async () => {
         const api = `${url}/api/prescription/getDoctorClinics/?doctor=${props.user.id}`
@@ -151,6 +161,18 @@ const Priscription = (props) => {
         }
       
     }
+  const  chatClinic = async (item) => {
+     
+      
+        let api = `${url}/api/prescription/createClinicChat/?clinic=${item.clinic}&customer=${props.user.id}`
+
+        let data = await HttpsClient.get(api)
+        console.log(data)
+
+        if (data.type == "success") {
+            props.navigation.navigate('Chat', { item: data.data })
+        }
+    }
   const  getPrescription = async () => {
     
       let api = `${url}/api/prescription/prescriptions/?doctor=${props.user.id}&date=${stateRef.current}&clinic=${clinicRef.current.clinicpk}`
@@ -171,6 +193,7 @@ const Priscription = (props) => {
          
             setIsDoctor(true)
         } else if (props.user.profile.occupation == "ClinicRecoptionist") {
+            props.selectClinic(props.user.profile.recopinistclinics[0])
            getClinicPrescription()
            setIsReceptionist(true)
            
@@ -182,15 +205,17 @@ const Priscription = (props) => {
        
     }
   const  getPateintPrescription = async () => {
-        let api = `${url}/api/prescription/prescriptions/?forUser=${props.user.id}`
+      let api = `${url}/api/prescription/prescriptions/?forUser=${props.user.id}`
         let data = await HttpsClient.get(api)
         console.log(api)
         if (data.type == "success") {
+           
             setPrescriptions(data.data)
-            setIsFetching(false)
+         
         }
     }
   const  getClinicPrescription = async () => {
+      console.log(props.user.profile.recopinistclinics,"pppp")
         let api = `${url}/api/prescription/prescriptions/?clinic=${props.user.profile.recopinistclinics[0].clinicpk}&date=${moment(date).format("YYYY-MM-DD")}`
         let data = await HttpsClient.get(api)
         console.log(api)
@@ -203,13 +228,16 @@ const Priscription = (props) => {
 
     }
     useEffect(()=>{
-        clinicRef.current = props.clinic
-        getPrescription()
-        if (props.clinic?.validtill?.available==false) {
-            setExpiryModal(true)
-        } else {
-            setExpiryModal(false)
+        if(props.user.profile.occupation =="Doctor"){
+            clinicRef.current = props.clinic
+            getPrescription()
+            if (props.clinic?.validtill?.available == false) {
+                setExpiryModal(true)
+            } else {
+                setExpiryModal(false)
+            }
         }
+     
     },[props.clinic])
  const   setActiveClinic = async (item) => {
         const api = `${url}/api/prescription/clinicDoctors/${item.pk}/`
@@ -336,7 +364,10 @@ const _keyboardDidShow =()=>{
                     onPress ={()=>{setShowModal(true)}}
                    >
                        <View>
-                           <Text style={[styles.text, { fontSize: 25, color: "#fff", fontWeight: "bold",marginLeft:5 }]} numberOfLines={1}>{props?.clinic?.name}</Text>
+                           {isDoctor?<Text style={[styles.text, { fontSize: 25, color: "#fff", fontWeight: "bold", marginLeft: 5 }]} numberOfLines={1}>{props?.clinic?.name }</Text>:
+                               <Text style={[styles.text, { fontSize: 25, color: "#fff", fontWeight: "bold", marginLeft: 5 }]} numberOfLines={1}>{props?.user?.profile?.recopinistclinics[0]?.clinicname}</Text>
+                           }
+                          
                        </View>
                     
                         <View style={{alignItems:"center",justifyContent:"center"}}>
@@ -402,23 +433,37 @@ const _keyboardDidShow =()=>{
                     // onPress={() => { props.navigation.navigate('showCard', { item }) }}
                   onPress={() => { props.navigation.navigate('PrescriptionView', { item, }) }}
                 >
-                    <View style={{ flex: 0.7 }}>
-                        <View style={{ justifyContent: "space-around", flex: 1 }}>
-                            <Text style={[styles.text, { fontSize: 18, }]}>{item?.username}</Text>
-                            <Text style={[styles.text, { fontSize: 12, fontWeight: "bold" }]}>Reason:</Text>
-                            <Text style={[styles.text, { fontSize: 12, }]}>{item.ongoing_treatment}</Text>
+                    <View style={{flex:0.3,alignItems:'center',justifyContent:'center'}}>
+                       <Image 
+                         style={{height:"90%",width:"95%",resizeMode:"cover",borderRadius:10}}
+                            source={{uri:"https://www.studentdoctor.net/wp-content/uploads/2018/08/20180815_prescription-1024x1024.png"}}
+                       />
+                    </View>
+                    <View style={{flex:0.7,marginHorizontal:10,justifyContent:'center'}}>
+                        <View style={{marginTop:10,flexDirection:'row',alignItems:'center',justifyContent:"space-between"}}>
+                            <View style={{alignItems:'center',justifyContent:'center'}}>
+                                <Text style={[styles.text, { color: "#000", fontWeight: 'bold' }]}>Patient : {item?.username}</Text>
+
+                            </View>
+                            <View style={{alignItems:"center",justifyContent:"center"}}>
+                                <Text>#{getIndex(index)}</Text>
+                            </View>
+                        </View>
+                        <View style={{marginTop:10}}>
+                            <View>
+                                <Text style={[styles.text]}>Reason : {item.ongoing_treatment}</Text>
+                            </View>
+                        </View>
+                        <View style={{ marginTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: "space-between"}}>
+                           <View>
+                                <Text style={[styles.text]}>Clinic :{item.clinicname.name}</Text>
+                           </View>
+                           <View>
+                                <Text style={[styles.text]}>{moment(item.created).format("h:mm a")}</Text>
+                           </View>
                         </View>
                     </View>
-                    <View style={{ flex: 0.3, justifyContent: 'center', alignItems: "center" }}>
-                        <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
-                            <Text>{moment(item.created).format("DD/MM/YYYY")}</Text>
-
-                        </View>
-                        <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
-                            <Text>{moment(item.created).format("h:mm a")}</Text>
-                        </View>
-
-                    </View>
+              
                 </TouchableOpacity>
             )
         }
@@ -431,31 +476,37 @@ const _keyboardDidShow =()=>{
 
             return (
                 <TouchableOpacity style={[styles.card, { flexDirection: "row", borderRadius: 5 }]}
-                    onPress={() => { props.navigation.navigate('showCard', { item }) }}
+                    onPress={() => { props.navigation.navigate('PrescriptionView', { item, }) }}
                 >
-                    <View style={{ flex: 0.3, alignItems: 'center', justifyContent: "center" }}>
+                    <View style={{ flex: 0.3, alignItems: 'center', justifyContent: 'center' }}>
                         <Image
-                            source={{ uri: dp || "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
-                            style={{ height: 60, width: 60, borderRadius: 30 }}
+                            style={{ height: "90%", width: "95%", resizeMode: "cover", borderRadius: 10 }}
+                            source={{ uri: "https://www.studentdoctor.net/wp-content/uploads/2018/08/20180815_prescription-1024x1024.png" }}
                         />
                     </View>
-                    <View style={{ flex: 0.4, justifyContent: 'center', alignItems: 'center' }}>
-                        <View >
-                            <Text style={[styles.text, { fontSize: 18, }]}>{item?.username}</Text>
-                            <Text style={[styles.text, { fontSize: 12, }]}>{item?.doctordetails?.name}</Text>
+                    <View style={{ flex: 0.7, marginHorizontal: 10, justifyContent: 'center' }}>
+                        <View style={{ marginTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: "space-between" }}>
+                            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                                <Text style={[styles.text, { color: "#000", fontWeight: 'bold' }]}>Patient : {item?.username}</Text>
 
+                            </View>
+                            <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                <Text>#{getIndex(index)}</Text>
+                            </View>
                         </View>
-
-                    </View>
-                    <View style={{ flex: 0.3, justifyContent: 'center', alignItems: "center" }}>
-                        <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
-                            <Text>{moment(item.created).format("DD/MM/YYYY")}</Text>
-
+                        <View style={{ marginTop: 10 }}>
+                            <View>
+                                <Text style={[styles.text]}>Reason : {item.ongoing_treatment}</Text>
+                            </View>
                         </View>
-                        <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
-                            <Text>{moment(item.created).format("h:mm a")}</Text>
+                        <View style={{ marginTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: "space-between" }}>
+                            <View>
+                                <Text style={[styles.text]}>Clinic :{item.clinicname.name}</Text>
+                            </View>
+                            <View>
+                                <Text style={[styles.text]}>{moment(item.created).format("h:mm a")}</Text>
+                            </View>
                         </View>
-
                     </View>
                 </TouchableOpacity>
             )
@@ -464,35 +515,84 @@ const _keyboardDidShow =()=>{
         // if patient
         return (
             <TouchableOpacity style={[styles.card, { flexDirection: "row", borderRadius: 5 }]}
-                onPress={() => { props.navigation.navigate('showCard', { item }) }}
+                onPress={() => { props.navigation.navigate('PrescriptionView', { item, }) }}
             >
-                {/* <View style={{ flex: 0.3, alignItems: 'center', justifyContent: "center" }}>
-                  <Image
-                      source={{ uri: item?.doctordetails?.dp || "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
-                      style={{ height: 60, width: 60, borderRadius: 30 }}
-                  />
-              </View> */}
-                <View style={{ flex: 0.7, }}>
-                    <View style={{ justifyContent: "space-around", flex: 1 }}>
-                        <Text style={[styles.text, { fontSize: 18, }]}>{item?.clinicname.name}</Text>
-                        <Text style={[styles.text, { fontSize: 12, fontWeight: "bold" }]}>Reason:</Text>
-                        <Text style={[styles.text, { fontSize: 12, }]}>{item.ongoing_treatment}</Text>
-                    </View>
-
+                <View style={{ flex: 0.3, alignItems: 'center', justifyContent: 'center' }}>
+                    <Image
+                      
+                        style={{ height: "90%", width: "95%", resizeMode:"contain", borderRadius: 10 }}
+                        source={{ uri: `${url}/static/images/mainPrescription.jpeg`}}
+                    />
                 </View>
-                <View style={{ flex: 0.3, justifyContent: 'center', alignItems: "center" }}>
-                    <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
-                        <Text>{moment(item.created).format("DD/MM/YYYY")}</Text>
+                <View style={{ flex: 0.7, marginHorizontal: 10, justifyContent: 'center' }}>
+                    <View style={{ marginTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: "space-between" }}>
+                        <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                            <Text style={[styles.text, { color: "#000", fontWeight: 'bold' }]}>Patient : {item?.username}</Text>
 
+                        </View>
+                        <View style={{ alignItems: "center", justifyContent: "center" }}>
+                            <Text>#{getIndex(index)}</Text>
+                        </View>
                     </View>
-                    <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
-                        <Text>{moment(item.created).format("h:mm a")}</Text>
+                    <View style={{ marginTop: 10 }}>
+                        <View>
+                            <Text style={[styles.text]}>Reason : {item.ongoing_treatment}</Text>
+                        </View>
                     </View>
+                    <View style={{ marginTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: "space-between" }}>
+                        <View>
+                            <Text style={[styles.text]}>Clinic :{item.clinicname.name}</Text>
+                        </View>
+                        <View>
+                            <View style={{alignSelf:"flex-end"}}>
+                                <Text style={[styles.text]}>{moment(item.created).format("h:mm a")}</Text>
 
+                            </View>
+                            <View>
+                                <Text style={[styles.text]}>{moment(item.created).format('DD/MM/YYYY')}</Text>
+                            </View>
+                        </View>
+                      
+                    </View>
+                    <View style={{flexDirection:"row",marginTop:10}}>
+                         <TouchableOpacity style={[styles.boxWithShadow, { backgroundColor: "#fff", height: 30, width: 30, borderRadius: 15, alignItems: "center", justifyContent: 'center', marginLeft: 10 }]}
+                            onPress={() => { chatClinic(item)}}
+                    >
+                            <Ionicons name="chatbox" size={24} color="#63BCD2" />
+                  
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.boxWithShadow, { backgroundColor: "#fff", height: 30, width: 30, borderRadius: 15, alignItems: "center", justifyContent: 'center', marginLeft: 10 }]}
+                        onPress={() => {
+                            Linking.openURL(
+                                `https://www.google.com/maps/dir/?api=1&destination=` +
+                                item.clinicname.lat +
+                                `,` +
+                                item.clinicname.long +
+                                `&travelmode=driving`
+                            );
+                        }}
+                    >
+                        <FontAwesome5 name="directions" size={20} color="#63BCD2" />
+                    </TouchableOpacity>
+                    </View>
+                   
                 </View>
             </TouchableOpacity>
         )
     }
+    const renderFooter =()=>{
+        if(loadMore){
+            return (
+                <View>
+                    <ActivityIndicator size={"large"} color={themeColor} />
+                </View>
+            )
+        }
+       return null
+    }
+    useEffect (()=>{
+      getPateintPrescription()
+    },[offset])
    const onRefresh = () => {
        setIsFetching(true)
      
@@ -525,7 +625,7 @@ const _keyboardDidShow =()=>{
                             progressViewOffset={headerHeight}
                          />
                      }
-                 
+          
                     scrollEventThrottle={16}
                     contentContainerStyle={{ paddingTop: headerHeight ,paddingBottom:90}}
                     onScroll={handleScroll}
@@ -547,6 +647,9 @@ const _keyboardDidShow =()=>{
 
                     }}
                     keyExtractor={(item, index) => index.toString()}
+                  
+         
+                
                 />
 
             </Animated.View>
@@ -667,9 +770,17 @@ const styles = StyleSheet.create({
         height: height * 2
     },
     card: {
-
-        backgroundColor: "#eeee",
-        height: height * 0.1,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0,
+        shadowRadius: 4.65,
+        elevation:5,
+        borderRadius:10,
+        backgroundColor: "#fff",
+        height: height * 0.2,
         marginHorizontal: 10,
         marginVertical: 3
 
@@ -682,6 +793,13 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "#fff"
     },
+    boxWithShadow: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 5
+    }
 });
 
 const mapStateToProps = (state) => {

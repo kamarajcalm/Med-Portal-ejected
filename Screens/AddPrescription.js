@@ -480,12 +480,23 @@ class AddPrescription extends Component {
                                 style={{ width: width * 0.9, height: height * 0.07, backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10, textAlignVertical: "top" }}
                             />
                         </View>
-                        {this.state.Diseases.length>0&&<ScrollView style={{ position: "relative", width: width * 0.9, height: height * 0.2,backgroundColor:"#eee",bottom:0,elevation:5}}>
+                        {this.state.Diseases.length>0&&<ScrollView 
+                        showsVerticalScrollIndicator ={false}
+                                style={{
+                                    position: "relative", width: width * 0.9, height: height * 0.2, backgroundColor: "#eee", bottom: 0, shadowColor: "#000",
+                                    shadowOffset: {
+                                        width: 0,
+                                        height: 2
+                                    },
+                                    shadowOpacity: 0.25,
+                                    shadowRadius: 4,
+                                    elevation: 5,}}>
                            {
-                               this.state.Diseases.map((i)=>{
+                               this.state.Diseases.map((i,index)=>{
                                    return(
                                        <TouchableOpacity 
-                                         style={{margin:20}}
+                                           key ={index}
+                                           style={{margin:20,justifyContent:"center"}}
                                            onPress={() => { this.setState({ Disease: i.title,Diseases:[]})}}
                                        >
                                            <Text style={[styles.text,{color:themeColor}]}>{i.title}</Text>
@@ -519,22 +530,23 @@ class AddPrescription extends Component {
                                 style={{ width: width * 0.9, height: height * 0.05, backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10 }}
                             />
                         </View>
-                        <View style={{ marginTop: 20 ,flexDirection:"row",flex:1}}>
-                            <View style={{flex:0.5,}}>
-                             
-                                    <Text style={[styles.text], { fontWeight: "bold", fontSize: 18 ,}}>Next Visit</Text>
+                            <View >
+
+                                <Text style={[styles.text], { fontWeight: "bold", fontSize: 18, }}>Next Visit</Text>
+                            </View>
+                            <View style={{ width: width * 0.9, height: height * 0.05, backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10 ,flexDirection:"row",alignItems:"center",justifyContent:"space-between"}}>
+                              <View style={{alignItems:"center",justifyContent:"center"}}>
+                                    <Text style={[styles.text]}>{this.state.nextVisit}</Text>
+                              </View>
+                                <View style={{}}>
+                                    <TouchableOpacity
+                                        onPress={() => { this.setState({ show1: true }) }}
+                                    >
+                                        <AntDesign name="calendar" size={24} color="black" />
+                                    </TouchableOpacity>
 
                                 
-                            </View>
-                            <View style={{flex:0.5,alignItems:"center"}}>
-                                 <TouchableOpacity 
-                                   onPress ={()=>{this.setState({show1:true})}}
-                                 >
-                                    <AntDesign name="calendar" size={24} color="black" />
-                                 </TouchableOpacity>
-                               
-                                <Text style={[styles.text]}>{this.state.nextVisit}</Text>
-                            </View>
+                                </View>
                            
                         </View>
                 <View style={{height:height*0.15,alignItems:"center",justifyContent:'center'}}>

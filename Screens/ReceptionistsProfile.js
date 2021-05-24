@@ -33,17 +33,6 @@ class ReceptionistsProfile extends Component {
                         <Text style={[styles.text, { color: "gray" }]}>Personal Info</Text>
                     </View>
                     <View style={{ flexDirection: "row", marginTop: 15, alignItems: "center", justifyContent: 'space-between' }}>
-                        <View >
-                            <Text style={[styles.text, { color: "gray" }]}>Age</Text>
-                            <Text style={[styles.text, { marginTop: 5, color: "#000", }]}>{this.props.user.profile.age}</Text>
-                        </View>
-                        <View>
-                            <Text style={[styles.text, { color: "gray" }]}>Blood Group</Text>
-                            <Text style={[styles.text, { marginTop: 5, color: "#000", }]}>{this.props.user.profile.blood_group}</Text>
-                        </View>
-                    </View>
-
-                    <View style={{ flexDirection: "row", marginTop: 15, alignItems: "center", justifyContent: 'space-between' }}>
                         <View style={{ flex: 0.6 }}>
                             <Text style={[styles.text, { color: "gray" }]}>Age</Text>
                             <Text style={[styles.text, { marginTop: 5, color: "#000", }]}>{this.props.user.profile.age}</Text>
@@ -53,6 +42,7 @@ class ReceptionistsProfile extends Component {
                             <Text style={[styles.text, { marginTop: 5, color: "#000", }]}>{this.props.user.profile.blood_group}</Text>
                         </View>
                     </View>
+
 
                     <View style={{ flexDirection: "row", marginTop: 15, alignItems: "center", justifyContent: 'space-between' }}>
                         <View style={{ flex: 0.6 }}>

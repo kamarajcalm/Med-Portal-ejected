@@ -95,7 +95,7 @@ let sendData ={
    }
     else{
      this.setState({ loading: false})
-     return this.showSimpleMessage(`${login?.error?.toString()}`, "#dd7030")
+     return this.showSimpleMessage(`${login?.error?.toString()||login.data.message}`, "#dd7030")
     }
  
 

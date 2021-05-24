@@ -135,7 +135,7 @@ class ProfileEdit extends Component {
                 <SafeAreaView style={styles.topSafeArea} />
                 <SafeAreaView style={styles.bottomSafeArea}>
                     <View style={{ flex: 1, }}>
-                        <StatusBar backgroundColor={themeColor} />
+                        <StatusBar backgroundColor={themeColor}/>
                                     {/* Headers */}
                         <View style={{ height: height * 0.1, backgroundColor: themeColor, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, justifyContent: "center", flexDirection: "row" }}>
 

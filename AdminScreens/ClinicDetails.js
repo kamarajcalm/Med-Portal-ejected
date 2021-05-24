@@ -96,18 +96,17 @@ class ClinicDetails extends Component {
       let today =days[date.getDay()]
 
       return(
-          item.clinicShits[today].map((i,index)=>{
-          if(i?.timings?.length>0){
+          item.clinicShits[today][0].timings.map((i, index) => {
               return (
-                  <View style={{ flexDirection: "row", marginTop: 5 }}>
-                      <Text>{index + 1}.</Text>
-                      <Text style={{ marginLeft: 5 }}>{i?.timings[0][0]}</Text>
-                      <Text>-</Text>
-                      <Text>{i?.timings[0][1]}</Text>
+                  <View
+                      key={index}
+                      style={{ flexDirection: "row", marginTop: 5 }}>
+                      <Text style={[styles.text, { fontWeight: "bold" }]}>{index + 1}.</Text>
+                      <Text style={[styles.text, { marginLeft: 5 }]}>{i[0]}</Text>
+                      <Text style={[styles.text]}>-</Text>
+                      <Text style={[styles.text]}>{i[1]}</Text>
                   </View>
               )
-          }
-          
           })
       )
 

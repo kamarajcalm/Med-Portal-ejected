@@ -611,7 +611,7 @@ export default class MedicineDetails extends Component {
                   <View style={{  margin:20 }}>
                       <Text style={[styles.text, { fontWeight: "bold", fontSize: 20 }]}>{item.title}</Text>
                   </View>
-                  <View style={{ flexDirection: "row",alignItems:"center",justifyContent:"center",marginTop:10 }}>
+                  <View style={{ flexDirection: "row",alignItems:"center",justifyContent:"center", }}>
                       <View style={{ alignItems: 'center', justifyContent: "center" }}>
                           <Text>Enter Qty</Text>
                       </View>

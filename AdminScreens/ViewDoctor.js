@@ -24,23 +24,28 @@ class ViewDoctor extends Component {
         console.log(this.state.item?.doctor?.profile?.name)
     }
     getTodayTimings = (today) => {
+      
+   return(
+       this.state.item.clinicShits[today][0].timings.map((i, index) => {
+           return (
+               <View 
+                key={index}
+                style={{ flexDirection: "row", marginTop: 5 }}>
+                   <Text style={[styles.text, { fontWeight: "bold" }]}>{index + 1}.</Text>
+                   <Text style={[styles.text, { marginLeft: 5 }]}>{i[0]}</Text>
+                   <Text style={[styles.text]}>-</Text>
+                   <Text style={[styles.text]}>{i[1]}</Text>
+               </View>
+           )
+       })
+   )
        
-        return (
-            this.state.item.clinicShits[today].map((i, index) => {
-                return (
-                    <View style={{ flexDirection: "row", marginTop: 5 }}>
-                        <Text style={[styles.text,{fontWeight:"bold"}]}>{index + 1}.</Text>
-                        <Text style={[styles.text,{ marginLeft: 5 }]}>{i.timings[0][0]}</Text>
-                        <Text style={[styles.text]}>-</Text>
-                        <Text style={[styles.text]}>{i.timings[0][1]}</Text>
-                    </View>
-                )
-            })
-        )
+       
 
 
 
     }
+
     render() {
         return (
             <>
@@ -59,7 +64,7 @@ class ViewDoctor extends Component {
                                 <Text style={[styles.text, { color: '#fff', fontWeight: 'bold', fontSize: 18 }]}>{this.state.item?.doctor?.profile?.name}</Text>
                             </View>
                            {this.state.owner&&<TouchableOpacity style={{ flex: 0.2, flexDirection:"row",alignItems:"center",justifyContent:'center' }}
-                                onPress={() => { this.props.navigation.navigate('EditDoctorTimings',{clinic:this.state.item})}}
+                                onPress={() => { this.props.navigation.navigate('EditDoctorTimings',{clinic:this.state.item,})}}
                             >
                                 <Entypo name="back-in-time" size={24} color="#fff" />
                                 <Text style={[styles.text, { marginLeft: 10, color: "#fff" }]}>Edit </Text>

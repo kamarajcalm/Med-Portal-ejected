@@ -19,8 +19,6 @@ import ChatStack from '../stacks/ChatStack';
 import ProfileStack from '../stacks/ProfileStack';
 import AppointmentStack from '../stacks/AppointmentStack';
 const Tab = createBottomTabNavigator();
-
-
 class TabNavigator extends Component {
     constructor(props) {
         super(props);
@@ -51,7 +49,9 @@ class TabNavigator extends Component {
         if (routeName == "showCard") {
             return false
         }
-
+        if (routeName == "Chat") {
+            return false
+        }
         return true
     }
     getTabBarVisibility2 = (route) => {

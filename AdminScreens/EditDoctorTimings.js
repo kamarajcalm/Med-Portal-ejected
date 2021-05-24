@@ -26,7 +26,6 @@ const url = settings.url
 class EditDoctorTimings extends Component {
     constructor(props) {
         let clinic = props.route.params.clinic
-     
         super(props);
         this.state = {
             openingTime: null,
@@ -124,7 +123,6 @@ class EditDoctorTimings extends Component {
         this.setState({ show1: false, }, () => {
             if (this.state.day == "Sun") {
                 let duplicate = this.state.Sun
-
                 duplicate.day = "Sun",
                     duplicate.index = 0,
                     duplicate.starttime = moment(date).format('h:mm a')
@@ -232,130 +230,9 @@ class EditDoctorTimings extends Component {
 
         this.hideDatePicker2();
     };
-    // onChange1 = (selectedDate) => {
-    //     if (selectedDate.type == "set") {
-    //         this.setState({ show1: false, }, () => {
-    //             if (this.state.day == "Sun") {
-    //                 let duplicate = this.state.Sun
 
-    //                 duplicate.day = "Sun",
-    //                     duplicate.index = 0,
-    //                     duplicate.starttime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
-
-    //                 return this.setState({ Sun: duplicate })
-    //             }
-    //             if (this.state.day == "Mon") {
-    //                 let duplicate = this.state.Mon
-
-    //                 duplicate.day = "Mon",
-    //                     duplicate.index = 1,
-    //                     duplicate.starttime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
-
-    //                 return this.setState({ Mon: duplicate })
-    //             }
-    //             if (this.state.day == "Tue") {
-    //                 let duplicate = this.state.Tue
-
-    //                 duplicate.day = "Tue",
-    //                     duplicate.index = 2,
-    //                     duplicate.starttime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
-
-    //                 return this.setState({ Tue: duplicate })
-    //             }
-    //             if (this.state.day == "Wed") {
-    //                 let duplicate = this.state.Wed
-    //                 duplicate.day = "Wed",
-    //                     duplicate.index = 3,
-    //                     duplicate.starttime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
-
-    //                 return this.setState({ Wed: duplicate })
-    //             }
-    //             if (this.state.day == "Thu") {
-    //                 let duplicate = this.state.Thu
-
-    //                 duplicate.day = "Thu",
-    //                     duplicate.index = 4,
-    //                     duplicate.starttime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
-
-    //                 return this.setState({ Thu: duplicate })
-    //             }
-    //             if (this.state.day == "Fri") {
-    //                 let duplicate = this.state.Fri
-
-    //                 duplicate.day = "Fri",
-    //                     duplicate.index = 5,
-    //                     duplicate.starttime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
-
-    //                 return this.setState({ Fri: duplicate })
-    //             }
-    //             if (this.state.day == "Sat") {
-    //                 let duplicate = this.state.Sat
-
-    //                 duplicate.day = "Sat",
-    //                     duplicate.index = 6,
-    //                     duplicate.starttime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
-
-    //                 return this.setState({ Sat: duplicate })
-    //             }
-
-    //         })
-
-    //     } else {
-    //         return null
-    //     }
-
-    // }
-    // onChange2 = (selectedDate) => {
-    //     if (selectedDate.type == "set") {
-    //         this.setState({ show2: false, }, () => {
-
-    //             if (this.state.day == "Sun") {
-    //                 let duplicate = this.state.Sun
-    //                 duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
-    //                 return this.setState({ Sun: duplicate })
-    //             }
-    //             if (this.state.day == "Mon") {
-    //                 let duplicate = this.state.Mon
-    //                 duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
-    //                 return this.setState({ Mon: duplicate })
-    //             }
-    //             if (this.state.day == "Tue") {
-    //                 let duplicate = this.state.Tue
-    //                 duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
-    //                 return this.setState({ Tue: duplicate })
-    //             }
-    //             if (this.state.day == "Wed") {
-    //                 let duplicate = this.state.Wed
-    //                 duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
-    //                 return this.setState({ Wed: duplicate })
-    //             }
-    //             if (this.state.day == "Thu") {
-    //                 let duplicate = this.state.Thu
-    //                 duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
-    //                 return this.setState({ Thu: duplicate })
-    //             }
-    //             if (this.state.day == "Fri") {
-    //                 let duplicate = this.state.Fri
-    //                 duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
-    //                 return this.setState({ Fri: duplicate })
-    //             }
-    //             if (this.state.day == "Sat") {
-    //                 let duplicate = this.state.Sat
-    //                 duplicate.endtime = moment(new Date(selectedDate.nativeEvent.timestamp)).format('h:mm a')
-    //                 return this.setState({ Sat: duplicate })
-    //             }
-
-
-
-    //         })
-
-    //     } else {
-    //         return null
-    //     }
-
-    // }
-    addDoctor = async () => {
-        let api = `${url}/api/prescription/clinicDoctors/?clinic=${this.state.pk.clinicpk}`
+    update = async () => {
+        let api = `${url}/api/prescription/addDoctors/`
         let timings = [
             {
                 type: "Monday",
@@ -387,12 +264,11 @@ class EditDoctorTimings extends Component {
             },
         ]
         let sendData = {
-            doctor: this.state.doctor.user,
-            clinic: this.state.clinic,
-            timings
+            shift:this.state.clinic.id,
+            timings,
 
         }
-
+console.log(sendData,"ppp")
         let post = await HttpsClient.post(api, sendData)
         console.log(post, "jkjjj")
         if (post.type == "success") {
@@ -406,22 +282,24 @@ class EditDoctorTimings extends Component {
     }
     setTimings =()=>{
         if (this.state.clinic.clinicShits.Sunday.length > 0) {
-            this.state.clinic.clinicShits.Sunday[0].timings.forEach((i) => {
+            this.state.clinic.clinicShits.Sunday[0].timings.forEach((i,index) => {
                 let arr = this.state.SunArray
                 let pushObject = {
                     starttime: i[0],
-                    endtime: i[1]
+                    endtime: i[1],
+                    index:index
                 }
                 arr.push(pushObject)
                 this.setState({ SunArray: arr })
             })
         }
         if (this.state.clinic.clinicShits.Monday.length>0){
-            this.state.clinic.clinicShits.Monday[0].timings.forEach((i)=>{
+            this.state.clinic.clinicShits.Monday[0].timings.forEach((i,index)=>{
                 let arr =this.state.MonArray
                 let pushObject ={
                     starttime:i[0],
-                    endtime:i[1]
+                    endtime:i[1],
+                    index: index
                 }
                 arr.push(pushObject)
                 this.setState({ MonArray:arr})
@@ -429,11 +307,12 @@ class EditDoctorTimings extends Component {
         }
    
         if (this.state.clinic.clinicShits.Tuesday.length > 0) {
-            this.state.clinic.clinicShits.Tuesday[0].timings.forEach((i) => {
+            this.state.clinic.clinicShits.Tuesday[0].timings.forEach((i,index) => {
                 let arr = this.state.TueArray
                 let pushObject = {
                     starttime: i[0],
-                    endtime: i[1]
+                    endtime: i[1],
+                    index: index
                 }
                 arr.push(pushObject)
                 this.setState({ TueArray: arr })
@@ -441,11 +320,12 @@ class EditDoctorTimings extends Component {
         }
       
         if (this.state.clinic.clinicShits.Wednesday.length > 0) {
-            this.state.clinic.clinicShits.Wednesday[0].timings.forEach((i) => {
+            this.state.clinic.clinicShits.Wednesday[0].timings.forEach((i,index) => {
                 let arr = this.state.WedArray
                 let pushObject = {
                     starttime: i[0],
-                    endtime: i[1]
+                    endtime: i[1],
+                    index: index
                 }
                 arr.push(pushObject)
                 this.setState({ WedArray: arr })
@@ -453,33 +333,36 @@ class EditDoctorTimings extends Component {
         }
 
         if (this.state.clinic.clinicShits.Thursday.length > 0) {
-            this.state.clinic.clinicShits.Thursday[0].timings.forEach((i) => {
+            this.state.clinic.clinicShits.Thursday[0].timings.forEach((i,index) => {
                 let arr = this.state.ThuArray
                 let pushObject = {
                     starttime: i[0],
-                    endtime: i[1]
+                    endtime: i[1],
+                    index: index
                 }
                 arr.push(pushObject)
                 this.setState({ ThuArray: arr })
             })
         }
         if (this.state.clinic.clinicShits.Friday.length > 0) {
-            this.state.clinic.clinicShits.Friday[0].timings.forEach((i) => {
+            this.state.clinic.clinicShits.Friday[0].timings.forEach((i,index) => {
                 let arr = this.state.FriArray
                 let pushObject = {
                     starttime: i[0],
-                    endtime: i[1]
+                    endtime: i[1],
+                    index: index
                 }
                 arr.push(pushObject)
                 this.setState({ FriArray: arr })
             })
         }
         if (this.state.clinic.clinicShits.Saturday.length > 0) {
-            this.state.clinic.clinicShits.Saturday[0].timings.forEach((i) => {
+            this.state.clinic.clinicShits.Saturday[0].timings.forEach((i,index) => {
                 let arr = this.state.SatArray
                 let pushObject = {
                     starttime: i[0],
-                    endtime: i[1]
+                    endtime: i[1],
+                    index: index
                 }
                 arr.push(pushObject)
                 this.setState({ SatArray: arr })
@@ -1095,7 +978,7 @@ class EditDoctorTimings extends Component {
 
                                 <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
                                     <TouchableOpacity style={{ width: width * 0.4, height: height * 0.05, borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: themeColor }}
-                                        onPress={() => { this.addDoctor() }}
+                                        onPress={() => { this.update() }}
                                     >
                                         <Text style={[styles.text, { color: "#fff" }]}>Update</Text>
                                     </TouchableOpacity>
