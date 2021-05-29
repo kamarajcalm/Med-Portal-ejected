@@ -25,7 +25,8 @@ class ListPatientPriscription extends Component {
         };
     }
     getPrescription =async()=>{
-        let api = `${url}/api/prescription/prescriptions/?forUser=${this.state.item.user}`
+  
+        let api = `${url}/api/prescription/prescriptions/?forUser=${this.state.item.user.id}`
         let data = await HttpsClient.get(api)
      console.log(api,"ppp")
         if (data.type == "success") {

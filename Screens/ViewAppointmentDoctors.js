@@ -249,7 +249,7 @@ class ViewAppointmentDoctors extends Component {
                             <View style={{ margin: 20 }}>
 
                                 <View>
-                                    <Text style={{ fontWeight: "bold", fontSize: 18, color: "#000" }}>{this.state.item.clinicname}</Text>
+                                    <Text style={{ fontWeight: "bold", fontSize: 18, color: "#000" }}>{this.state.item.clinicname.name}</Text>
                                 </View>
 
 

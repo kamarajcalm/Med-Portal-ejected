@@ -4,10 +4,35 @@ import settings from '../AppSettings'
 import { AntDesign, Entypo } from '@expo/vector-icons';
 import { Octicons } from '@expo/vector-icons';
 import Modal from "react-native-modal";
-import DropDownPicker from 'react-native-dropdown-picker';
+
 const { height, width } = Dimensions.get("window");
 const fontFamily = settings.fontFamily;
 const themeColor = settings.themeColor;
+let types = [
+    {
+        label: "Tablet", value: 'Tablet'
+    },
+    {
+        label: "Drops", value: 'Drops'
+    },
+    {
+        label: "Others", value: 'Others'
+    },
+    {
+        label: "Capsules", value: 'Capsules'
+    },
+    {
+        label: "Liquid", value: 'Liquid'
+    },
+ 
+    {
+        label: "Cream", value: 'Cream'
+    },
+    {
+        label: "Injections", value: 'Injections'
+    },
+]
+import DropDownPicker from 'react-native-dropdown-picker';
 export default class MedicineDetails extends Component {
   constructor(props) {
     super(props);
@@ -22,7 +47,8 @@ export default class MedicineDetails extends Component {
         days:"",
         qty:'',
         comment:"",
-        selectedVariant:""
+        selectedVariant:"",
+        name:""
     };
   }
     toggleSwitch =()=>{
@@ -50,21 +76,31 @@ export default class MedicineDetails extends Component {
         this.props.changeFunction("variant", this.state.selectedVariant, this.props.index)
     
     }
+    changeType =(item) =>{
+        this.props.changeFunction("type", item.value, this.props.index)
+    }
+    changeName = (name) => {
+        this.setState({name})
+        this.props.changeFunction("name", name, this.props.index)
+    }
+    componentDidMount(){
+        
+    }
   render() {
       const{item,index} =this.props
       console.log(item)
-      let variants = []
-      try{
-          item.variants.forEach((i) => {
-              let obj = {
-                  label: i,
-                  value: i,
-              }
-              variants.push(obj)
-          })
-      }catch(e){
-          console.log(e)
-      }
+    //   let variants = []
+    //   try{
+    //       item.variants.forEach((i) => {
+    //           let obj = {
+    //               label: i,
+    //               value: i,
+    //           }
+    //           variants.push(obj)
+    //       })
+    //   }catch(e){
+    //       console.log(e)
+    //   }
     
                         // if tablets
       if (item.type == "Tablet" || item.type =="Drops"||item.type =="Capsules"){
@@ -643,7 +679,48 @@ export default class MedicineDetails extends Component {
               </View>
           )
       }
-     
+      if(item.manual){
+          return(
+              <View style={[styles.card4]}>
+                  <View style={{ marginLeft: 15, }}>
+                      <Text style={[styles.text, { color: "#000" }]}>Enter Name</Text>
+                      <TextInput
+                          value={this.state.name}
+                          selectionColor={themeColor}
+                          onChangeText={(name) => { this.changeName(name) }}
+                          style={{ width: width * 0.8, height: height * 0.05, backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10 }}
+                      />
+                  </View>
+               {this.state.name.length>0&&<View style={{margin:15}}>
+                      <Text style={[styles.text,{color:"#000"}]}>Select Type</Text>
+                      <View style={{ marginLeft: 10,marginTop:10 }}>
+                          <DropDownPicker
+                              items={types}
+                              containerStyle={{ height: 40, width: width * 0.4 }}
+                              style={{ backgroundColor: '#fafafa' }}
+                              itemStyle={{
+                                  justifyContent: 'flex-start'
+                              }}
+                              dropDownStyle={{ backgroundColor: '#fafafa', width: width * 0.4 }}
+                            //   onChangeItem={item => this.setState({
+                            //       selectedType: item.value
+                            //   })}
+                              onChangeItem={(item)=>{
+                                  this.changeType(item)
+                              }}  
+                          />
+                      </View>
+                  </View>}
+                  
+                  <TouchableOpacity
+                      onPress={() => { this.props.changeFunction("delete", item, index) }}
+                      style={{ position: "absolute", top: 10, right: 10, }}
+                  >
+                      <Entypo name="circle-with-cross" size={24} color="red" />
+                  </TouchableOpacity>
+              </View>
+          )
+      }
       return null
   }
 }
@@ -687,5 +764,13 @@ const styles = StyleSheet.create({
         height: height * 0.25,
         borderRadius: 10,
 
-    }
+    },
+    card4:{
+        backgroundColor: "#fff",
+        elevation: 6,
+        margin: 10,
+        minHeight: height * 0.4,
+        borderRadius: 10,
+
+    },
 })

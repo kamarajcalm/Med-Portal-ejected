@@ -28,7 +28,7 @@ Notifications.setNotificationHandler({
     };
   }
      getUserDetails = async () => {
-     
+      //  return this.props.navigation.navigate('Login')
       //  return this.props.navigation.dispatch(
       //    CommonActions.reset({
       //      index: 0,

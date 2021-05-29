@@ -64,7 +64,7 @@ class PriscriptionIssue extends Component {
     }
     getPriscriptions =async(pk)=>{
         let api = `${url}/api/prescription/issued/?clinic=${pk}&date=${moment(this.state.date).format("YYYY-MM-DD")}`
-        console.log(api)
+        console.log(api,"[kjk")
         const data = await HttpsClient.get(api)
         console.log(data)
         if(data.type =="success"){
@@ -92,6 +92,7 @@ class PriscriptionIssue extends Component {
             
             let api = `${url}/api/prescription/getDoctorClinics/?medicalRep=${this.props.user.id}`
             let data = await HttpsClient.get(api)
+            console.log(api)
             if(data.type =="success"){
                 this.setState({ medicals: data.data.ownedclinics})
                 this.props.selectMedical(data.data.ownedclinics[0])
@@ -198,7 +199,7 @@ class PriscriptionIssue extends Component {
                             renderItem={({ item, index }) => {
                                 return (
                                     <TouchableOpacity style={[styles.card, { flexDirection: "row", borderRadius: 5 ,marginTop:15}]}
-                                        onPress={() => { this.props.navigation.navigate('showCard2', { item }) }}
+                                        onPress={() => { this.props.navigation.navigate('PrescriptionView', { item, }) }}
                                     >
                                         <View style={{ flex: 0.3, alignItems: 'center', justifyContent: "center" }}>
                                             <Image

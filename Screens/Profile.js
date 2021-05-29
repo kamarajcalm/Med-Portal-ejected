@@ -216,7 +216,7 @@ validateExpiry =()=>{
               <View style={{ alignItems: "center", justifyContent: "center", flexDirection: "row", marginLeft: 20 }}>
                 <Image
                   source={{ uri: this.props.user.profile.displayPicture || "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
-                  style={{ height: 60, width: 60, borderRadius: 30 }}
+                  style={{ height: 100, width: 100, borderRadius: 50 }}
                 />
                 <TouchableOpacity style={{}}
                   onPress={() => { this.props.navigation.navigate('ProfileEdit') }}

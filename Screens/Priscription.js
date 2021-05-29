@@ -26,7 +26,7 @@ import { Fontisto } from '@expo/vector-icons';
 import moment from 'moment';
 import { connect } from 'react-redux';
 import { selectTheme, selectClinic ,selectWorkingClinics,selectOwnedClinics} from '../actions';
-import authAxios from '../api/authAxios';
+import axios from 'axios';
 import HttpsClient from "../api/HttpsClient";
 import Modal from 'react-native-modal';
 import { Ionicons, Entypo, Feather, MaterialCommunityIcons, FontAwesome, FontAwesome5, EvilIcons } from '@expo/vector-icons';
@@ -48,7 +48,7 @@ const today1 = moment(Date1).format("YYYY-MM-DD")
 const getCloser = (value, checkOne, checkTwo) =>
 Math.abs(value - checkOne) < Math.abs(value - checkTwo) ? checkOne : checkTwo;
 const Priscription = (props) => {
-    
+    let cancelToken;
           //   STATES
     const[collapsed,setCollapsed] =useState(false)
     const[check,setChecked] =useState(false)
@@ -71,8 +71,8 @@ const Priscription = (props) => {
     const [search,setSearch] =useState(false)
     const [button,setButton] =useState(true)
     const [expiryModal, setExpiryModal] =useState(false)
-    const [offset, setOffset] =useState(0)
-    const [loadMore, setLoadMore] =useState(true)
+
+    
 
     //         search:false,
 
@@ -131,14 +131,65 @@ const getIndex =(index) =>{
             }
         }
     };
+                        //   USE EFFECT
+
+
+
+    useEffect(() => {
+        if (props.user.profile.occupation == "Doctor") {
+            clinicRef.current = props.clinic
+            getPrescription()
+            if (props.clinic?.validtill?.available == false) {
+                setExpiryModal(true)
+            } else {
+                setExpiryModal(false)
+            }
+        }
+
+    }, [props.clinic])
+
+    useEffect(() => {
+        if (isDoctor) {
+            getPrescription()
+        } else {
+            getClinicPrescription()
+        }
+    }, [date])
+        //   ComponentDidmount
+    useEffect(() => {
+        stateRef.current = today1
+        findUser();
+        const unsubscribe = props.navigation.addListener('focus', () => {
+
+
+            if (props.user.profile.occupation == "Doctor") {
+                getPrescription()
+
+            }
+
+
+
+        });
+
+        Keyboard.addListener("keyboardDidShow", _keyboardDidShow);
+        Keyboard.addListener("keyboardDidHide", _keyboardDidHide);
+
+        // cleanup function
+        return () => {
+            Keyboard.removeListener("keyboardDidShow", _keyboardDidShow);
+            Keyboard.removeListener("keyboardDidHide", _keyboardDidHide);
+            unsubscribe
+        };
+    }, [])
+
    const searchPriscriptions = async(text) => {
-       let api = `${url}/api/prescription/prescriptions/?forUser=${props.user.id}&usersearch=${text}`
-       const data =await HttpsClient.get(api)
-       console.log(data)
-       if(data.type=="success"){
-           setPrescriptions(data.data)
+       if (typeof cancelToken != typeof undefined) {
+          cancelToken.cancel('cancelling the previous request')
        }
-       
+       cancelToken = axios.CancelToken.source()
+       let api = `${url}/api/prescription/prescriptions/?forUser=${props.user.id}&usersearch=${text}`
+       const data = await axios.get(api, { cancelToken:cancelToken.token });
+       setPrescriptions(data.data)
     }
    const getClinics = async () => {
         const api = `${url}/api/prescription/getDoctorClinics/?doctor=${props.user.id}`
@@ -209,10 +260,11 @@ const getIndex =(index) =>{
         let data = await HttpsClient.get(api)
         console.log(api)
         if (data.type == "success") {
-           
+            setLoading(false)
             setPrescriptions(data.data)
-         
+            
         }
+        setIsFetching(false)
     }
   const  getClinicPrescription = async () => {
       console.log(props.user.profile.recopinistclinics,"pppp")
@@ -227,18 +279,7 @@ const getIndex =(index) =>{
         }
 
     }
-    useEffect(()=>{
-        if(props.user.profile.occupation =="Doctor"){
-            clinicRef.current = props.clinic
-            getPrescription()
-            if (props.clinic?.validtill?.available == false) {
-                setExpiryModal(true)
-            } else {
-                setExpiryModal(false)
-            }
-        }
-     
-    },[props.clinic])
+
  const   setActiveClinic = async (item) => {
         const api = `${url}/api/prescription/clinicDoctors/${item.pk}/`
         let sendData = {
@@ -253,31 +294,7 @@ const getIndex =(index) =>{
         }
        
     }
-    useEffect(()=>{
-        stateRef.current =today1
-       findUser();
-        const unsubscribe = props.navigation.addListener('focus', () => {
-            
-        
-            if (props.user.profile.occupation == "Doctor"){
-                getPrescription()
-       
-            }
-      
-       
 
-        });
-      
-        Keyboard.addListener("keyboardDidShow", _keyboardDidShow);
-        Keyboard.addListener("keyboardDidHide", _keyboardDidHide);
-
-        // cleanup function
-        return () => {
-            Keyboard.removeListener("keyboardDidShow", _keyboardDidShow);
-            Keyboard.removeListener("keyboardDidHide", _keyboardDidHide);
-            unsubscribe
-        };
-    },[])
   const  showDatePicker = () => {
       setShow(true)
     };
@@ -286,16 +303,8 @@ const getIndex =(index) =>{
        setShow(false)
   
     };
-    useEffect(()=>{
-     
-    },[])
-useEffect (()=>{
-if(isDoctor){
-    getPrescription()
-}else{
-    getClinicPrescription()
-}
-},[date])
+   
+
 const _keyboardDidShow =()=>{
     setButton(false);
 
@@ -442,7 +451,7 @@ const _keyboardDidShow =()=>{
                     <View style={{flex:0.7,marginHorizontal:10,justifyContent:'center'}}>
                         <View style={{marginTop:10,flexDirection:'row',alignItems:'center',justifyContent:"space-between"}}>
                             <View style={{alignItems:'center',justifyContent:'center'}}>
-                                <Text style={[styles.text, { color: "#000", fontWeight: 'bold' }]}>Patient : {item?.username}</Text>
+                                <Text style={[styles.text, { color: "#000", fontWeight: 'bold' }]}>Patient : {item?.username?.name}</Text>
 
                             </View>
                             <View style={{alignItems:"center",justifyContent:"center"}}>
@@ -527,7 +536,7 @@ const _keyboardDidShow =()=>{
                 <View style={{ flex: 0.7, marginHorizontal: 10, justifyContent: 'center' }}>
                     <View style={{ marginTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: "space-between" }}>
                         <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                            <Text style={[styles.text, { color: "#000", fontWeight: 'bold' }]}>Patient : {item?.username}</Text>
+                            <Text style={[styles.text, { color: "#000", fontWeight: 'bold' }]}>Patient : {item?.username.name}</Text>
 
                         </View>
                         <View style={{ alignItems: "center", justifyContent: "center" }}>
@@ -581,7 +590,7 @@ const _keyboardDidShow =()=>{
         )
     }
     const renderFooter =()=>{
-        if(loadMore){
+        if(loading){
             return (
                 <View>
                     <ActivityIndicator size={"large"} color={themeColor} />
@@ -590,12 +599,9 @@ const _keyboardDidShow =()=>{
         }
        return null
     }
-    useEffect (()=>{
-      getPateintPrescription()
-    },[offset])
+ 
    const onRefresh = () => {
        setIsFetching(true)
-     
         if (isDoctor) {
             getPrescription()
         } else if (isReceptionist) {
@@ -625,7 +631,7 @@ const _keyboardDidShow =()=>{
                             progressViewOffset={headerHeight}
                          />
                      }
-          
+                    ListFooterComponent={renderFooter}
                     scrollEventThrottle={16}
                     contentContainerStyle={{ paddingTop: headerHeight ,paddingBottom:90}}
                     onScroll={handleScroll}

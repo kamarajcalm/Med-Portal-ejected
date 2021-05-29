@@ -22,6 +22,13 @@ import axios from 'axios';
     };
    
   }
+
+    addNew =()=>{
+        let duplicate = this.state.medicines
+        duplicate.push({manual:true})
+        this.props.route.params.backFunction(duplicate)
+        this.props.navigation.goBack()
+    }
      selectMedicine =(item)=>{
 
          let data =this.state.selected
@@ -40,13 +47,13 @@ import axios from 'axios';
          
      }
      SearchMedicines =async(query)=>{
-      
+      this.setState({search:true})
       if(typeof this.state.cancelToken != typeof undefined){
          this.state.cancelToken.cancel('cancelling the previous request')
       }
       this.state.cancelToken = axios.CancelToken.source()
       let api= `${url}/api/prescription/medicines/?name=${query}`
-       
+       console.log(api,"ppp")
       const data = await axios.get(api,{cancelToken:this.state.cancelToken.token});
          this.setState({ medicines: data.data })
     // const data =await HttpsClient.get(api)
@@ -83,7 +90,7 @@ import axios from 'axios';
                 </View>
                  
             </View>
-            <FlatList
+           { this.state.medicines.length>0&&<FlatList
                 data={this.state.medicines}
                 keyExtractor={(item,index)=>index.toString()}
                 renderItem={({item,index})=>{
@@ -91,18 +98,33 @@ import axios from 'axios';
                       <Medicine item ={item} selection={(item)=>{this.selectMedicine(item)}}/>
                     )
                 }}
-            />
-            <View style={{position:"absolute",bottom:30,left: 20,height:height*0.05,width:width*0.4,backgroundColor:themeColor,borderRadius:15,alignItems:"center",justifyContent:'center'}}>
+            />}
+            {
+                this.state.medicines.length ==0&&this.state.search&&<View style={{flex:1,alignItems:'center',justifyContent:'center'}}>
+                    <View>
+                        <Text style={[styles.text]}>No results Found</Text>
+                    </View>
+                   <TouchableOpacity 
+                                onPress={() => {
+                                    this.addNew()
+                                }}
+                                style={{ height: height * 0.05, width: width * 0.4, backgroundColor: themeColor, borderRadius: 15, alignItems: "center", justifyContent: 'center' }}
+                   >
+                                <Text style={[styles.text, { color: "#fff" }]}>Add New</Text>
+                   </TouchableOpacity>
+                </View>
+            }
+            {this.state.medicines.length>0&&<View style={{position:"absolute",bottom:30,left: 20,height:height*0.05,width:width*0.4,backgroundColor:themeColor,borderRadius:15,alignItems:"center",justifyContent:'center'}}>
                   <Text style={[styles.text,{color:"#fff"}]}>selected ({this.state.selected.length})</Text> 
-            </View>
-                    <TouchableOpacity style={{ position: "absolute", bottom: 30, right: 20, height: height * 0.05, width: width * 0.4, backgroundColor: themeColor, borderRadius: 15, alignItems: "center", justifyContent: 'center' }}
+            </View>}
+                    {this.state.medicines.length>0&&<TouchableOpacity style={{ position: "absolute", bottom: 30, right: 20, height: height * 0.05, width: width * 0.4, backgroundColor: themeColor, borderRadius: 15, alignItems: "center", justifyContent: 'center' }}
                       onPress={()=>{
                           this.props.route.params.backFunction(this.state.selected)
                           this.props.navigation.goBack()
                         }}
                     >
                         <Text style={[styles.text, { color: "#fff" }]}>Proceed</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity>}
       </View>
             </SafeAreaView>
         </>

@@ -152,6 +152,9 @@ class ProfileEdit extends Component {
                             </View>
                         </View>
                         <View style={{ flex: 1 }}>
+                            <ScrollView style={{ margin: 20 }}
+                                showsVerticalScrollIndicator={false}
+                            >
                             <View style={{ height: height * 0.12, alignItems: "center", justifyContent: 'center' }}>
                                 <Image
                                     source={{ uri: "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
@@ -167,9 +170,7 @@ class ProfileEdit extends Component {
                             </View>
                            
                             
-                            <ScrollView style={{margin:20}}
-                              showsVerticalScrollIndicator={false}
-                            >
+                          
                                 <View >
                                     <Text style={styles.text}>Name</Text>
                                     <TextInput 

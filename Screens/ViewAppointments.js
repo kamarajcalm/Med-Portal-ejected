@@ -49,6 +49,9 @@ class ViewAppointments extends Component {
         if (status == "Rejected") {
             return "red"
         }
+        if (status == "Declined") {
+            return "red"
+        }
     }
     getDirections =(item)=>{
         
@@ -70,9 +73,8 @@ class ViewAppointments extends Component {
             this.props.navigation.navigate('Chat', { item: data.data })
         }
     }
-    chatDoctor =async () =>{
+    chatDoctor =async ()=>{
         let api = `${url}/api/prescription/createDoctorChat/?doctor=${this.state.item.doctor}&customer=${this.props.user.id}`
-
         let data = await HttpsClient.get(api)
         console.log(data)
         if (data.type == "success") {

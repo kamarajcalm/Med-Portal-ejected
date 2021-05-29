@@ -4,7 +4,7 @@ import settings from '../AppSettings';
 import { connect } from 'react-redux';
 import { selectTheme } from '../actions';
 const { height, width } = Dimensions.get("window");
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons ,AntDesign} from '@expo/vector-icons';
 import authAxios from '../api/authAxios';
 const fontFamily = settings.fontFamily;
 const themeColor = settings.themeColor;
@@ -16,6 +16,13 @@ import { Feather } from '@expo/vector-icons';
 import HttpsClient from '../api/HttpsClient';
 import Modal from 'react-native-modal';
 import Toast from 'react-native-simple-toast';
+import { SliderBox } from "react-native-image-slider-box";
+const images = [
+    "https://source.unsplash.com/1024x768/?nature",
+    "https://source.unsplash.com/1024x768/?water",
+    "https://source.unsplash.com/1024x768/?girl",
+    "https://source.unsplash.com/1024x768/?tree",
+]
 class ViewClinicDetails extends Component {
     constructor(props) {
         let item = props.route.params.item
@@ -155,14 +162,26 @@ class ViewClinicDetails extends Component {
 
                         <ScrollView style={{ flex: 1, }}>
                             {/* image */}
-                            <View style={{ height: height * 0.2, width }}>
-                                <Image
-                                    style={{ height: "100%", width: "100%", resizeMode: "cover", borderRadius: 5 }}
-                                    source={{ uri: this.state?.item?.displayPicture || "https://t2conline.com/wp-content/uploads/2019/04/thumbnail_Minor_Injury_Walk_In_Clinic1.jpg" }}
+                            <View style={{ height: height * 0.25, }}>
+                                <SliderBox
+                                    images={images}
+                                    dotColor={themeColor}
+                                    imageLoadingColor={themeColor}
+                                    ImageComponentStyle={{ height: "100%", width: "100%", resizeMode: "cover" }}
+                                    autoplay={true}
+                                    circleLoop={true}
                                 />
                             </View>
 
                             {/* Details */}
+                            <View style={[styles.boxWithShadow, { height: height * 0.07, width, backgroundColor: "#eee", flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20 }]}>
+                                <View>
+                                    <Text style={[styles.text]}>Clinic Details</Text>
+                                </View>
+                                <View>
+                                    <AntDesign name="down" size={20} color="black" />
+                                </View>
+                            </View>
                             <View style={{ flexDirection: "row", marginHorizontal: 20, marginTop: 10 }}>
                                 <View style={{ alignItems: "center", justifyContent: "center" }}>
                                     <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Owned By:</Text>
@@ -314,8 +333,16 @@ class ViewClinicDetails extends Component {
                                     <Feather name="phone" size={20} color="black" />
                                 </TouchableOpacity>
                             </View>
+                            <View style={[styles.boxWithShadow, { height: height * 0.07, width, backgroundColor: "#eee", flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20 ,marginTop:10}]}>
+                                <View>
+                                    <Text style={[styles.text]}>Reception list:</Text>
+                                </View>
+                                <View>
+                                    <AntDesign name="down" size={20} color="black" />
+                                </View>
+                            </View>
                             <View style={{ margin: 20 }}>
-                                <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}> Receptionist List:</Text>
+                              
                                 <FlatList
                                     data={this.state.receptionList}
                                     keyExtractor={(item, index) => index.toString()}
@@ -342,8 +369,16 @@ class ViewClinicDetails extends Component {
                                     }}
                                 />
                             </View>
+                            <View style={[styles.boxWithShadow, { height: height * 0.07, width, backgroundColor: "#eee", flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20 }]}>
+                                <View>
+                                    <Text style={[styles.text]}>Doctor List:</Text>
+                                </View>
+                                <View>
+                                    <AntDesign name="down" size={20} color="black" />
+                                </View>
+                            </View>
                             <View style={{ margin: 20 }}>
-                                <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}> Doctors List:</Text>
+                               
                                 <FlatList
                                     data={this.state.doctors}
                                     keyExtractor={(item, index) => index.toString()}
@@ -475,6 +510,13 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "#fff"
     },
+    boxWithShadow: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 5
+    }
 })
 const mapStateToProps = (state) => {
 

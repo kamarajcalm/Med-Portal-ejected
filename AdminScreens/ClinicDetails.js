@@ -71,6 +71,7 @@ class ClinicDetails extends Component {
     }
     deleteReceptionist =async()=>{
         let api = `${url}/api/prescription/recopinists/${this.state.deleteReceptionist.id}/`
+        console.log(api,"ppppp")
         let deletee = await HttpsClient.delete(api);
         if (deletee.type == "success") {
             this.state.receptionList.splice(this.state.deleteReceptionIndex, 1);
@@ -201,7 +202,7 @@ class ClinicDetails extends Component {
                                 </TouchableOpacity>
                             </View>
                             {this.state.showAll && this.state.item.working_hours?.length>0&&
-                                    this.state.item.working_hours.map((i)=>{
+                                    this.state.item.working_hours.map((i,index)=>{
                                      let day= ""
                                      if(i[2]=="0"){
                                          day ="Sun"
@@ -222,7 +223,10 @@ class ClinicDetails extends Component {
                                      }
                                         
                                         return(
-                                            <View style={{ marginHorizontal: 20, marginTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: "space-between" }}>
+                                            <View 
+                                             style={{ marginHorizontal: 20, marginTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: "space-between" }}
+                                             key ={index}
+                                            >
                                                 <View>
                                                     <View style={{alignSelf:"flex-start"}}>
                                                         <Text style={[styles.text, { fontWeight: "bold", fontSize: 18,color:"gray" }]}>{day}:</Text>
@@ -310,7 +314,9 @@ class ClinicDetails extends Component {
                                     keyExtractor={(item,index)=>index.toString()}
                                     renderItem={({item,index})=>{
                                         return(
-                                            <View style={{flexDirection:"row",height:height*0.1,}}>
+                                            <TouchableOpacity style={{flexDirection:"row",height:height*0.1,}}
+                                                onPress={() => { this.props.navigation.navigate('ReceptionistProfile',{item:item})}}
+                                            >
                                                 <View style={{alignItems:"center",justifyContent:"center",flex:0.33}}>
                                                     <Image
                                                         source={{ uri: item.user.profile.displayPicture || "https://s3-ap-southeast-1.amazonaws.com/practo-fabric/practices/711061/lotus-multi-speciality-health-care-bangalore-5edf8fe3ef253.jpeg" }}
@@ -326,7 +332,7 @@ class ClinicDetails extends Component {
                                                 >
                                                     <Entypo name="circle-with-cross" size={24} color={themeColor} />
                                                 </TouchableOpacity>
-                                            </View>
+                                            </TouchableOpacity>
                                         )
                                     }}
                                  />

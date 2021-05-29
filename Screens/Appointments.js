@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StatusBar, Dimensions, TouchableOpacity, StyleSheet, Linking, FlatList, Image, SafeAreaView, ToastAndroid } from 'react-native';
+import { View, Text, StatusBar, Dimensions, TouchableOpacity, StyleSheet, Linking, FlatList, Image, SafeAreaView, ToastAndroid, TextInput, ScrollView } from 'react-native';
 import settings from '../AppSettings';
 import { connect } from 'react-redux';
 import { selectTheme } from '../actions';
@@ -10,14 +10,16 @@ const themeColor = settings.themeColor;
 const screenHeight =Dimensions.get("screen").height;
 import Modal from 'react-native-modal';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-
+import axios from 'axios';
 const initialLayout = { width: Dimensions.get('window').width };
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import moment from 'moment';
 import HttpsClient from '../api/HttpsClient';
-import { FontAwesome, FontAwesome5, Octicons,Fontisto} from '@expo/vector-icons';
+import { FontAwesome, FontAwesome5, Octicons, Fontisto, EvilIcons, Feather, AntDesign} from '@expo/vector-icons';
 import FlashMessage, { showMessage, hideMessage } from "react-native-flash-message";
 import { color } from 'react-native-reanimated';
+import DropDownPicker from 'react-native-dropdown-picker';
+import { ActivityIndicator } from 'react-native-paper';
 const Date1 = new Date()
 const today = moment(Date1).format("YYYY-MM-DD")
 const url = settings.url
@@ -40,8 +42,98 @@ class Appointments extends Component {
             selectedAppointment:null,
             selectedIndex:null,
             Appointments2:[],
-            today
+            today,
+            search:false,
+            cancelToken:undefined,
+            showAppoinmentModal:false,
+            doctors:[],
+            selectedDoctor:null,
+            time:moment(new Date()).format('hh:mm a'),
+            patientNo:"",
+            patientname:""
         };
+    }
+    searchUser = async (mobileNo) => {
+        this.setState({ userfound: false })
+        let api = `${url}/api/profile/userss/?search=${mobileNo}&role=Customer`
+        console.log(api, 'ppppppp')
+        this.setState({ patientNo: mobileNo })
+        if (mobileNo.length > 9) {
+           let data =await HttpsClient.get(api)
+           if(data.type =="success"){
+               if (data.data[0].mobile == mobileNo){
+                   this.setState({userfound:true})
+                   this.setState({ patientname: data.data[0].name, user: data.data[0].user})
+               }
+           }
+        }
+    }
+    requestAppointment = async () => {
+        this.setState({creating:true})
+        if (this.state.today == null) {
+            this.setState({ creating: false })
+            return this.showSimpleMessage("please select date", "#dd7030",)
+   
+        }
+        if (this.state.time == null) {
+            this.setState({ creating: false })
+            return this.showSimpleMessage("please select time", "#dd7030",)
+        }
+        let api = `${url}/api/prescription/addAppointment/`
+        let sendData;
+        if(this.state.userfound){
+            sendData = {
+                clinic: this.props.clinic.clinicpk,
+                doctor: this.state.selectedDoctor.pk,
+                requesteduser: this.state?.user?.id,
+                requesteddate: this.state.today,
+                requestedtime: this.state.time,
+                reason: this.state.reason,
+                
+            }
+
+        }else{
+            sendData = {
+                clinic: this.props.clinic.clinicpk,
+                doctor: this.state.selectedDoctor.pk,
+                requesteduser: this.state.patientNo,
+                requesteddate: this.state.today,
+                requestedtime: this.state.time,
+                reason: this.state.reason,
+                clinicCreation:true,
+                first_name:this.state.patientname
+            }
+        }
+      
+       
+        let post = await HttpsClient.post(api, sendData)
+        console.log(post, "klkk")
+        if (post.type == "success") {
+            this.setState({ creating: false,showAppoinmentModal:false })
+            this.getAppointments()
+            this.showSimpleMessage("requested SuccessFully", "#00A300", "success")
+        } else {
+            this.setState({ creating: false, showAppoinmentModal: false})
+            this.showSimpleMessage("Try again", "#B22222", "danger")
+        }
+    }
+    getDoctors = async () => {
+        let api = `${url}/api/prescription/clinicDoctors/?clinic=${this.props.clinic.clinicpk}`
+        const data = await HttpsClient.get(api)
+        console.log(api, "jjjjj")
+        if (data.type == "success") {
+            let doctors = []
+            data.data.forEach((i) => {
+                let sendObject = {
+                    label: i.doctor.first_name,
+                    value: i.doctor.first_name,
+                    pk: i.doctor.id,
+                    clinicShits: i.clinicShits
+                }
+                doctors.push(sendObject)
+            })
+            this.setState({ doctors, selectedDoctor: doctors[0] })
+        }
     }
     chatClinic = async (item) => {
    
@@ -62,7 +154,7 @@ class Appointments extends Component {
             api = `${url}/api/prescription/appointments/?clinic=${this.props.user.profile.recopinistclinics[0].clinicpk}&date=${this.state.today}`
         }
         else {
-            api = `${url}/api/prescription/appointments/?requesteduser=${this.props.user.id}&date=${this.state.today}`
+            api = `${url}/api/prescription/appointments/?requesteduser=${this.props.user.id}`
         }
 
         const data = await HttpsClient.get(api)
@@ -153,7 +245,7 @@ class Appointments extends Component {
         showMessage(message);
     }
     componentDidMount() {
-        
+        this.getDoctors()
       this.getAppointments();
       this.getAppointments2();
         this._unsubscribe = this.props.navigation.addListener('focus', () => {
@@ -882,6 +974,20 @@ class Appointments extends Component {
             this.setState({ index })
         
     }
+    SearchOppoinments=async(text)=>{
+
+        if (typeof this.state.cancelToken != typeof undefined) {
+            this.state.cancelToken.cancel('cancelling the previous request')
+        }
+        this.state.cancelToken = axios.CancelToken.source()
+        let api = `${url}/api/prescription/appointments/?requesteduser=${this.props.user.id}&search=${text}`
+        console.log(api,"pppp")
+        const data = await axios.get(api, { cancelToken: this.state.cancelToken.token });
+        this.setState({ Appointments2: data.data })
+       
+
+       
+    }
     Modal =()=>{
       
         return(
@@ -932,6 +1038,183 @@ class Appointments extends Component {
             </Modal>
         )
     }
+    appoinmentModal =()=>{
+        return (
+            <Modal
+                deviceHeight={screenHeight}
+                isVisible={this.state.showAppoinmentModal}
+                onBackdropPress={() => { this.setState({ showAppoinmentModal: false }) }}
+            >
+                <View style={{ flex: 1, justifyContent: "center" }}>
+                    <View style={{ height: height * 0.6, backgroundColor: "#eee", borderRadius: 10, }}>
+                        <ScrollView 
+                         showsVerticalScrollIndicator ={false}
+                        > 
+                        <View style={{marginVertical:10,alignItems:'center',justifyContent:"center"}}>
+                            <Text style={[styles.text,{color:"#000",fontWeight:"bold"}]}>Create New Appoinment</Text>
+                          
+                        </View>
+                        <View style={{marginHorizontal:20,marginVertical:10}}>
+                                <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Patient Contact No</Text>
+                                <View style={{marginTop:5}}>
+                                    <TextInput
+                                
+                                        keyboardType={"numeric"}
+                                        selectionColor={themeColor}
+                                        value={this.state.patientNo}
+                                        style={{ width: width * 0.8, height: height * 0.05, backgroundColor: "#fff", borderRadius: 10, paddingLeft: 5, textAlignVertical: "top", paddingTop: 5 }}
+                                        onChangeText={(patientNo) => { this.searchUser(patientNo) }}
+
+                                    />
+                                </View>
+                              
+                        </View>
+                            <View style={{ marginHorizontal: 20, marginVertical: 10 }}>
+                                <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Patient Name</Text>
+                                <View style={{ marginTop: 5 }}>
+                                    <TextInput
+                                      
+                                        selectionColor={themeColor}
+                                        value={this.state.patientname}
+                                        style={{ width: width * 0.8, height: height * 0.05, backgroundColor: "#fff", borderRadius: 10, paddingLeft: 5, textAlignVertical: "top", paddingTop: 5 }}
+                                        onChangeText={(patientname) => { this.setState({ patientname }) }}
+
+                                    />
+                                </View>
+
+                            </View>
+                        <View style={{ marginHorizontal: 20,marginVertical:10 }}>
+                            <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Select Doctor</Text>
+                            <View style={{ marginTop: 10 }}>
+                                <DropDownPicker
+
+                                    items={this.state.doctors}
+                                    defaultValue={this.state.doctors[0]?.value}
+                                    containerStyle={{ height: 40 }}
+                                    style={{ backgroundColor: '#fafafa' }}
+                                    itemStyle={{
+                                        justifyContent: 'flex-start'
+                                    }}
+                                    dropDownStyle={{ backgroundColor: '#fafafa' }}
+                                    onChangeItem={item => this.setState({
+                                        selectedDoctor: item
+                                    })}
+                                />
+                            </View>
+
+                        </View>
+                        <View style={{ marginLeft: 20, marginTop: 20 }}>
+                            <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Select Date</Text>
+                            </View>
+
+                            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+                                <TouchableOpacity style={{ marginTop: 10 }}
+                                    onPress={() => { this.setState({ show: true }) }}
+                                >
+                                    <FontAwesome name="calendar" size={24} color="black" />
+                                </TouchableOpacity>
+                                <View style={{ alignItems: 'center', justifyContent: "center", marginLeft: 20, marginTop: 5 }}>
+                                    <Text>{this.state.today}</Text>
+                                </View>
+
+                            </View>
+
+
+                        </View>
+                        <View style={{ marginLeft: 20, marginTop: 20 }}>
+                            <View style={{ alignItems: "center", justifyContent: 'center' }}>
+                                <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Select Time</Text>
+
+                            </View>
+                            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+                                <TouchableOpacity style={{ marginTop: 10 }}
+                                    onPress={() => { this.setState({ show2: true }) }}
+                                >
+                                    <FontAwesome name="calendar" size={24} color="black" />
+                                </TouchableOpacity>
+                                <View style={{ alignItems: 'center', justifyContent: "center", marginLeft: 20, marginTop: 5 }}>
+                                    <Text>{this.state.time}</Text>
+                                </View>
+
+                            </View>
+
+
+                        </View>
+                            <View style={{ margin: 20 }}>
+                                <View style={{}}>
+                                    <Text style={[styles.text, { fontWeight: "bold" }]}>Reason :</Text>
+
+                                </View>
+                                <View style={{ marginTop: 10 }}>
+                                    <TextInput
+                                        selectionColor={themeColor}
+                                        value={this.state.reason}
+                                        style={{ width: width * 0.8, height: height * 0.1, backgroundColor: "#fff", borderRadius: 10, paddingLeft: 5, textAlignVertical: "top", paddingTop: 5 }}
+                                        onChangeText={(reason) => { this.setState({ reason }) }}
+
+                                    />
+                                </View>
+
+                            </View>
+                            <View style={{margin:20,alignItems:'center',justifyContent:'center'}}>
+                               <TouchableOpacity 
+                                 style={{backgroundColor:themeColor,height:height*0.05,width:width*0.4,alignItems:'center',justifyContent:'center',borderRadius:10}}
+                                 onPress ={()=>{this.requestAppointment()}}
+                               >
+                                   {!this.state.creating?<Text style={[styles.text,{color:"#fff"}]}>Create Appoinment</Text>:
+                                   <ActivityIndicator  color ={"#fff"} size ={"small"}/>
+                                   }
+                               </TouchableOpacity>
+                            </View>
+                        </ScrollView>
+                    </View>
+                    
+                </View>
+            </Modal>
+        )
+    }
+    renderFilter =()=>{
+        if (this.state.index == 1 && this.props.user.profile.occupation == "Customer"){
+            return(
+                <View style={{ flex: 0.4, alignItems: "center", justifyContent: "center"}}>
+                    <TouchableOpacity 
+                      onPress ={()=>{this.setState({search:true})}}
+                      style={{alignSelf:"flex-end",marginRight:20}}
+                    >
+                        <Feather name="search" size={24} color="#fff" />
+                    </TouchableOpacity>
+                    
+                </View>
+            )
+        }
+        if (this.state.index == 1)
+        return(
+            <View style={{ flex: 0.4, alignItems: "center", justifyContent: "center" }}>
+                    <View style={{ flexDirection: "row" }}>
+                        <View style={{ alignItems: "center", justifyContent: "center" }}>
+                            <Text style={[styles.text, { color: "#fff" }]}>{this.state.today}</Text>
+                        </View>
+
+                        <TouchableOpacity
+                            style={{ marginLeft: 20 }}
+                            onPress={() => { this.setState({ show: true }) }}
+                        >
+                            <Fontisto name="date" size={24} color={"#fff"} />
+                        </TouchableOpacity>
+
+
+                        <DateTimePickerModal
+                            isVisible={this.state.show}
+                            mode="date"
+                            onConfirm={this.handleConfirm}
+                            onCancel={this.hideDatePicker}
+                        />
+                    </View>
+                </View>
+            
+        )
+    }
     render() {
         const { index, routes } = this.state
         return (
@@ -941,34 +1224,37 @@ class Appointments extends Component {
                     <View style={{ flex: 1, backgroundColor: "#fff" }}>
                         <StatusBar backgroundColor={themeColor} />
                               {/* HEADERS */}
-                        <View style={{ height: height * 0.1, backgroundColor: themeColor, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, flexDirection: 'row', alignItems: "center" }}>
+                      {!this.state.search?<View style={{ height: height * 0.1, backgroundColor: themeColor, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, flexDirection: 'row', alignItems: "center" }}>
                     
-                            <View style={{ flex: 0.6, alignItems: "center", justifyContent: "center" }}>
-                                <Text style={[styles.text, { color: '#fff', marginLeft: 20, fontWeight: 'bold' ,fontSize:25}]}>Appointments</Text>
-                            </View>
-                   {this.state.index ==1&&<View style={{flex:0.4,alignItems:"center",justifyContent:"center"}}>
-                                <View style={{ flexDirection: "row" }}>
-                                    <View style={{ alignItems: "center", justifyContent: "center" }}>
-                                        <Text style={[styles.text, { color: "#fff" }]}>{this.state.today}</Text>
-                                    </View>
+                            <View style={{ flex: 0.6,  }}>
+                                <View>
+                                    <Text style={[styles.text, { color: '#fff', marginLeft: 20, fontWeight: 'bold', fontSize: 25 }]}>Appointments</Text>
 
-                                    <TouchableOpacity
-                                        style={{ marginLeft: 20 }}
-                                        onPress={() => { this.setState({show:true})}}
-                                    >
-                                        <Fontisto name="date" size={24} color={"#fff"} />
-                                    </TouchableOpacity>
-
-
-                                    <DateTimePickerModal
-                                        isVisible={this.state.show}
-                                        mode="date"
-                                        onConfirm={this.handleConfirm}
-                                        onCancel={this.hideDatePicker}
-                                    />
                                 </View>
-                            </View>}
+                            </View>
+                            {
+                                this.renderFilter()
+                            }
+                        </View>:
+                            <View style={{ height: height * 0.1, backgroundColor: themeColor, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, flexDirection: 'row', alignItems: "center" }}>
+                                <TouchableOpacity style={{ flex: 0.2, alignItems: "center", justifyContent: 'center' }}
+                                    onPress={() => {
+                                      this.setState({search:false})
+                                    }}
+                                >
+                                    <Ionicons name="chevron-back-circle" size={30} color="#fff" />
+                                </TouchableOpacity>
+                                <View style={{ flex: 0.7, alignItems: "center", justifyContent: "center" }}>
+                                    <TextInput
+                                        autoFocus={true}
+                                        selectionColor={themeColor}
+                                        style={{ height: "45%", backgroundColor: "#fafafa", borderRadius: 15, padding: 10, marginTop: 10, width: "100%" }}
+                                        placeholder="search by reason or clinic name"
+                                        onChangeText={(text) => { this.SearchOppoinments(text)}}
+                                    />
+                               </View>
                         </View>
+                        }
                         <TabView
                             style={{ backgroundColor: "#ffffff" }}
                             navigationState={{ index, routes }}
@@ -992,6 +1278,7 @@ class Appointments extends Component {
                         />
                          {/* Appointments */}
                         {this.Modal()}
+                        {this.appoinmentModal()}
                         {/* {this.state.show && (
                             <DateTimePicker
                                 testID="dateTimePicker1"
@@ -1026,6 +1313,23 @@ class Appointments extends Component {
                             onCancel={this.hideDatePicker2}
                         />
                     </View>
+                    {this.props.user.profile.occupation!="Customer"&&<View style={{
+                        position: "absolute",
+                        bottom: 100,
+                        left: 20,
+                        right: 20,
+                        flex: 1,
+                        alignItems: "center",
+                        justifyContent: "center",
+
+                        borderRadius: 20
+                    }}>
+                        <TouchableOpacity
+                            onPress={() => { this.setState({showAppoinmentModal:true}) }}
+                        >
+                            <AntDesign name="pluscircle" size={40} color={themeColor} />
+                        </TouchableOpacity>
+                    </View>}
                 </SafeAreaView>
             </>
         );
@@ -1055,7 +1359,8 @@ const mapStateToProps = (state) => {
 
     return {
         theme: state.selectedTheme,
-        user:state.selectedUser
+        user:state.selectedUser,
+        clinic: state.selectedClinic,
     }
 }
 export default connect(mapStateToProps, { selectTheme })(Appointments);
