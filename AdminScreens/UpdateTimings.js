@@ -18,7 +18,8 @@ import { StackActions, CommonActions} from '@react-navigation/native';
 
 class UpdateTimings extends Component {
     constructor(props) {
-        let clinicPk = props.route.params.item.id
+       
+        let clinicPk = props?.route?.params?.item?.id || props?.route?.params?.clinicPk
         super(props);
         this.state = {
             isMedical:this.props.route.params.medical||false,

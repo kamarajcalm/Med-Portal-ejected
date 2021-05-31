@@ -15,6 +15,7 @@ import {
     ActivityIndicator,
     TextInput,
     BackHandler,
+    RefreshControl
 
 } from "react-native";
 import { AntDesign } from '@expo/vector-icons';
@@ -23,6 +24,7 @@ import settings from '../AppSettings';
 import { Fontisto } from '@expo/vector-icons';
 import moment from 'moment';
 import { connect } from 'react-redux';
+import axios from 'axios';
 import { selectTheme,selectClinic } from '../actions';
 import authAxios from '../api/authAxios';
 import HttpsClient from "../api/HttpsClient";
@@ -64,12 +66,28 @@ class Priscription extends React.Component {
             search:false,
             textRef1:React.createRef(),
             textRef2:React.createRef(),
-        
+            cancelToken: undefined,
+            offset:0,
+            next:true
          
         };
          this.scrollY=new Animated.Value(0)
         this.translateYNumber= React.createRef()
     } 
+    handleEndReached =()=>{
+        if(this.state.next){
+            this.setState({offset:this.state.offset+5},()=>{
+               if(this.state.isDoctor){
+                   this.getPrescription()
+               }else if(this.state.isReceptionist){
+                   this.getClinicPrescription()
+               }else{
+                   this.getPateintPrescription()
+               }
+             
+            })
+        }
+    }
 showDatePicker = () => {
        this.setState({show:true})
     };
@@ -79,40 +97,61 @@ hideDatePicker = () => {
     };
 
  handleConfirm = (date) => {
-        console.warn("A date has been picked: ", date);
-     this.setState({ dob: moment(date).format('YYYY-MM-DD'), show: false, date: new Date(date) }, () => {
-         
+     this.setState({})
+     this.setState({ today: moment(date).format('YYYY-MM-DD'), show: false, prescriptions: [], offset: 0, next: true  }, () => {
+         if(this.state.isDoctor){
+             this.getPrescription()
+         }else if(this.state.isReceptionist){
+             this.getClinicPrescription()
+         }else{
+             return null
+         }
 
      })
         this.hideDatePicker();
     };
 
     getPateintPrescription = async()=>{
-        let api = `${url}/api/prescription/prescriptions/?forUser=${this.props.user.id}`
+        let api = `${url}/api/prescription/prescriptions/?forUser=${this.props.user.id}&limit=5&offset=${this.state.offset}`
         let data =await HttpsClient.get(api)
         console.log(api)
         if(data.type =="success"){
-            this.setState({ prescriptions:data.data,isFetching:false})
+            this.setState({ prescriptions: this.state.prescriptions.concat(data.data.results),isFetching:false,})
+            if(data.data.next!=null){
+                this.setState({next:true})
+            }else{
+                this.setState({ next:false})
+            }
         }
     }
     getPrescription = async()=>{
       
-        let api = `${url}/api/prescription/prescriptions/?doctor=${this.props.user.id}&date=${moment(this.state.date).format("YYYY-MM-DD")}`
+        let api = `${url}/api/prescription/prescriptions/?doctor=${this.props.user.id}&date=${this.state.today}&limit=5&offset=${this.state.offset}`
         console.log(api)
         let data  =await HttpsClient.get(api)
     
       if(data.type == 'success'){
-          this.setState({ prescriptions:data.data})
+          this.setState({ prescriptions:this.state.prescriptions.concat(data.data.results)})
           this.setState({ loading: false ,isFetching:false})
+          if (data.data.next != null) {
+              this.setState({ next: true })
+          } else {
+              this.setState({ next: false })
+          }
       }
     }
     getClinicPrescription = async()=>{
-        let api = `${url}/api/prescription/prescriptions/?clinic=${this.props.user.profile.recopinistclinics[0].clinicpk}&date=${moment(this.state.date).format("YYYY-MM-DD")}`
+        let api = `${url}/api/prescription/prescriptions/?clinic=${this.props.user.profile.recopinistclinics[0].clinicpk}&date=${this.state.today}&limit=5&offset=${this.state.offset}`
         let data = await HttpsClient.get(api)
   console.log(api)
         if (data.type == 'success') {
-            this.setState({ prescriptions: data.data })
+            this.setState({ prescriptions: this.state.prescriptions.concat(data.data.results)})
             this.setState({ loading: false ,isFetching:false})
+            if (data.data.next != null) {
+                this.setState({ next: true })
+            } else {
+                this.setState({ next: false })
+            }
         }
      
     }
@@ -163,29 +202,27 @@ hideDatePicker = () => {
         this.setState({ loading: false })
     }
     componentDidMount(){
-        console.log(this.ref,"pppp")
+     
        this.findUser()
         this._unsubscribe = this.props.navigation.addListener('focus', () => {
             if(this.state.isDoctor){
+                this.setState({prescriptions:[],offset:0,next:true})
                 this.getPrescription()
             }
             
         });
-     this.backHandler = BackHandler.addEventListener('hardwareBackPress',()=>{
-         if(this.state.search){
-             this.setState({search:false})
-             return true;
-         }
-        
-         return false;
-         
-        })
+
     }
-    searchPriscriptions =(text)=>{
-     let filter  =this.state.prescriptions.filter((i)=>{
-         return i.clinicname.name.includes(text)
-     })
-        this.setState({ prescriptions:filter})
+    searchPriscriptions = async (text) => {
+     
+        if (typeof this.state.cancelToken != typeof undefined) {
+            this.state.cancelToken.cancel('cancelling the previous request')
+        }
+        this.state.cancelToken = axios.CancelToken.source()
+        let api = `${url}/api/prescription/prescriptions/?forUser=${this.props.user.id}&usersearch=${text}`
+        const data = await axios.get(api, { cancelToken: this.state.cancelToken.token });
+        this.setState({next:false})
+        this.setState({prescriptions:data.data})
     }
     searchPriscriptions2 = (text) => {
         let filter = this.state.prescriptions.filter((i) => {
@@ -196,121 +233,188 @@ hideDatePicker = () => {
         console.log(filter)
         this.setState({ prescriptions: filter })
     }
-    componentWillUnmount(){
-        this.backHandler.remove();
-        this._unsubscribe();
+
+    getIndex = (index) => {
+        let value = this.state.prescriptions.length - index
+        return value
     }
-    showDifferentPriscription =(item,index)=>{
-      if(this.state.isDoctor){
+    showDifferentPriscription = (item, index) => {
 
-          return(
-              <TouchableOpacity style={[styles.card,{ flexDirection: "row", borderRadius: 5 }]}
-                  onPress={() => { this.props.navigation.navigate('showCard', { item }) }}
-                //   onPress={() => { this.props.navigation.navigate('PrescriptionView', { item }) }}
-              >
-                   <View style={{flex:0.7}}> 
-                      <View style={{ justifyContent: "space-around", flex: 1 }}>
-                          <Text style={[styles.text, { fontSize: 18, }]}>{item?.username}</Text>
-                          <Text style={[styles.text, { fontSize: 12, fontWeight: "bold" }]}>Reason:</Text>
-                          <Text style={[styles.text, { fontSize: 12, }]}>{item.ongoing_treatment}</Text>
-                      </View>
-                   </View>
-                  <View style={{ flex: 0.3, justifyContent: 'center', alignItems: "center" }}>
-                      <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
-                          <Text>{moment(item.created).format("DD/MM/YYYY")}</Text>
+        if (this.state.isDoctor){
 
-                      </View>
-                      <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
-                          <Text>{moment(item.created).format("h:mm a")}</Text>
-                      </View>
+            return (
+                <TouchableOpacity style={[styles.card, { flexDirection: "row", borderRadius: 5 }]}
+                    // onPress={() => { props.navigation.navigate('showCard', { item }) }}
+                    onPress={() => { this.props.navigation.navigate('PrescriptionView', { item, }) }}
+                >
+                    <View style={{ flex: 0.3, alignItems: 'center', justifyContent: 'center' }}>
+                        <Image
+                            style={{ height: "90%", width: "95%", resizeMode: "cover", borderRadius: 10 }}
+                            source={{ uri: "https://www.studentdoctor.net/wp-content/uploads/2018/08/20180815_prescription-1024x1024.png" }}
+                        />
+                    </View>
+                    <View style={{ flex: 0.7, marginHorizontal: 10, justifyContent: 'center' }}>
+                        <View style={{ marginTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: "space-between" }}>
+                            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                                <Text style={[styles.text, { color: "#000", fontWeight: 'bold' }]}>Patient : {item?.username?.name}</Text>
 
-                  </View>
-              </TouchableOpacity>
-          )
-      }
-      if(this.state.isReceptionist){
+                            </View>
+                            <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                <Text>#{this.getIndex(index)}</Text>
+                            </View>
+                        </View>
+                        <View style={{ marginTop: 10 }}>
+                            <View>
+                                <Text style={[styles.text]}>Reason : {item.ongoing_treatment}</Text>
+                            </View>
+                        </View>
+                        <View style={{ marginTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: "space-between" }}>
+                            <View>
+                                <Text style={[styles.text]}>Clinic :{item.clinicname.name}</Text>
+                            </View>
+                            <View>
+                                <Text style={[styles.text]}>{moment(item.created).format("h:mm a")}</Text>
+                            </View>
+                        </View>
+                    </View>
 
-           let dp =null
-          if (item?.doctordetails?.dp){
-              dp = `${url}${item?.doctordetails?.dp}`
-          }
-         
-          return(
-              <TouchableOpacity style={[styles.card, { flexDirection: "row", borderRadius: 5 }]}
-                  onPress={() => { this.props.navigation.navigate('showCard', { item }) }}
-              >
-                  <View style={{ flex: 0.3, alignItems: 'center', justifyContent: "center" }}>
-                      <Image
-                          source={{ uri:dp|| "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
-                          style={{ height: 60, width: 60, borderRadius: 30 }}
-                      />
-                  </View>
-                  <View style={{ flex: 0.4, justifyContent: 'center', alignItems: 'center' }}>
-                      <View >
-                          <Text style={[styles.text, { fontSize: 18, }]}>{item?.username}</Text>
-                          <Text style={[styles.text, { fontSize: 12, }]}>{item?.doctordetails?.name}</Text>
-                  
-                      </View>
+                </TouchableOpacity>
+            )
+        }
+        if (this.state.isReceptionist) {
 
-                  </View>
-                  <View style={{ flex: 0.3, justifyContent: 'center', alignItems: "center" }}>
-                      <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
-                          <Text>{moment(item.created).format("DD/MM/YYYY")}</Text>
+            let dp = null
+            if (item?.doctordetails?.dp) {
+                dp = `${url}${item?.doctordetails?.dp}`
+            }
 
-                      </View>
-                      <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
-                          <Text>{moment(item.created).format("h:mm a")}</Text>
-                      </View>
+            return (
+                <TouchableOpacity style={[styles.card, { flexDirection: "row", borderRadius: 5 }]}
+                    onPress={() => { this.props.navigation.navigate('PrescriptionView', { item, }) }}
+                >
+                    <View style={{ flex: 0.3, alignItems: 'center', justifyContent: 'center' }}>
+                        <Image
+                            style={{ height: "90%", width: "95%", resizeMode: "cover", borderRadius: 10 }}
+                            source={{ uri: "https://www.studentdoctor.net/wp-content/uploads/2018/08/20180815_prescription-1024x1024.png" }}
+                        />
+                    </View>
+                    <View style={{ flex: 0.7, marginHorizontal: 10, justifyContent: 'center' }}>
+                        <View style={{ marginTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: "space-between" }}>
+                            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                                <Text style={[styles.text, { color: "#000", fontWeight: 'bold' }]}>Patient : {item?.username.name}</Text>
 
-                  </View>
-              </TouchableOpacity>
-          )
-      }
-        
-      // if patient
-      return(
-          <TouchableOpacity style={[styles.card, { flexDirection: "row", borderRadius: 5 }]}
-              onPress={() => { this.props.navigation.navigate('showCard', { item }) }}
-          >
-              {/* <View style={{ flex: 0.3, alignItems: 'center', justifyContent: "center" }}>
-                  <Image
-                      source={{ uri: item?.doctordetails?.dp || "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" }}
-                      style={{ height: 60, width: 60, borderRadius: 30 }}
-                  />
-              </View> */}
-              <View style={{ flex: 0.7,}}>
-                  <View style={{justifyContent:"space-around",flex:1}}>
-                      <Text style={[styles.text, { fontSize: 18,}]}>{item?.clinicname.name}</Text>
-                      <Text style={[styles.text, { fontSize: 12,fontWeight:"bold" }]}>Reason:</Text>
-                      <Text style={[styles.text, { fontSize: 12, }]}>{item.ongoing_treatment}</Text>
-                  </View>
+                            </View>
+                            <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                <Text>#{this.getIndex(index)}</Text>
+                            </View>
+                        </View>
+                        <View style={{ marginTop: 10 }}>
+                            <View>
+                                <Text style={[styles.text]}>Reason : {item.ongoing_treatment}</Text>
+                            </View>
+                        </View>
+                        <View style={{ marginTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: "space-between" }}>
+                            <View>
+                                <Text style={[styles.text]}>Clinic :{item.clinicname.name}</Text>
+                            </View>
+                            <View>
+                                <Text style={[styles.text]}>{moment(item.created).format("h:mm a")}</Text>
+                            </View>
+                        </View>
+                    </View>
+                </TouchableOpacity>
+            )
+        }
 
-              </View>
-              <View style={{ flex: 0.3, justifyContent: 'center', alignItems: "center" }}>
-                  <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
-                      <Text>{moment(item.created).format("DD/MM/YYYY")}</Text>
+        // if patient
+        return (
+            <TouchableOpacity style={[styles.card, { flexDirection: "row", borderRadius: 5 }]}
+                onPress={() => { this.props.navigation.navigate('PrescriptionView', { item, }) }}
+            >
+                <View style={{ flex: 0.3, alignItems: 'center', justifyContent: 'center' }}>
+                    <Image
 
-                  </View>
-                  <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
-                      <Text>{moment(item.created).format("h:mm a")}</Text>
-                  </View>
+                        style={{ height: "90%", width: "95%", resizeMode: "contain", borderRadius: 10 }}
+                        source={{ uri: `https://www.studentdoctor.net/wp-content/uploads/2018/08/20180815_prescription-1024x1024.png` }}
+                    />
+                </View>
+                <View style={{ flex: 0.7, marginHorizontal: 10, justifyContent: 'center' }}>
+                    <View style={{ marginTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: "space-between" }}>
+                        <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                            <Text style={[styles.text, { color: "#000", fontWeight: 'bold' }]}>Patient : {item?.username.name}</Text>
 
-              </View>
-          </TouchableOpacity>
-      )
+                        </View>
+                        <View style={{ alignItems: "center", justifyContent: "center" }}>
+                            <Text>#{this.getIndex(index)}</Text>
+                        </View>
+                    </View>
+                    <View style={{ marginTop: 10 }}>
+                        <View>
+                            <Text style={[styles.text]}>Reason : {item.ongoing_treatment}</Text>
+                        </View>
+                    </View>
+                    <View style={{ marginTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: "space-between" }}>
+                        <View>
+                            <Text style={[styles.text]}>Clinic :{item.clinicname.name}</Text>
+                        </View>
+                        <View>
+                            <View style={{ alignSelf: "flex-end" }}>
+                                <Text style={[styles.text]}>{moment(item.created).format("h:mm a")}</Text>
+
+                            </View>
+                            <View>
+                                <Text style={[styles.text]}>{moment(item.created).format('DD/MM/YYYY')}</Text>
+                            </View>
+                        </View>
+
+                    </View>
+                    <View style={{ flexDirection: "row", marginTop: 10 }}>
+                        <TouchableOpacity style={[styles.boxWithShadow, { backgroundColor: "#fff", height: 30, width: 30, borderRadius: 15, alignItems: "center", justifyContent: 'center', marginLeft: 10 }]}
+                            onPress={() => { chatClinic(item) }}
+                        >
+                            <Ionicons name="chatbox" size={24} color="#63BCD2" />
+
+                        </TouchableOpacity>
+                        <TouchableOpacity style={[styles.boxWithShadow, { backgroundColor: "#fff", height: 30, width: 30, borderRadius: 15, alignItems: "center", justifyContent: 'center', marginLeft: 10 }]}
+                            onPress={() => {
+                                Linking.openURL(
+                                    `https://www.google.com/maps/dir/?api=1&destination=` +
+                                    item.clinicname.lat +
+                                    `,` +
+                                    item.clinicname.long +
+                                    `&travelmode=driving`
+                                );
+                            }}
+                        >
+                            <FontAwesome5 name="directions" size={20} color="#63BCD2" />
+                        </TouchableOpacity>
+                    </View>
+
+                </View>
+            </TouchableOpacity>
+        )
     }
     onRefresh =()=>{
         this.setState({isFetching:true})
         if(this.state.isDoctor){
-            this.getPrescription()
+            this.setState({ prescriptions: [], offset: 0, next: true }, () => {
+                this.getPrescription()
+            })
+         
         }else if(this.state.isReceptionist){
-            this.getClinicPrescription()
+            this.setState({ prescriptions: [], offset: 0, next: true }, () => {
+                this.getClinicPrescription()
+            })
+          
         }else{
-            this.getPateintPrescription()
+            this.setState({prescriptions:[],offset:0,next:true},()=>{
+                this.getPateintPrescription()
+            })
+         
         }
     }
     renderFilter = () => {
-        if (this.state.isDoctor ||this.state.isReceptionist) {
+        if (this.state.isDoctor || this.state.isReceptionist) {
             return (
 
                 <View style={{ alignItems: "center", justifyContent: "center", width: width * 0.32, }}>
@@ -321,7 +425,7 @@ hideDatePicker = () => {
 
                         <TouchableOpacity
                             style={{ marginLeft: 20 }}
-                            onPress={() => { setShow(true) }}
+                            onPress={() => {this.setState({show:true}) }}
                         >
                             <Fontisto name="date" size={24} color={"#fff"} />
                         </TouchableOpacity>
@@ -353,8 +457,8 @@ hideDatePicker = () => {
                             onPress={() => { this.setState({showModal:true}) }}
                         >
                             <View>
-                                {this.state,isDoctor ? <Text style={[styles.text, { fontSize: 25, color: "#fff", fontWeight: "bold", marginLeft: 5 }]} numberOfLines={1}>{props?.clinic?.name}</Text> :
-                                    <Text style={[styles.text, { fontSize: 25, color: "#fff", fontWeight: "bold", marginLeft: 5 }]} numberOfLines={1}>{props?.user?.profile?.recopinistclinics[0]?.clinicname}</Text>
+                                {this.state.isDoctor ? <Text style={[styles.text, { fontSize: 25, color: "#fff", fontWeight: "bold", marginLeft: 5 }]} numberOfLines={1}>{this.props?.clinic?.name}</Text> :
+                                    <Text style={[styles.text, { fontSize: 25, color: "#fff", fontWeight: "bold", marginLeft: 5 }]} numberOfLines={1}>{this.props?.user?.profile?.recopinistclinics[0]?.clinicname}</Text>
                                 }
 
                             </View>
@@ -366,13 +470,13 @@ hideDatePicker = () => {
 
                         </TouchableOpacity>
                         {
-                            renderFilter()
+                            this.renderFilter()
                         }
                     </View>
 
                     <View style={{ marginHorizontal: 20, height: headerHeight / 3, alignItems: 'center', justifyContent: "center", marginBottom: 5 }}>
                         <TouchableOpacity style={{ flexDirection: 'row', borderRadius: 10, backgroundColor: "#eee", width: "100%", height: height * 0.05, }}
-                            onPress={() => { props.navigation.navigate('SearchPatient') }}
+                            onPress={() => { this.props.navigation.navigate('SearchPatient') }}
                         >
                             <View style={{ alignItems: 'center', justifyContent: "center", marginLeft: 5, flex: 0.1 }}>
                                 <EvilIcons name="search" size={24} color="black" />
@@ -405,7 +509,7 @@ hideDatePicker = () => {
                             selectionColor={themeColor}
                             style={{ height: "90%", flex: 0.8, backgroundColor: "#eee", paddingLeft: 10, marginTop: 3 }}
                             placeholder="search"
-                            onChangeText={(text) => { searchPriscriptions(text) }}
+                            onChangeText={(text) => { this.searchPriscriptions(text) }}
                         />
                     </View>
 
@@ -413,46 +517,17 @@ hideDatePicker = () => {
             </View>
         )
     }
-    renderFilter =()=>{
-    if(this.state.isDoctor||this.state.isReceptionist){
-        return (
-
-            <View style={{ height: height * 0.07, alignItems: "center", justifyContent: "space-around", flexDirection: "row", }}>
-                <View style={{ flexDirection: "row" }}>
-                    <Text style={[styles.text, { color: "#000" }]}>{this.state.today}</Text>
-                    <TouchableOpacity
-                        style={{ marginLeft: 20 }}
-                        onPress={() => { this.setState({ show: true }) }}
-                    >
-                        <Fontisto name="date" size={24} color={themeColor} />
-                    </TouchableOpacity>
-                    {/* {this.state.show && (
-                        <DateTimePicker
-                            testID="dateTimePicker1"
-                            value={this.state.date}
-                            mode={this.state.mode}
-                            is24Hour={true}
-                            display="default"
-                            onChange={(time) => { this.onChange(time) }}
-                        />
-                    )} */}
-
-                    <DateTimePickerModal
-                        isVisible={this.state.show}
-                        mode="date"
-                        onConfirm={this.handleConfirm}
-                        onCancel={this.hideDatePicker}
-                    />
-                </View>
-                <View>
-                    <Text style={[styles.text,]}> Total:{this.state.prescriptions.length}</Text>
-                </View>
-            </View>
-
-        )
+    renderFooter =()=>{
+       if(this.state.next){
+           return(
+               <ActivityIndicator size="large" color ={themeColor} />
+           )
+       }
+       return null
     }
+  
 
-    }
+    
     getCloser = (value, checkOne, checkTwo) =>
         Math.abs(value - checkOne) < Math.abs(value - checkTwo) ? checkOne : checkTwo;
     render() { 
@@ -483,6 +558,7 @@ hideDatePicker = () => {
         );
 
         const handleSnap = ({ nativeEvent }) => {
+            
             const offsetY = nativeEvent.contentOffset.y;
             if (
                 !(
@@ -490,8 +566,9 @@ hideDatePicker = () => {
                     this.translateYNumber.current === -headerHeight / 2
                 )
             ) {
-                if (this.ref.current) {
-                    this.ref.current.scrollToOffset({
+                if (this.ref) {
+               
+                    this.ref.scrollToOffset({
                         offset:
                             this.getCloser(this.translateYNumber.current, -headerHeight / 2, 0) ===
                                 -headerHeight / 2
@@ -514,22 +591,28 @@ hideDatePicker = () => {
                         }
 
                     </Animated.View>
-   {  !this.state.loading?<Animated.View style={{flex:1,backgroundColor:"#f3f3f3f3"}}>
+   <Animated.View style={{flex:1,backgroundColor:"#f3f3f3f3"}}>
            
-                 {
-                     this.renderFilter()
-                 }
               
                         <Animated.FlatList
+                            keyExtractor={(item, index) => index.toString()}
+                            refreshControl={
+                                <RefreshControl
+                                    onRefresh={() => this.onRefresh()}
+                                    refreshing={this.state.isFetching}
+                                    progressViewOffset={headerHeight}
+                                />
+                            }
+                            data={this.state.prescriptions}
+                            scrollEventThrottle={16}
+                            contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: 90 }}
                             onScroll={handleScroll}
+                            ref={ref=>this.ref=ref}
                             onMomentumScrollEnd={handleSnap}
-                          ref ={ref=>this.ref =ref}
-                          contentContainerStyle={{ paddingBottom: 90 }}
-                          onRefresh={() => this.onRefresh()}
-                          refreshing={this.state.isFetching}
-                          data={this.state.prescriptions}
-                          keyExtractor={(item,index)=>index.toString()}
-                          renderItem={({item,index})=>{
+                            onEndReached ={()=>{this.handleEndReached()}}
+                            ListFooterComponent={this.renderFooter()}
+                            onEndReachedThreshold={0.1}
+                            renderItem={({item,index})=>{
                                return(
                                    <View>
                                        {
@@ -561,9 +644,7 @@ hideDatePicker = () => {
                                 <AntDesign name="pluscircle" size={40} color={themeColor} />
                             </TouchableOpacity>
                         </View>}
-            </Animated.View>:<View style={{flex:1,alignItems:"center",justifyContent:"center"}}>
-                <ActivityIndicator size="large" color={themeColor}/>
-                </View>}
+            </Animated.View>
                     <Modal
                         deviceHeight={screenHeight}
                         animationIn="slideInUp"

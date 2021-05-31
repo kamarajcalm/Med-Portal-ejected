@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StatusBar, Dimensions, TouchableOpacity, StyleSheet, Linking, FlatList, Image, SafeAreaView, ToastAndroid, TextInput, ScrollView } from 'react-native';
+import { View, Text, StatusBar, Dimensions, TouchableOpacity, StyleSheet, Linking, FlatList, Image, SafeAreaView, ToastAndroid, TextInput, ScrollView, ActivityIndicator} from 'react-native';
 import settings from '../AppSettings';
 import { connect } from 'react-redux';
 import { selectTheme } from '../actions';
@@ -19,7 +19,7 @@ import { FontAwesome, FontAwesome5, Octicons, Fontisto, EvilIcons, Feather, AntD
 import FlashMessage, { showMessage, hideMessage } from "react-native-flash-message";
 import { color } from 'react-native-reanimated';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { ActivityIndicator } from 'react-native-paper';
+
 const Date1 = new Date()
 const today = moment(Date1).format("YYYY-MM-DD")
 const url = settings.url
@@ -50,7 +50,14 @@ class Appointments extends Component {
             selectedDoctor:null,
             time:moment(new Date()).format('hh:mm a'),
             patientNo:"",
-            patientname:""
+            patientname:"",
+            next:true,
+            next2:true,
+            offset2:0,
+            offset:0,
+            isFectching:false,
+            isFectching2:false,
+            first:true,
         };
     }
     searchUser = async (mobileNo) => {
@@ -83,7 +90,7 @@ class Appointments extends Component {
         let sendData;
         if(this.state.userfound){
             sendData = {
-                clinic: this.props.clinic.clinicpk,
+                clinic: this.props?.clinic?.clinicpk || this.props.user.profile.recopinistclinics[0].clinicpk,
                 doctor: this.state.selectedDoctor.pk,
                 requesteduser: this.state?.user?.id,
                 requesteddate: this.state.today,
@@ -94,7 +101,7 @@ class Appointments extends Component {
 
         }else{
             sendData = {
-                clinic: this.props.clinic.clinicpk,
+                clinic: this.props?.clinic?.clinicpk || this.props.user.profile.recopinistclinics[0].clinicpk,
                 doctor: this.state.selectedDoctor.pk,
                 requesteduser: this.state.patientNo,
                 requesteddate: this.state.today,
@@ -109,8 +116,11 @@ class Appointments extends Component {
         let post = await HttpsClient.post(api, sendData)
         console.log(post, "klkk")
         if (post.type == "success") {
-            this.setState({ creating: false,showAppoinmentModal:false })
-            this.getAppointments()
+            this.setState({ patientNo: "", reason: "", patientname:""})
+            this.setState({ creating: false, showAppoinmentModal: false, Appointments:[],offset:0,next:true},()=>{
+                this.getAppointments()
+            })
+           
             this.showSimpleMessage("requested SuccessFully", "#00A300", "success")
         } else {
             this.setState({ creating: false, showAppoinmentModal: false})
@@ -118,7 +128,7 @@ class Appointments extends Component {
         }
     }
     getDoctors = async () => {
-        let api = `${url}/api/prescription/clinicDoctors/?clinic=${this.props.clinic.clinicpk}`
+        let api = `${url}/api/prescription/clinicDoctors/?clinic=${this.props?.clinic?.clinicpk || this.props.user.profile.recopinistclinics[0].clinicpk}`
         const data = await HttpsClient.get(api)
         console.log(api, "jjjjj")
         if (data.type == "success") {
@@ -149,39 +159,50 @@ class Appointments extends Component {
     getAppointments2 = async () => {
         let api = ""
         if (this.props.user.profile.occupation == "Doctor") {
-            api = `${url}/api/prescription/appointments/?doctor=${this.props.user.id}&date=${this.state.today}`
+            api = `${url}/api/prescription/appointments/?doctor=${this.props.user.id}&date=${this.state.today}&limit=5&offset=${this.state.offset2}`
         } else if (this.props.user.profile.occupation == "ClinicRecoptionist") {
-            api = `${url}/api/prescription/appointments/?clinic=${this.props.user.profile.recopinistclinics[0].clinicpk}&date=${this.state.today}`
+            api = `${url}/api/prescription/appointments/?clinic=${this.props.user.profile.recopinistclinics[0].clinicpk}&date=${this.state.today}&limit=5&offset=${this.state.offset2}`
         }
         else {
-            api = `${url}/api/prescription/appointments/?requesteduser=${this.props.user.id}`
+            api = `${url}/api/prescription/appointments/?requesteduser=${this.props.user.id}&limit=5&offset=${this.state.offset2}`
         }
-
+        console.log(api,"second")
         const data = await HttpsClient.get(api)
-        console.log(data)
+      
         if (data.type == "success") {
-            let Appointments = this.state.Appointments
+       
 
-            this.setState({ Appointments2: data.data })
+            this.setState({ Appointments2:this.state.Appointments2.concat(data.data.results),isFectching2:false})
+            if (data.data.next != null) {
+                this.setState({ next2: true })
+            } else {
+                this.setState({ next2: false })
+            }
         }
     }
     getAppointments =async()=>{
+
         let api =""
         if (this.props.user.profile.occupation == "Doctor") {
-            api = `${url}/api/prescription/appointments/?doctor=${this.props.user.id}&pending=true&accepted=true`
+            api = `${url}/api/prescription/appointments/?doctor=${this.props.user.id}&pending=true&accepted=true&limit=5&offset=${this.state.offset}`
         } else if (this.props.user.profile.occupation == "ClinicRecoptionist"){
-            api = `${url}/api/prescription/appointments/?clinic=${this.props.user.profile.recopinistclinics[0].clinicpk}&pending=true&accepted=true`
+            api = `${url}/api/prescription/appointments/?clinic=${this.props.user.profile.recopinistclinics[0].clinicpk}&pending=true&accepted=true&limit=5&offset=${this.state.offset}`
         }
         else{
             api = `${url}/api/prescription/appointments/?requesteduser=${this.props.user.id}&pending=true&accepted=true`
         }
-        console.log(api,"zzz")
+        console.log(api,"first")
         const data =await HttpsClient.get(api,"lll")
   
         if(data.type =="success"){
-            let Appointments= this.state.Appointments
+       
 
-            this.setState({ Appointments:data.data})
+            this.setState({ Appointments:this.state.Appointments.concat(data.data.results),isFectching:false})
+            if (data.data.next != null) {
+                this.setState({ next: true })
+            } else {
+                this.setState({ next: false })
+            }
         }
     }
 
@@ -195,7 +216,7 @@ class Appointments extends Component {
 
 
     handleConfirm = (date) => {
-        this.setState({ today: moment(date).format('YYYY-MM-DD'), show: false, date: new Date(date) }, () => {
+        this.setState({ today: moment(date).format('YYYY-MM-DD'), show: false, date: new Date(date),Appointments2:[],offset2:0,next2:true}, () => {
           this.getAppointments2()
 
         })
@@ -246,18 +267,42 @@ class Appointments extends Component {
     }
     componentDidMount() {
         this.getDoctors()
-      this.getAppointments();
-      this.getAppointments2();
-        this._unsubscribe = this.props.navigation.addListener('focus', () => {
-                this.setState({ modal:false})
-                this.getAppointments();
-                this.getAppointments2();
+        this.getAppointments();
+        this.getAppointments2();
+        this.setState({first:false})
+        this._unsubscribe = this.props.navigation.addListener('focus',() => {
+            if(!this.state.first){
+                this.setState({ modal: false })
+                this.setState({ offset2: 0, offset: 0, Appointments2: [], Appointments: [], next: true, next2: true }, () => {
+                    console.log("oipopo")
+                    this.getAppointments();
+                    this.getAppointments2();
+                })
+
+            }
+           
             
 
         });
     }
     componentWillUnmount(){
         this._unsubscribe();
+    }
+    renderFooter = () => {
+        if (this.state.next) {
+            return (
+                <ActivityIndicator size="large" color={themeColor} />
+            )
+        }
+        return null
+    }
+    renderFooter2 = () => {
+        if (this.state.next2) {
+            return (
+                <ActivityIndicator size="large" color={themeColor} />
+            )
+        }
+        return null
     }
     acceptAppointment =async()=>{
         let api = `${url}/api/prescription/appointments/${this.state.selectedAppointment.id}/`
@@ -297,7 +342,26 @@ class Appointments extends Component {
         }
     }
     completeAppointment =async()=>{
-        this.props.navigation.navigate('addPriscription', { appoinment: this.state.selectedAppointment})
+        if(this.props.user.profile.occupation=="Doctor"){
+            this.props.navigation.navigate('addPriscription', { appoinment: this.state.selectedAppointment })
+        }else{
+            let api = `${url}/api/prescription/appointments/${this.state.selectedAppointment.id}/`
+            let sendData = {
+                status: "Completed"
+            }
+            let post = await HttpsClient.patch(api, sendData)
+            if (post.type == "success") {
+                let duplicate = this.state.Appointments
+                duplicate.splice(this.state.selectedIndex, 1)
+                this.showSimpleMessage("Completed SuccessFully", "#00A300",)
+
+                this.setState({ modal: false, Appointments: duplicate })
+            } else {
+                this.showSimpleMessage("Try again", "#B22222", "danger")
+                this.setState({ modal: false })
+            }
+        }
+       
         
     }
     onChange = (selectedDate) => {
@@ -313,7 +377,7 @@ class Appointments extends Component {
 
     }
     validateInformation =(item)=>{
-        console.log(item.status)
+        
         if (item.status == "Pending" || item.status == "Rejected") {
             return(
                 <View style={{marginTop:10}}>
@@ -389,11 +453,42 @@ class Appointments extends Component {
             return "red"
         }
     }
+    handleEndReached = () => {
+        if (this.state.next) {
+            this.setState({ offset: this.state.offset + 5 }, () => {
+               this.getAppointments()
+            })
+        }
+        return
+    }
+    handleEndReached2 = () => {
+        if (this.state.next2) {
+            this.setState({ offset: this.state.offset2 + 5 }, () => {
+                this.getAppointments2()
+            })
+        }
+        return
+    }
+    handleRefresh =()=>{
+        this.setState({ Appointments: [], isFectching:true,next:true,offset:0},()=>{
+            this.getAppointments()
+        })
+    }
+    handleRefresh2 = () => {
+        this.setState({ Appointments2: [], isFectching2: true, next2: true, offset2: 0,today:moment(new Date()).format("YYYY-MM-DD") }, () => {
+            this.getAppointments2()
+        })
+    }
     FirstRoute =()=>{
         return(
             <FlatList 
+              refreshing={this.state.isFectching}
+              onRefresh ={()=>{this.handleRefresh()}}
+              ListFooterComponent ={this.renderFooter}
               contentContainerStyle={{paddingBottom:90}}
               data={this.state.Appointments}
+              onEndReached={()=>{this.handleEndReached()}}
+              onEndReachedThreshold={0.1}
               keyExtractor ={(item,index)=>index.toString()}
               renderItem ={({item,index})=>{
              
@@ -643,6 +738,11 @@ class Appointments extends Component {
     SecondRoute =()=>{
         return(
             <FlatList
+            refreshing={this.state.isFectching2}
+            onRefresh ={()=>{this.handleRefresh2()}}
+            onEndReached ={()=>{this.handleEndReached2()}}
+            onEndReachedThreshold={0.1}
+            ListFooterComponent={this.renderFooter2}
             contentContainerStyle={{paddingBottom:90}}
                 data={this.state.Appointments2}
                 keyExtractor={(item, index) => index.toString()}
@@ -1051,14 +1151,14 @@ class Appointments extends Component {
                          showsVerticalScrollIndicator ={false}
                         > 
                         <View style={{marginVertical:10,alignItems:'center',justifyContent:"center"}}>
-                            <Text style={[styles.text,{color:"#000",fontWeight:"bold"}]}>Create New Appoinment</Text>
+                            <Text style={[styles.text,{color:"#000",fontWeight:"bold",fontSize:20}]}>Create New Appoinment</Text>
                           
                         </View>
                         <View style={{marginHorizontal:20,marginVertical:10}}>
                                 <Text style={[styles.text, { fontWeight: "bold", fontSize: 18 }]}>Patient Contact No</Text>
                                 <View style={{marginTop:5}}>
                                     <TextInput
-                                
+                                        maxLength={10}
                                         keyboardType={"numeric"}
                                         selectionColor={themeColor}
                                         value={this.state.patientNo}

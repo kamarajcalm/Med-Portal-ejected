@@ -127,7 +127,7 @@ class CreateClinics extends Component {
         // console.log(post2,"pppp")
         // return
         let sendData ={
-            owner: this.state.doctor.user,
+            owner: this.state.doctor.user.id,
             displayPicture:this.state.image,
             mobile:this.state.mobile,
             gstin:this.state.GST,

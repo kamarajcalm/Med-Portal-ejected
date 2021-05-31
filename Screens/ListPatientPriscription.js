@@ -71,7 +71,7 @@ class ListPatientPriscription extends Component {
 
             return (
                 <TouchableOpacity style={[styles.card, { flexDirection: "row", borderRadius: 5 }]}
-                    onPress={() => { this.props.navigation.navigate('showCard', { item }) }}
+                    onPress={() => { this.props.navigation.navigate('PrescriptionView', { item, }) }}
                 >
                     <View style={{ flex: 0.3, alignItems: 'center', justifyContent: "center" }}>
                         <Image
@@ -81,7 +81,7 @@ class ListPatientPriscription extends Component {
                     </View>
                     <View style={{ flex: 0.4, justifyContent: 'center', alignItems: 'center' }}>
                         <View >
-                            <Text style={[styles.text, { fontSize: 18, }]}>{item?.username}</Text>
+                            <Text style={[styles.text, { fontSize: 18, }]}>{item?.username.name}</Text>
                             <Text style={[styles.text, { fontSize: 12, }]}>{item?.doctordetails?.name}</Text>
 
                         </View>

@@ -19,8 +19,9 @@ import { StackActions, CommonActions} from '@react-navigation/native';
 class UpdateTimings extends Component {
     constructor(props) {
         console.log("jjjjj")
-        let clinicPk = props.route.params.item.id
-        console.log(props.route.params.item,"hihi")
+        let clinicpk
+        // let clinicPk = props?.route?.params?.item?.id||null
+     
         let item = props.route.params.item
         super(props);
         this.state = {
