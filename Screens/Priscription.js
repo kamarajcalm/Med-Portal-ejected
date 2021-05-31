@@ -157,6 +157,7 @@ const getIndex =(index) =>{
     }, [date])
         //   ComponentDidmount
     useEffect(() => {
+        setLoading(true)
         stateRef.current = today1
         findUser();
         const unsubscribe = props.navigation.addListener('focus', () => {
@@ -192,10 +193,12 @@ const getIndex =(index) =>{
        setPrescriptions(data.data)
     }
    const getClinics = async () => {
+         
         const api = `${url}/api/prescription/getDoctorClinics/?doctor=${props.user.id}`
         const data = await HttpsClient.get(api)
         console.log(api,"clinic api")
         if (data.type == "success") {
+         
             props.selectWorkingClinics(data.data.workingclinics)
             props.selectOwnedClinics(data.data.ownedclinics)
             setClinics(data.data.workingclinics)
@@ -225,7 +228,7 @@ const getIndex =(index) =>{
         }
     }
   const  getPrescription = async () => {
-    
+      setLoading(true)
       let api = `${url}/api/prescription/prescriptions/?doctor=${props.user.id}&date=${stateRef.current}&clinic=${clinicRef.current.clinicpk}`
         console.log(api,"prescription api")
         let data = await HttpsClient.get(api)
@@ -252,10 +255,11 @@ const getIndex =(index) =>{
         else {
           getPateintPrescription()
         }
-        setLoading(false)
+       
        
     }
   const  getPateintPrescription = async () => {
+      
       let api = `${url}/api/prescription/prescriptions/?forUser=${props.user.id}`
         let data = await HttpsClient.get(api)
         console.log(api)
@@ -267,6 +271,7 @@ const getIndex =(index) =>{
         setIsFetching(false)
     }
   const  getClinicPrescription = async () => {
+      setLoading(true)
       console.log(props.user.profile.recopinistclinics,"pppp")
         let api = `${url}/api/prescription/prescriptions/?clinic=${props.user.profile.recopinistclinics[0].clinicpk}&date=${moment(date).format("YYYY-MM-DD")}`
         let data = await HttpsClient.get(api)
@@ -623,7 +628,7 @@ const _keyboardDidShow =()=>{
             <Animated.View style={{flex:1,}}>
                 <StatusBar backgroundColor={themeColor} style="light" />
                 <Animated.FlatList
-                 
+                    keyExtractor={(item, index) => index.toString()}
                      refreshControl ={
                          <RefreshControl 
                             onRefresh={() => onRefresh()}
@@ -652,7 +657,7 @@ const _keyboardDidShow =()=>{
 
 
                     }}
-                    keyExtractor={(item, index) => index.toString()}
+                  
                   
          
                 

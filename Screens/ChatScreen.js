@@ -574,7 +574,11 @@ sendMessage =async()=>{
                           if (item.msgType == "image") {
 
                               return (
-                                  <View style={{ alignSelf: "flex-start", backgroundColor: '#eeee', padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
+                                  <TouchableOpacity style={{ alignSelf: "flex-start", backgroundColor: '#eeee', padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}
+                                      onPress={() => {
+                                          this.props.navigation.navigate('ImageViewer', { images: this.state.images, index: index })
+                                      }}
+                                  >
                                       <Image
                                           source={{ uri: item.attachment }}
                                           style={{ height: height * 0.15, width: width * 0.4, resizeMode: "contain" }}
@@ -587,7 +591,7 @@ sendMessage =async()=>{
                                       <View style={styles.leftArrow}></View>
 
                                       <View style={styles.leftArrowOverlap}></View>
-                                  </View>
+                                  </TouchableOpacity>
                               )
 
                           }
@@ -648,7 +652,11 @@ sendMessage =async()=>{
                       if (item.msgType == "image") {
 
                           return (
-                              <View style={{ alignSelf: 'flex-end', backgroundColor: themeColor, padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
+                              <TouchableOpacity style={{ alignSelf: 'flex-end', backgroundColor: themeColor, padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}
+                                  onPress={() => {
+                                      this.props.navigation.navigate('ImageViewer', { images: this.state.images, index: index })
+                                  }}
+                              >
                                   <Image
                                       resizeMethod="scale"
                                       source={{ uri: item.attachment }}
@@ -662,7 +670,7 @@ sendMessage =async()=>{
                                   <View style={styles.rightArrow}></View>
 
                                   <View style={styles.rightArrowOverlap}></View>
-                              </View>
+                              </TouchableOpacity>
                           )
 
                       }
@@ -727,7 +735,11 @@ sendMessage =async()=>{
                           if (item.msgType == "image") {
 
                               return (
-                                  <View style={{ alignSelf: "flex-start", backgroundColor: '#eeee', padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}>
+                                  <TouchableOpacity style={{ alignSelf: "flex-start", backgroundColor: '#eeee', padding: 10, borderRadius: 20, marginRight: 10, marginTop: 10, marginLeft: 20, maxWidth: width * 0.6 }}
+                                      onPress={() => {
+                                          this.props.navigation.navigate('ImageViewer', { images: this.state.images, index: index })
+                                      }}
+                                  >
                                       <Image
                                           source={{ uri: item.attachment }}
                                           style={{ height: height * 0.15, width: width * 0.4, resizeMode: "contain" }}
@@ -740,7 +752,7 @@ sendMessage =async()=>{
                                       <View style={styles.leftArrow}></View>
 
                                       <View style={styles.leftArrowOverlap}></View>
-                                  </View>
+                                  </TouchableOpacity>
                               )
 
                           }

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Dimensions, TouchableOpacity, StyleSheet, TextInput, FlatList, Image, SafeAreaView, Alert } from 'react-native';
+import { View, Text, Dimensions, TouchableOpacity, StyleSheet, TextInput, FlatList, Image, SafeAreaView, Alert, ActivityIndicator} from 'react-native';
 import { Ionicons, Entypo, AntDesign, FontAwesome, FontAwesome5, MaterialIcons} from '@expo/vector-icons';
 import { connect } from 'react-redux';
 import { selectTheme } from '../actions';
@@ -14,7 +14,7 @@ const fontFamily = settings.fontFamily;
 const themeColor = settings.themeColor;
 const screenHeight = Dimensions.get("screen").height;
 import FlashMessage, { showMessage, hideMessage } from "react-native-flash-message";
-import { ActivityIndicator } from 'react-native-paper';
+import {  } from 'react-native-paper';
 import moment from 'moment';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 const url = settings.url;
@@ -221,7 +221,7 @@ class ViewItem extends Component {
                 <>
                   
                     <View style={{ marginHorizontal: 20, marginTop: 10 }}>
-                        <Text style={[styles.text, { color: '#000' }]}>No of Medicines </Text>
+                        <Text style={[styles.text, { color: '#000' }]}>No of Medicines</Text>
                         <TextInput
                             keyboardType={"numeric"}
                             style={{ width: width * 0.8, height: height * 0.05, backgroundColor: "#fff", borderRadius: 5, marginTop: 10 }}

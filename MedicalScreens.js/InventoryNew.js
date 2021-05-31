@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { View, Text, Dimensions, TouchableOpacity, StyleSheet, TextInput, FlatList, Image, SafeAreaView, Alert} from 'react-native';
-import { Ionicons, Entypo, AntDesign } from '@expo/vector-icons';
+import { View, Text, Dimensions, TouchableOpacity, StyleSheet, TextInput, FlatList, Image, SafeAreaView, Alert,} from 'react-native';
+import { Ionicons, Entypo, AntDesign, MaterialIcons} from '@expo/vector-icons';
 import { connect } from 'react-redux';
 import { selectTheme } from '../actions';
 import settings from '../AppSettings';
@@ -10,10 +10,30 @@ const { height, width } = Dimensions.get("window");
 const fontFamily = settings.fontFamily;
 const themeColor = settings.themeColor;
 const url = settings.url;
-import { ActivityIndicator, Modal, } from 'react-native-paper';
+const screenHeight = Dimensions.get("screen").height
+import { ActivityIndicator, } from 'react-native-paper';
 import HttpsClient from '../api/HttpsClient';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import DropDownPicker from 'react-native-dropdown-picker';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import moment from 'moment';
 import FlashMessage, { showMessage, hideMessage } from "react-native-flash-message";
+let types = [
+    {
+        label: "Pending", value: 'Pending'
+    },
+    {
+        label: "Cancelled", value: 'Cancelled'
+    },
+    {
+        label: "Received", value: 'Received'
+    },
+    {
+        label: "Distrubutor Cancelled", value: 'Distrubutor Cancelled'
+    },
+
+]
+import Modal from 'react-native-modal';
 const initialLayout = { width: Dimensions.get('window').width };
 class InventoryNew extends Component {
     constructor(props) {
@@ -30,10 +50,59 @@ class InventoryNew extends Component {
             items:[],
             categoryName:'',
             creating:false,
-            refreshing:false
+            refreshing:false,
+            orders:[],
+            date: new Date(),
+            show: false,
+            today: null,
+            orderDetails:"",
+            Discount:"",
+            Amount:"",
+            selectedStatus:types[0].value,
+            modal2:false
         };
     }
+    createAlert = (item) => {
+        
+        Alert.alert(
+            "Do you want to delete?",
+            `${item.title}`,
+            [
+                {
+                    text: "No",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
+                { text: "Yes", onPress: () => { this.deleteCategory(item) } }
+            ]
+        );
 
+    }
+    validateColor = (status) => {
+        if (status == "Pending") {
+            return "orange"
+        }
+        if (status == "Cancelled") {
+            return "red"
+        }
+        if (status == "Received") {
+            return "green"
+        }
+        if (status == "Distrubutor Cancelled") {
+            return "red"
+        }
+    }
+    hideDatePicker = () => {
+        this.setState({ show: false })
+    };
+    handleConfirm = (date) => {
+
+        this.setState({ today: moment(date).format('YYYY-MM-DD'), show: false, date: new Date(date) }, () => {
+
+
+        })
+        this.hideDatePicker();
+    };
     showSimpleMessage(content, color, type = "info", props = {}) {
         const message = {
             message: content,
@@ -47,7 +116,7 @@ class InventoryNew extends Component {
     }
     getItems = async()=>{
         this.setState({ refreshing:true})
-        let api = `${url}/api/prescription/inventorycategory/?clinic=${this.props.medical.clinicpk}`
+        let api = `${url}/api/prescription/inventorycategory/?inventory=${this.props.medical.inventory}`
 
       let data =await HttpsClient.get(api)
       if(data.type =="success"){
@@ -56,6 +125,48 @@ class InventoryNew extends Component {
       }else{
           this.setState({ refreshing: false })
       }
+    }
+    getOrders =async()=>{
+        let api = `${url}/api/prescription/inventoryorders/?inventory=${this.props.medical.inventory}`
+        let data =await HttpsClient.get(api)
+        console.log(api)
+        if(data.type =="success"){
+              this.setState({orders:data.data})
+        }
+    }
+    createOrders =async()=>{
+        this.setState({ creating: true })
+        if (this.state.orderDetails == "") {
+            this.setState({ creating: false })
+            return this.showSimpleMessage("Please add order Details", "#dd7030",)
+        }
+        if (this.state.today ==null) {
+            this.setState({ creating: false })
+            return this.showSimpleMessage("Please add expected Arriving", "#dd7030",)
+        }
+        if (this.state.Amount == "") {
+            this.setState({ creating: false })
+            return this.showSimpleMessage("Please add amount", "#dd7030",)
+        }
+        let api = `${url}/api/prescription/createOrders/`
+        let sendData ={
+            status:this.state.selectedStatus,
+            order_details:this.state.orderDetails,
+            expected_arriving:this.state.today,
+            discount:this.state.Discount,
+            amount:this.state.Amount,
+            clinic:this.props.medical.clinicpk
+        }
+        let post = await HttpsClient.post(api,sendData)
+        if (post.type == "success") {
+            this.setState({ modal: false, orderDetails: "", Discount: "", Amount:""})
+            this.setState({ creating: false })
+            this.showSimpleMessage("created SuccessFully", "#00A300", "success")
+            this.getOrders()
+        } else {
+            this.setState({ creating: false })
+            this.showSimpleMessage("Try again", "#B22222", "danger")
+        }
     }
     addCategory = async()=>{
         if(this.state.categoryName ==""){
@@ -89,23 +200,16 @@ class InventoryNew extends Component {
              this.showSimpleMessage("Try again", "#B22222", "danger")
          }
     }
-    createAlert =(item)=>{
-        Alert.alert(
-            "Do you want to delete?",
-           `${item.title}`,
-            [
-                {
-                    text: "No",
-                    onPress: () => console.log("Cancel Pressed"),
-                    style: "cancel"
-                },
-                { text: "Yes", onPress: () => { this.deleteCategory(item)} }
-            ]
-        );
-
-    }
+ 
     componentDidMount() {
      this.getItems()  
+     this.getOrders()
+        this._unsubscribe = this.props.navigation.addListener('focus', () => {
+            this.getOrders()
+        });
+    }
+    componentWillUnmount(){
+        this._unsubscribe()
     }
     header =()=>{
         return(
@@ -178,17 +282,209 @@ class InventoryNew extends Component {
             </View>
         )
     }
+                    //    orders
+    orderHeaders =()=>{
+        return(
+            <View style={{flexDirection:"row",flex:1,marginTop:10}}>
+                <View style={{flex:0.1,alignItems:'center',justifyContent:"center"}}>
+                  <Text style={[styles.text,{color:"#000"}]}>#</Text>
+                </View>
+                <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
+                    <Text style={[styles.text, { color: "#000" }]}>Created</Text>
+                </View>
+                <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
+                    <Text style={[styles.text, { color: "#000" }]}>Arriving</Text>
+                </View>
+                <View style={{ flex: 0.3, alignItems: 'center', justifyContent: "center" }}>
+                    <Text style={[styles.text, { color: "#000" }]}>Detail</Text>
+                </View>
+                <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
+                    <Text style={[styles.text, { color: "#000" }]}>Status</Text>
+                </View>
+              
+            </View>
+        )
+    }
+    modal2 =()=>{
+        return(
+            <Modal
+                deviceHeight={screenHeight}
+                isVisible={this.state.modal2}
+                onBackdropPress={() => { this.setState({ modal2: false }) }}
+            >
+                <View style={{ flex: 1, justifyContent: "center" }}>
+             
+                    <View style={{ height: height * 0.6, backgroundColor: "#eee", borderRadius: 10, }}>
+                        <View>
+                            <Text>sff</Text>
+                        </View>
+                    </View>
+
+                </View>
+                </Modal>
+        )
+    }
+    modal = () => {
+        
+        return (
+            <Modal
+                deviceHeight={screenHeight}
+                isVisible={this.state.modal}
+                onBackdropPress={() => { this.setState({ modal: false }) }}
+            >
+                <View style={{ flex: 1, justifyContent: "center" }}>
+                    <View style={{ height: height * 0.6, backgroundColor: "#eee", borderRadius: 10, }}>
+                        <View style={{ marginHorizontal: 20, marginTop: 10 }}>
+                            <Text style={[styles.text, { color: '#000' }]}>Select status</Text>
+                            <View style={{ marginTop: 10 }}>
+                                <DropDownPicker
+                                    items={types}
+                                    defaultValue={types[0].value}
+                                    containerStyle={{ height: 40, width: width * 0.4 }}
+                                    style={{ backgroundColor: '#fafafa' }}
+                                    itemStyle={{
+                                        justifyContent: 'flex-start'
+                                    }}
+                                    dropDownStyle={{ backgroundColor: '#fafafa', width: width * 0.4 }}
+
+                                    onChangeItem={(item) => {
+                                        this.setState({ selectedStatus: item.value })
+                                    }}
+                                />
+                            </View>
+                            <View style={{ marginTop:10 }}>
+                                <Text style={[styles.text, { color: '#000' }]}>order Details</Text>
+                                <TextInput
+                                   
+                                    multiline={true}
+                                    style={{ width: width * 0.8, height: height * 0.07, backgroundColor: "#fff", borderRadius: 5, marginTop: 10, textAlignVertical: "top" }}
+                                    selectionColor={themeColor}
+                                    value={this.state.orderDetails}
+                                    onChangeText={(orderDetails) => { this.setState({ orderDetails }) }}
+                                />
+                            </View>
+                            <View style={{ marginTop: 10,}}>
+                                <Text style={[styles.text, { color: "#000" }]}>Expected Arriving</Text>
+                                <View style={{ flexDirection: "row", marginTop: 10 }}>
+                                    <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center' }}
+                                        onPress={() => { this.setState({ show: true }) }}
+                                    >
+                                        <MaterialIcons name="date-range" size={24} color="black" />
+                                    </TouchableOpacity>
+                                    <View style={{ alignItems: 'center', justifyContent: "center", marginLeft: 10 }}>
+                                        <Text style={[styles.text]}>{this.state.today}</Text>
+                                    </View>
+                                </View>
+                            </View>
+                            <View style={{ marginTop: 10 }}>
+                                <Text style={[styles.text, { color: '#000' }]}>Discount</Text>
+                                <TextInput
+                                    keyboardType={"numeric"}
+                                    style={{ width: width * 0.8, height: height * 0.05, backgroundColor: "#fff", borderRadius: 5, marginTop: 10 }}
+                                    selectionColor={themeColor}
+                                    value={this.state.Discount}
+                                    onChangeText={(Discount) => { this.setState({ Discount }) }}
+                                />
+                            </View>
+                            <View style={{ marginTop: 10 }}>
+                                <Text style={[styles.text, { color: '#000' }]}>Amount</Text>
+                                <TextInput
+                                    keyboardType={"numeric"}
+                                    style={{ width: width * 0.8, height: height * 0.05, backgroundColor: "#fff", borderRadius: 5, marginTop: 10 }}
+                                    selectionColor={themeColor}
+                                    value={this.state.Amount}
+                                    onChangeText={(Amount) => { this.setState({ Amount }) }}
+                                />
+                            </View>
+                            <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                <TouchableOpacity style={{ backgroundColor: themeColor, height: height * 0.05, width: width * 0.4, alignItems: 'center', justifyContent: 'center', marginTop: 25, borderRadius: 5 }}
+                                    onPress={() => { this.createOrders() }}
+                                >
+                                    {!this.state.creating ? <Text style={[styles.text, { color: '#fff' }]}>Add</Text> :
+                                        <ActivityIndicator size={"small"} color={"#fff"} />
+                                    }
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+
+                </View>
+            </Modal>
+        )
+    }
     SecondRoute =()=>{
         return (
-            <View>
+            <View style={{flex:1}}>
+               <FlatList 
+                 ListHeaderComponent ={this.orderHeaders()}
+                 data ={this.state.orders}
+                 keyExtractor ={(item,index)=>{index.toString()}}
+                 renderItem = {({item,index})=>{
+                   return(
+                       <TouchableOpacity style={{ flexDirection: "row", flex: 1, marginTop: 10,backgroundColor:"#eee" ,paddingVertical:20}}
+                         onPress ={()=>{this.props.navigation.navigate('ViewOrders',{item})}}
+                       >
+                           <View style={{ flex: 0.1, alignItems: 'center', justifyContent: "center" }}>
+                               <Text style={[styles.text, { color: "#000" }]}>{index+1}</Text>
+                           </View>
+                           <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
+                               <Text style={[styles.text, { color: "#000" ,fontSize:10}]}>{moment(item.created).format("YYYY-MM-DD")}</Text>
+                           </View>
+                           <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
+                               <Text style={[styles.text, { color: "#000", fontSize: 10}]}>{item.expected_arriving}</Text>
+                           </View>
+                           <View style={{ flex: 0.3, alignItems: 'center', justifyContent: "center" }}>
+                               <Text style={[styles.text, { color: "#000" }]}>{item.order_details}</Text>
+                           </View>
+                           <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
+                               <Text style={[styles.text, { color: this.validateColor(item.status) }]}>{item.status}</Text>
+                           </View>
+                           
+                       </TouchableOpacity>
+                   )
+                 }}
+               />
+                <View style={{
+                    position: "absolute",
+                    bottom: 50,
+                    left: 20,
+                    right: 20,
+                    flex: 1,
+                    alignItems: "center",
+                    justifyContent: "center",
 
+                    borderRadius: 20
+                }}>
+                    <TouchableOpacity
+                        onPress={() => { this.setState({ modal: true }) }}
+                    >
+                        <AntDesign name="pluscircle" size={40} color={themeColor} />
+                    </TouchableOpacity>
+                </View>
+              
             </View>
         )
     }
     ThirdRoute =()=>{
         return (
-            <View>
+            <View style={{flex:1}}>
+                <View style={{
+                    position: "absolute",
+                    bottom: 50,
+                    left: 20,
+                    right: 20,
+                    flex: 1,
+                    alignItems: "center",
+                    justifyContent: "center",
 
+                    borderRadius: 20
+                }}>
+                    <TouchableOpacity
+                        onPress={() => { this.setState({modal2: true })}}
+                    >
+                        <AntDesign name="pluscircle" size={40} color={themeColor} />
+                    </TouchableOpacity>
+                </View>
             </View>
         )
     }
@@ -232,7 +528,19 @@ class InventoryNew extends Component {
                         }
 
                     />
-                  
+                    {
+                        this.modal()
+                    }
+                    {
+                        this.modal2()
+                    }
+                    <DateTimePickerModal
+                        testID="2"
+                        isVisible={this.state.show}
+                        mode="date"
+                        onConfirm={this.handleConfirm}
+                        onCancel={this.hideDatePicker}
+                    />
                 </SafeAreaView>
 
               

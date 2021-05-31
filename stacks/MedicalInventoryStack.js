@@ -9,6 +9,7 @@ import SearchMedicinesMedical from '../MedicalScreens.js/SearchMedicinesMedical'
 import InventoryNew from '../MedicalScreens.js/InventoryNew';
 import ViewCategory from '../MedicalScreens.js/ViewCategory';
 import ViewItem from '../MedicalScreens.js/ViewItem';
+import ViewOrders from '../MedicalScreens.js/ViewOrders';
 const Stack = createStackNavigator();
 export default class MedicalInventoryStack extends Component {
     constructor(props) {
@@ -26,6 +27,7 @@ export default class MedicalInventoryStack extends Component {
                 <Stack.Screen name="SearchMedicinesMedical" component={SearchMedicinesMedical} options={{ headerShown: false }} />
                 <Stack.Screen name="ViewCategory" component={ViewCategory} options={{ headerShown: false }} />
                 <Stack.Screen name="ViewItem" component={ViewItem} options={{ headerShown: false }} />
+                <Stack.Screen name="ViewOrders" component={ViewOrders} options={{ headerShown: false }} />
             </Stack.Navigator>
         );
     }
