@@ -33,9 +33,11 @@ let types = [
 
 ]
 import Modal from 'react-native-modal';
+import { ScrollView } from 'react-native-gesture-handler';
 class ViewOrders extends Component {
     constructor(props) {
         let item =props.route.params.item
+        console.log(item,"ppp")
         super(props);
         this.state = {
             item,
@@ -45,7 +47,9 @@ class ViewOrders extends Component {
             orderDetails: this.props.route.params.item.order_details,
             Discount: this.props.route.params.item.discount.toString(),
             Amount: this.props.route.params.item.amount.toString(),
-            selectedStatus:this.props.route.params.item.status
+            selectedStatus:this.props.route.params.item.status,
+            distributorName: this.props.route.params.item.from_contact,
+            MobileNo: this.props.route.params.item.from_contactNo
         };
     }
     updateOrders = async () => {
@@ -69,7 +73,8 @@ class ViewOrders extends Component {
             expected_arriving: this.state.today,
             discount: this.state.Discount,
             amount: this.state.Amount,
-         
+            from_contact:this.state.distributorName,
+            from_contactNo:this.state.MobileNo
         }
         let post = await HttpsClient.patch(api, sendData)
         console.log(post)
@@ -79,7 +84,9 @@ class ViewOrders extends Component {
                 orderDetails: post.data.order_details, 
                 Discount: post.data.discount.toString(), 
                 Amount: post.data.amount.toString(), 
-                selectedStatus:post.data.status 
+                selectedStatus:post.data.status,
+                distributorName:post.data.from_contact,
+                MobileNo: post.data.from_contactNo
             })
             this.setState({ creating: false })
             this.showSimpleMessage("Edited SuccessFully", "#00A300", "success")
@@ -145,24 +152,47 @@ class ViewOrders extends Component {
             >
                 <View style={{ flex: 1, justifyContent: "center" }}>
                     <View style={{ height: height * 0.6, backgroundColor: "#eee", borderRadius: 10, }}>
+                        <ScrollView>
+
+
                         <View style={{ marginHorizontal: 20, marginTop: 10 }}>
                             <Text style={[styles.text, { color: '#000' }]}>Select status</Text>
                             <View style={{ marginTop: 10 }}>
                                 <DropDownPicker
                                     items={types}
                                     defaultValue={this.state.selectedStatus}
-                                    containerStyle={{ height: 40, width: width * 0.4 }}
+                                    containerStyle={{ height: 40, width: width * 0.8 }}
                                     style={{ backgroundColor: '#fafafa' }}
                                     itemStyle={{
                                         justifyContent: 'flex-start'
                                     }}
-                                    dropDownStyle={{ backgroundColor: '#fafafa', width: width * 0.4 }}
+                                    dropDownStyle={{ backgroundColor: '#fafafa', width: width * 0.8 }}
 
                                     onChangeItem={(item) => {
                                         this.setState({ selectedStatus: item.value })
                                     }}
                                 />
                             </View>
+                            <View style={{ marginTop: 10 }}>
+                                <Text style={[styles.text, { color: '#000' }]}>Distrubutor Name</Text>
+                                <TextInput
+                                    multiline={true}
+                                    style={{ width: width * 0.8, height: height * 0.05, backgroundColor: "#fff", borderRadius: 5, marginTop: 10, textAlignVertical: "top" }}
+                                    selectionColor={themeColor}
+                                    value={this.state.distributorName}
+                                    onChangeText={(distributorName) => { this.setState({ distributorName }) }}
+                                />
+                            </View>
+                                <View style={{ marginTop: 10 }}>
+                                    <Text style={[styles.text, { color: '#000' }]}>Mobile No</Text>
+                                    <TextInput
+                                        keyboardType={"numeric"}
+                                        style={{ width: width * 0.8, height: height * 0.05, backgroundColor: "#fff", borderRadius: 5, marginTop: 10 }}
+                                        selectionColor={themeColor}
+                                        value={this.state.MobileNo}
+                                        onChangeText={(MobileNo) => { this.setState({ MobileNo }) }}
+                                    />
+                                </View>
                             <View style={{ marginTop: 10 }}>
                                 <Text style={[styles.text, { color: '#000' }]}>order Details</Text>
                                 <TextInput
@@ -206,16 +236,17 @@ class ViewOrders extends Component {
                                     onChangeText={(Amount) => { this.setState({ Amount }) }}
                                 />
                             </View>
-                            <View style={{ alignItems: "center", justifyContent: "center" }}>
+                            <View style={{ alignItems: "center", justifyContent: "center" ,marginVertical:20}}>
                                 <TouchableOpacity style={{ backgroundColor: themeColor, height: height * 0.05, width: width * 0.4, alignItems: 'center', justifyContent: 'center', marginTop: 25, borderRadius: 5 }}
                                     onPress={() => { this.updateOrders() }}
                                 >
-                                    {!this.state.creating ? <Text style={[styles.text, { color: '#fff' }]}>Add</Text> :
+                                    {!this.state.creating ? <Text style={[styles.text, { color: '#fff' }]}>Edit</Text> :
                                         <ActivityIndicator size={"small"} color={"#fff"} />
                                     }
                                 </TouchableOpacity>
                             </View>
                         </View>
+                        </ScrollView>
                     </View>
 
                 </View>
@@ -235,6 +266,78 @@ class ViewOrders extends Component {
         if (status == "Distrubutor Cancelled") {
             return "red"
         }
+    }
+    renderHeader =()=>{
+        return(
+            <View style={{flexDirection:"row"}}>
+                <View style={{width:width*0.1,alignItems:"center",justifyContent:"center"}}>
+                    <Text style={[styles.text,{color:"#000"}]}>#</Text>
+                </View>
+                <View style={{ width: width * 0.3, alignItems: "center", justifyContent: "center" }}>
+                    <Text style={[styles.text,{color:"#000"}]}>Name</Text>
+                </View>
+                <View style={{ width: width * 0.25, alignItems: "center", justifyContent: "center" }}>
+                    <Text style={[styles.text,{color:"#000"}]}>Type</Text>
+                </View>
+                <View style={{ width: width * 0.3, alignItems: "center", justifyContent: "center" }}>
+                    <Text style={[styles.text,{color:"#000"}]}>boxes</Text>
+                </View>
+                <View style={{ width: width * 0.3, alignItems: "center", justifyContent: "center" }}>
+                    <Text style={[styles.text,{color:"#000"}]}>Strips</Text>
+                </View>
+                <View style={{ width: width * 0.3, alignItems: "center", justifyContent: "center" }}>
+                    <Text style={[styles.text,{color:"#000"}]}>Pieces</Text>
+                </View>
+                <View style={{ width: width * 0.3, alignItems: "center", justifyContent: "center" }}>
+                    <Text style={[styles.text,{color:"#000"}]}>Quantity</Text>
+                </View>
+            </View>
+        )
+    }
+    renderFooter =()=>{
+        return(
+            <>
+                <View style={{ marginTop: 10, marginHorizontal: 10 }}>
+                    <Text style={[styles.text, { color: "#000" }]}>Order Details :</Text>
+                    <View style={{ marginTop: 5, marginLeft: 10 }}>
+                        <Text style={[styles.text]}>{this.state.orderDetails}</Text>
+                    </View>
+                </View>
+                <View style={{ marginTop: 20, marginHorizontal: 10 }}>
+                    <Text style={[styles.text, { color: "#000" }]}>Order Created :</Text>
+                    <View style={{ marginTop: 5, marginLeft: 10 }}>
+                        <Text style={[styles.text]}>{moment(this.state.item.created).format('YYYY-MM-DD')}</Text>
+                    </View>
+                </View>
+                <View style={{ marginTop: 20, marginHorizontal: 10 }}>
+                    <Text style={[styles.text, { color: "#000" }]}>Expected Arriving :</Text>
+                    <View style={{ marginTop: 5, marginLeft: 10 }}>
+                        <Text style={[styles.text]}>{this.state.today}</Text>
+                    </View>
+                </View>
+                <View style={{ marginTop: 20, marginHorizontal: 10 }}>
+                    <Text style={[styles.text, { color: "#000" }]}>Amount</Text>
+                    <View style={{ marginTop: 5, marginLeft: 10, flexDirection: 'row' }}>
+
+                        <Text style={[styles.text]}>₹ {this.state.Amount}</Text>
+                    </View>
+                </View>
+                <View style={{ marginTop: 20, marginHorizontal: 10 }}>
+                    <Text style={[styles.text, { color: "#000" }]}>Discount</Text>
+                    <View style={{ marginTop: 5, marginLeft: 10, flexDirection: 'row' }}>
+
+                        <Text style={[styles.text]}>₹ {this.state.Discount}</Text>
+                    </View>
+                </View>
+                <View style={{ marginTop: 20, marginHorizontal: 10 }}>
+                    <Text style={[styles.text, { color: "#000" }]}>Status</Text>
+                    <View style={{ marginTop: 5, marginLeft: 10, flexDirection: 'row' }}>
+
+                        <Text style={[styles.text, { color: this.validateColor(this.state.selectedStatus) }]}> {this.state.selectedStatus}</Text>
+                    </View>
+                </View>
+            </>
+        )
     }
     render() {
         return (
@@ -256,53 +359,56 @@ class ViewOrders extends Component {
                         </View>
                     </View>
                     <View style={{flex:1}}>
-                         <View style={{marginTop:10,marginHorizontal:10}}>
-                             <Text style={[styles.text,{color:"#000"}]}>Order Details :</Text>
-                             <View style={{marginTop:5,marginLeft:10}}>
-                                <Text style={[styles.text]}>{this.state.orderDetails}</Text>
-                             </View>
-                         </View>
-                        <View style={{ marginTop: 20, marginHorizontal: 10 }}>
-                            <Text style={[styles.text, { color: "#000" }]}>Order Created :</Text>
-                            <View style={{ marginTop: 5, marginLeft: 10 }}>
-                                <Text style={[styles.text]}>{moment(this.state.item.created).format('YYYY-MM-DD')}</Text>
-                            </View>
+                        <View style={{alignItems:"center",marginVertical:10}}>
+                            <Text style={[styles.text,{color:"#000",fontSize:16}]}>Medicines</Text>
                         </View>
-                        <View style={{ marginTop: 20, marginHorizontal: 10 }}>
-                            <Text style={[styles.text, { color: "#000" }]}>Expected Arriving :</Text>
-                            <View style={{ marginTop: 5, marginLeft: 10 }}>
-                                <Text style={[styles.text]}>{this.state.today}</Text>
-                            </View>
-                        </View>
-                        <View style={{ marginTop: 20, marginHorizontal: 10 }}>
-                            <Text style={[styles.text, { color: "#000" }]}>Amount</Text>
-                            <View style={{ marginTop: 5, marginLeft: 10,flexDirection:'row' }}>
-                              
-                                <Text style={[styles.text]}>₹ {this.state.Amount}</Text>
-                            </View>
-                        </View>
-                        <View style={{ marginTop: 20, marginHorizontal: 10 }}>
-                            <Text style={[styles.text, { color: "#000" }]}>Discount</Text>
-                            <View style={{ marginTop: 5, marginLeft: 10, flexDirection: 'row' }}>
-
-                                <Text style={[styles.text]}>₹ {this.state.Discount}</Text>
-                            </View>
-                        </View>
-                        <View style={{ marginTop: 20, marginHorizontal: 10 }}>
-                            <Text style={[styles.text, { color: "#000" }]}>Status</Text>
-                            <View style={{ marginTop: 5, marginLeft: 10, flexDirection: 'row' }}>
-
-                                <Text style={[styles.text, { color: this.validateColor(this.state.selectedStatus)}]}> {this.state.selectedStatus}</Text>
-                            </View>
-                        </View>
+                        <ScrollView 
+                         horizontal ={true}
+                         showsHorizontalScrollIndicator ={false}
+                        >
+                            <FlatList 
+                              data= {this.state.item.items}
+                              keyExtractor ={(item,index)=>index.toString()}
+                              ListHeaderComponent ={this.renderHeader()}
+                              ListFooterComponent ={this.renderFooter()}
+                              renderItem ={({item,index})=>{
+                                    return(
+                                        <View style={{ flexDirection: "row" ,marginTop:5}}>
+                                            <View style={{ width: width * 0.1, alignItems: "center", justifyContent: "center" }}>
+                                                <Text style={[styles.text]}>{index+1}</Text>
+                                            </View>
+                                            <View style={{ width: width * 0.3, alignItems: "center", justifyContent: "center" }}>
+                                                <Text style={[styles.text]}>{item.medicineDetail.title}</Text>
+                                            </View>
+                                            <View style={{ width: width * 0.25, alignItems: "center", justifyContent: "center" }}>
+                                                <Text style={[styles.text]}>{item.medicineDetail.type}</Text>
+                                            </View>
+                                            <View style={{ width: width * 0.3, alignItems: "center", justifyContent: "center" }}>
+                                                <Text style={[styles.text]}>{item.number_of_boxes}</Text>
+                                            </View>
+                                            <View style={{ width: width * 0.3, alignItems: "center", justifyContent: "center" }}>
+                                                <Text style={[styles.text]}>{item.number_of_strips}</Text>
+                                            </View>
+                                            <View style={{ width: width * 0.3, alignItems: "center", justifyContent: "center" }}>
+                                                <Text style={[styles.text]}>{item.number_of_medicines}</Text>
+                                            </View>
+                                            <View style={{ width: width * 0.3, alignItems: "center", justifyContent: "center" }}>
+                                                <Text style={[styles.text]}>{item.quantity}</Text>
+                                            </View>
+                                        </View>
+                                    )
+                              }}
+                            />
+                
+                        </ScrollView>
                     </View>
                     <View style={{position:"absolute",width,alignItems:"center",justifyContent:"space-around",bottom:30,flexDirection:'row'}}>
-                        <TouchableOpacity 
+                        {this.state.item.status !="Received"&&<TouchableOpacity
                           style={{height:height*0.05,width:width*0.3,backgroundColor:themeColor,alignItems:"center",justifyContent:"center",borderRadius:5}}
                           onPress ={()=>{this.setState({modal:true})}}
                         >
                             <Text style={[styles.text],{color:"#fff"}}>Edit</Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity>}
                         <TouchableOpacity
                             style={{ height: height * 0.05, width: width * 0.3, backgroundColor: "red",alignItems:"center",justifyContent:"center" ,borderRadius:5}}
                             onPress ={()=>{this.createAlert2()}}

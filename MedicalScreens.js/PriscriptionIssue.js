@@ -116,8 +116,7 @@ class PriscriptionIssue extends Component {
               this.getClinic();
         this._unsubscribe = this.props.navigation.addListener('focus', () => {
         
-            this.getClinic()
-            
+            this.getPriscriptions(this.props?.medical?.clinic?.id)
 
         });
     }

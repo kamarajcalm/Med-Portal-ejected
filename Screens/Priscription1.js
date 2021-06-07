@@ -71,7 +71,7 @@ class Priscription extends React.Component {
             next:true
          
         };
-         this.scrollY=new Animated.Value(0)
+        this.scrollY=new Animated.Value(0)
         this.translateYNumber= React.createRef()
     } 
     handleEndReached =()=>{

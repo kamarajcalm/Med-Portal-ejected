@@ -33,6 +33,7 @@ let types = [
 class ViewItem extends Component {
     constructor(props) {
         let item = props.route.params.item
+        console.log(item,"oooo")
         super(props);
         this.state = {
             modal: false,
@@ -40,13 +41,16 @@ class ViewItem extends Component {
             Price: '',
             type: types[0].value,
             items: [],
-            NoofStripe:'',
-            NoofMedicines:"",
+            NoofStripe:"0",
+            NoofMedicines:"0",
             boxes:"",
             item,
             date: new Date(),
             show:false,
             today: null,
+            quantity:"",
+            converted:false
+
         };
     }
     showDatePicker = () => {
@@ -77,34 +81,34 @@ class ViewItem extends Component {
     }
     addMedicine = async () => {
         this.setState({ creating: true })
-        if (this.state.type =="Box"){
-            if (this.state.boxes == "") {
-                this.setState({ creating: false })
-                return this.showSimpleMessage("Please add No of boxes", "#dd7030",)
-            }
-            if (this.state.NoofStripe == "") {
-                this.setState({ creating: false })
-                return this.showSimpleMessage("Please add No of Stripe", "#dd7030",)
-            }
-            if (this.state.NoofMedicines == "") {
-                this.setState({ creating: false })
-                return this.showSimpleMessage("Please add No of Medicines", "#dd7030",)
-            }
-        } else if (this.state.type =="Strip"){
-            if (this.state.NoofStripe == "") {
-                this.setState({ creating: false })
-                return this.showSimpleMessage("Please add No of Stripe", "#dd7030",)
-            }
-            if (this.state.NoofMedicines == "") {
-                this.setState({ creating: false })
-                return this.showSimpleMessage("Please add No of Medicines", "#dd7030",)
-            }
-        }else{
-            if (this.state.NoofMedicines == "") {
-                this.setState({ creating: false })
-                return this.showSimpleMessage("Please add No of Medicines", "#dd7030",)
-            }
-        }
+        // if (this.state.type =="Box"){
+        //     if (this.state.boxes == "") {
+        //         this.setState({ creating: false })
+        //         return this.showSimpleMessage("Please add No of boxes", "#dd7030",)
+        //     }
+        //     if (this.state.NoofStripe == "") {
+        //         this.setState({ creating: false })
+        //         return this.showSimpleMessage("Please add No of Stripe", "#dd7030",)
+        //     }
+        //     if (this.state.NoofMedicines == "") {
+        //         this.setState({ creating: false })
+        //         return this.showSimpleMessage("Please add No of Medicines", "#dd7030",)
+        //     }
+        // } else if (this.state.type =="Strip"){
+        //     if (this.state.NoofStripe == "") {
+        //         this.setState({ creating: false })
+        //         return this.showSimpleMessage("Please add No of Stripe", "#dd7030",)
+        //     }
+        //     if (this.state.NoofMedicines == "") {
+        //         this.setState({ creating: false })
+        //         return this.showSimpleMessage("Please add No of Medicines", "#dd7030",)
+        //     }
+        // }else{
+        //     if (this.state.NoofMedicines == "") {
+        //         this.setState({ creating: false })
+        //         return this.showSimpleMessage("Please add No of Medicines", "#dd7030",)
+        //     }
+        // }
     
      
         let api = `${url}/api/prescription/createSubInventories/`
@@ -115,12 +119,13 @@ class ViewItem extends Component {
             number_of_boxes:Number(this.state.boxes),
             number_of_strips:Number(this.state.NoofStripe),
             number_of_medicines:Number(this.state.NoofMedicines),
-            expiry_date:this.state.today
+            expiry_date:this.state.today,
+            quantity:this.state.quantity
         }
 
         let post = await HttpsClient.post(api, sendData)
         console.log(post)
-        if (post.type == "success") {
+        if (post.type == "success"){
             this.setState({ modal: false })
             this.setState({ creating: false })
             this.showSimpleMessage("Added SuccessFully", "#00A300", "success")
@@ -151,88 +156,115 @@ class ViewItem extends Component {
             this.showSimpleMessage("Try again", "#B22222", "danger")
         }
     }
+    calculateQuantity=()=>{
+        if (this.props.route.params.item.type == "Tablet" || this.props.route.params.item.type == "Capsules"){
+            let box = Number(this.state.boxes)
+            let strips = Number(this.state.NoofStripe)
+            let medicines = Number(this.state.NoofMedicines)
+            let quantity = 0
+            quantity += (box * this.state.item.strips_per_boxes) * this.state.item.medicines_per_strips
+            quantity += strips * this.state.item.medicines_per_strips
+            quantity += medicines
+          return  this.setState({ quantity: quantity.toString() })
+        }
+        let box = Number(this.state.boxes)
+        let medicines = Number(this.state.NoofMedicines)
+        let quantity = 0
+        quantity += (box * this.state.item.medicines_per_strips) + medicines
+        return this.setState({ quantity: quantity.toString() })
+    }
+   convertToStandards =()=>{
+       if (this.props.route.params.item.type == "Tablet" || this.props.route.params.item.type == "Capsules") {
+       let quantity = Number(this.state.quantity)
+       let total_strips = Math.floor(quantity / this.state.item.medicines_per_strips)
+       let boxes = Math.floor(total_strips / this.state.item.strips_per_boxes)
+       let strips = total_strips % this.state.item.strips_per_boxes
+       let medicines = quantity % this.state.item.medicines_per_strips
+       return this.setState({ boxes: boxes.toString(), NoofStripe: strips.toString(), NoofMedicines: medicines.toString(),converted:true})
+       }
+       let quantity = Number(this.state.quantity)
+       let boxes = Math.floor(quantity / this.state.item.medicines_per_strips)
+       let medicines = quantity % this.state.item.medicines_per_strips
+       return this.setState({ boxes: boxes.toString(), NoofMedicines: medicines.toString(), converted: true })
+    }
     showDiffrentFields =()=>{
-      
-        if (this.state.type =="Box"){
-
-            return(
+        if (this.props.route.params.item.type == "Tablet" || this.props.route.params.item.type =="Capsules"){
+            return (
                 <>
-                    <View style={{ marginHorizontal: 20 }}>
+                    <View style={{ marginHorizontal: 20, marginTop: 10 }}>
                         <Text style={[styles.text, { color: '#000' }]}>No of  boxes</Text>
                         <TextInput
                             keyboardType={"numeric"}
                             style={{ width: width * 0.8, height: height * 0.05, backgroundColor: "#fff", borderRadius: 5, marginTop: 10 }}
                             selectionColor={themeColor}
                             value={this.state.boxes}
-                            onChangeText={(boxes) => { this.setState({ boxes }) }}
+                            onChangeText={(boxes) => { this.setState({ boxes,converted:false},()=>{
+                                this.calculateQuantity()
+                            })}}
                         />
                     </View>
-                <View style={{ marginHorizontal: 20 ,marginTop:10}}>
+                <View style={{ marginHorizontal: 20, marginTop: 10 }}>
                     <Text style={[styles.text, { color: '#000' }]}>No of strip per boxes</Text>
                     <TextInput
                         keyboardType={"numeric"}
                         style={{ width: width * 0.8, height: height * 0.05, backgroundColor: "#fff", borderRadius: 5, marginTop: 10 }}
                         selectionColor={themeColor}
                         value={this.state.NoofStripe}
-                            onChangeText={(NoofStripe) => { this.setState({ NoofStripe }) }}
+                            onChangeText={(NoofStripe) => {
+                                this.setState({ NoofStripe, converted: false},()=>{
+                                   this.calculateQuantity()
+                            })}}
                     />
                 </View>
-                    <View style={{ marginHorizontal: 20, marginTop: 10}}>
-                        <Text style={[styles.text, { color: '#000' }]}>No of Medicines per strip</Text>
-                        <TextInput
-                            keyboardType={"numeric"}
-                            style={{ width: width * 0.8, height: height * 0.05, backgroundColor: "#fff", borderRadius: 5, marginTop: 10 }}
-                            selectionColor={themeColor}
-                            value={this.state.NoofMedicines}
-                            onChangeText={(NoofMedicines) => { this.setState({ NoofMedicines }) }}
-                        />
-                    </View>
-                </>
-            )
-        }
-        if (this.state.type =="Strip"){
-            return(
-                <>
-                <View style={{ marginHorizontal: 20 ,marginTop:10}}>
-                    <Text style={[styles.text, { color: '#000' }]}>No of strip per boxes</Text>
-                    <TextInput
-                        keyboardType={"numeric"}
-                        style={{ width: width * 0.8, height: height * 0.05, backgroundColor: "#fff", borderRadius: 5, marginTop: 10 }}
-                        selectionColor={themeColor}
-                        value={this.state.NoofStripe}
-                            onChangeText={(NoofStripe) => { this.setState({ NoofStripe }) }}
-                    />
-                </View>
-                    <View style={{ marginHorizontal: 20, marginTop: 10}}>
-                        <Text style={[styles.text, { color: '#000' }]}>No of Medicines per strip</Text>
-                        <TextInput
-                            keyboardType={"numeric"}
-                            style={{ width: width * 0.8, height: height * 0.05, backgroundColor: "#fff", borderRadius: 5, marginTop: 10 }}
-                            selectionColor={themeColor}
-                            value={this.state.NoofMedicines}
-                            onChangeText={(NoofMedicines) => { this.setState({ NoofMedicines }) }}
-                        />
-                    </View>
-                    </>
-            )
-        }
-        if (this.state.type == "Quantity") {
-            return (
-                <>
-                  
                     <View style={{ marginHorizontal: 20, marginTop: 10 }}>
-                        <Text style={[styles.text, { color: '#000' }]}>No of Medicines</Text>
+                        <Text style={[styles.text, { color: '#000' }]}>No of Tablet per Strips</Text>
                         <TextInput
                             keyboardType={"numeric"}
                             style={{ width: width * 0.8, height: height * 0.05, backgroundColor: "#fff", borderRadius: 5, marginTop: 10 }}
                             selectionColor={themeColor}
                             value={this.state.NoofMedicines}
-                            onChangeText={(NoofMedicines) => { this.setState({ NoofMedicines }) }}
+                            onChangeText={(NoofMedicines) => {
+                                this.setState({ NoofMedicines, converted: false},()=>{
+                                  this.calculateQuantity()
+                            }) }}
                         />
                     </View>
                 </>
             )
         }
+       return(
+           <>
+               <View style={{ marginHorizontal: 20, marginTop: 10 }}>
+                   <Text style={[styles.text, { color: '#000' }]}>No of  boxes</Text>
+                   <TextInput
+                       keyboardType={"numeric"}
+                       style={{ width: width * 0.8, height: height * 0.05, backgroundColor: "#fff", borderRadius: 5, marginTop: 10 }}
+                       selectionColor={themeColor}
+                       value={this.state.boxes}
+                       onChangeText={(boxes) => {
+                           this.setState({ boxes, converted: false }, () => {
+                               this.calculateQuantity()
+                           })
+                       }}
+                   />
+               </View>
+               <View style={{ marginHorizontal: 20, marginTop: 10 }}>
+                   <Text style={[styles.text, { color: '#000' }]}>No of Pieces</Text>
+                   <TextInput
+                       keyboardType={"numeric"}
+                       style={{ width: width * 0.8, height: height * 0.05, backgroundColor: "#fff", borderRadius: 5, marginTop: 10 }}
+                       selectionColor={themeColor}
+                       value={this.state.NoofMedicines}
+                       onChangeText={(NoofMedicines) => {
+                           this.setState({ NoofMedicines, converted: false }, () => {
+                               this.calculateQuantity()
+                           })
+                       }}
+                   />
+               </View>
+           </>
+       )
+        
     }
     modal = () => {
         return (
@@ -244,29 +276,21 @@ class ViewItem extends Component {
                 <View style={{ flex: 1, justifyContent: "center" }}>
                     <View style={{ height: height * 0.6, backgroundColor: "#eee", borderRadius: 10, }}>
                     
-                        <View style={{ marginHorizontal: 20, marginTop: 10 }}>
-                            <Text style={[styles.text, { color: '#000' }]}>Select Type</Text>
-                            <View style={{ marginTop: 10 }}>
-                                <DropDownPicker
-                                    items={types}
-                                    defaultValue={types[0].value}
-                                    containerStyle={{ height: 40, width: width * 0.4 }}
-                                    style={{ backgroundColor: '#fafafa' }}
-                                    itemStyle={{
-                                        justifyContent: 'flex-start'
-                                    }}
-                                    dropDownStyle={{ backgroundColor: '#fafafa', width: width * 0.4 }}
-
-                                    onChangeItem={(item) => {
-                                        this.setState({ type: item.value })
-                                    }}
-                                />
-                            </View>
-
-                        </View>
+                    
                         {
                             this.showDiffrentFields()
                         }
+                        <View style={{ marginHorizontal: 20, marginTop: 10 }}>
+                            <Text style={[styles.text, { color: '#000' }]}>Quantity</Text>
+                            <TextInput
+                                editable={false}
+                                keyboardType={"numeric"}
+                                style={{ width: width * 0.8, height: height * 0.05, backgroundColor: "#fff", borderRadius: 5, marginTop: 10 }}
+                                selectionColor={themeColor}
+                                value={this.state.quantity}
+                                onChangeText={(quantity) => { this.setState({ quantity }) }}
+                            />
+                        </View>
                         <View style={{marginTop:10,marginHorizontal:20}}>
                             <Text style={[styles.text,{color:"#000"}]}>Expiry date</Text>
                             <View style={{flexDirection:"row",marginTop:10}}>
@@ -280,14 +304,21 @@ class ViewItem extends Component {
                                  </View>
                             </View>
                         </View>
-                        <View style={{ alignItems: "center", justifyContent: "center" }}>
+                        <View style={{ alignItems: "center", justifyContent: "space-around" ,flexDirection:"row"}}>
                             <TouchableOpacity style={{ backgroundColor: themeColor, height: height * 0.05, width: width * 0.4, alignItems: 'center', justifyContent: 'center', marginTop: 25, borderRadius: 5 }}
+                                onPress={() => { this.convertToStandards() }}
+                            >
+                              <Text style={[styles.text, { color: '#fff' }]}>Covert</Text>
+                               
+                                
+                            </TouchableOpacity>
+                          {this.state.converted&&  <TouchableOpacity style={{ backgroundColor: themeColor, height: height * 0.05, width: width * 0.4, alignItems: 'center', justifyContent: 'center', marginTop: 25, borderRadius: 5 }}
                                 onPress={() => { this.addMedicine() }}
                             >
                                 {!this.state.creating ? <Text style={[styles.text, { color: '#fff' }]}>Add</Text> :
                                     <ActivityIndicator size={"small"} color={"#fff"} />
                                 }
-                            </TouchableOpacity>
+                            </TouchableOpacity>}
                         </View>
 
                     </View>
@@ -317,23 +348,41 @@ class ViewItem extends Component {
                 <View style={{ flex: 0.1, alignItems: "center", justifyContent: "center" }}>
                     <Text style={[styles.text, { color: "#000" }]}>#</Text>
                 </View>
-                <View style={{ flex: 0.15, alignItems: "center", justifyContent: "center" }}>
+                <View style={{ flex: 0.2, alignItems: "center", justifyContent: "center" }}>
                     <Text style={[styles.text, { color: "#000" }]}>Boxes</Text>
                 </View>
-                <View style={{ flex: 0.15, alignItems: "center", justifyContent: "center" }}>
+                <View style={{ flex: 0.2, alignItems: "center", justifyContent: "center" }}>
                     <Text style={[styles.text, { color: "#000" }]}>Strips</Text>
                 </View>
                 <View style={{ flex: 0.2, alignItems: "center", justifyContent: "center" }}>
                     <Text style={[styles.text, { color: "#000" }]}>Medicines</Text>
                 </View>
-                <View style={{ flex: 0.1, alignItems: "center", justifyContent: "center" }}>
-                    <Text style={[styles.text], { color: "#000" }}>Qty</Text>
-                </View>
                 <View style={{ flex: 0.2, alignItems: "center", justifyContent: "center" }}>
-                      <Text style={[styles.text,{color:'#000'}]}>status</Text>
+                    <Text style={[styles.text], { color: "#000" }}>Qty</Text>
                 </View>
                 <View style={{ flex: 0.1, alignItems: "center", justifyContent: "center" }}>
                  
+                </View>
+            </View>
+        )
+    }
+    renderHeader2 = () => {
+        return (
+            <View style={{ flexDirection: 'row', flex: 1, marginTop: 10 }}>
+                <View style={{ flex: 0.1, alignItems: "center", justifyContent: "center" }}>
+                    <Text style={[styles.text, { color: "#000" }]}>#</Text>
+                </View>
+                <View style={{ flex: 0.266, alignItems: "center", justifyContent: "center" }}>
+                    <Text style={[styles.text, { color: "#000" }]}>No of Boxes</Text>
+                </View>
+                <View style={{ flex: 0.266, alignItems: "center", justifyContent: "center" }}>
+                    <Text style={[styles.text, { color: "#000" }]}>No of Pieces</Text>
+                </View>
+                <View style={{ flex: 0.266, alignItems: "center", justifyContent: "center" }}>
+                    <Text style={[styles.text], { color: "#000" }}>Qty</Text>
+                </View>
+                <View style={{ flex: 0.1, alignItems: "center", justifyContent: "center" }}>
+
                 </View>
             </View>
         )
@@ -356,44 +405,75 @@ class ViewItem extends Component {
 
                     </View>
                     <FlatList
-                        ListHeaderComponent={this.renderHeader()}
+                        ListHeaderComponent={this.state.item.type=="Tablet"||this.state.item.type=="Capsules"?this.renderHeader():this.renderHeader2()}
                         data={this.state.items}
                         keyExtractor={(item, index) => index.toString()}
                         renderItem={({ item, index }) => {
-                            return (
-                                <TouchableOpacity
-                                    style={{ flexDirection: "row", marginTop: 5, flex: 1, backgroundColor: "#eee",paddingVertical:10}}
+                            if (this.state.item.type == "Tablet" || this.state.item.type == "Capsules" ){
+                                return (
+                                    <View
+                                        style={{ flexDirection: "row", marginTop: 5, flex: 1, backgroundColor: "#eee", paddingVertical: 10 }}
 
-                                >
-                                
+                                    >
+
                                         <View style={{ flex: 0.1, alignItems: "center", justifyContent: "center" }}>
-                                            <Text style={[styles.text, { color: "#000" }]}>{index+1}</Text>
+                                            <Text style={[styles.text, { color: "#000" }]}>{index + 1}</Text>
                                         </View>
-                                        <View style={{ flex: 0.15, alignItems: "center", justifyContent: "center" }}>
-                                        <Text style={[styles.text, { color: "#000" }]}>{item.number_of_boxes}</Text>
-                                        </View>
-                                        <View style={{ flex: 0.15, alignItems: "center", justifyContent: "center" }}>
-                                        <Text style={[styles.text, { color: "#000" }]}>{item.number_of_strips}</Text>
-                                        </View>
+
                                         <View style={{ flex: 0.2, alignItems: "center", justifyContent: "center" }}>
-                                        <Text style={[styles.text, { color: "#000" }]}>{item.number_of_medicines}</Text>
+                                            <Text style={[styles.text, { color: "#000" }]}>{item.number_of_boxes}</Text>
                                         </View>
-                                        <View style={{ flex: 0.1, alignItems: "center", justifyContent: "center" }}>
-                                        <Text style={[styles.text], { color: "#000" }}>{item.quantity}</Text>
-                                        </View>
+
                                         <View style={{ flex: 0.2, alignItems: "center", justifyContent: "center" }}>
-                                        <Text style={[styles.text, { fontSize: 10, color: "#000"}]}>{item.timeleft}</Text>
+                                            <Text style={[styles.text, { color: "#000" }]}>{item.number_of_strips}</Text>
                                         </View>
+
+                                        <View style={{ flex: 0.2, alignItems: "center", justifyContent: "center" }}>
+                                            <Text style={[styles.text, { color: "#000" }]}>{item.number_of_medicines}</Text>
+                                        </View>
+
+                                        <View style={{ flex: 0.2, alignItems: "center", justifyContent: "center" }}>
+                                            <Text style={[styles.text], { color: "#000" }}>{item.quantity}</Text>
+                                        </View>
+
                                         <TouchableOpacity style={{ flex: 0.1, alignItems: "center", justifyContent: "center" }}
-                                         onPress ={()=>{
-                                             this.createAlert(item)
-                                         }}
+                                            onPress={() => {
+                                                this.createAlert(item)
+                                            }}
                                         >
                                             <Entypo name="cross" size={20} color="red" />
                                         </TouchableOpacity>
 
-                                </TouchableOpacity>
-                            )
+                                    </View>
+                                )
+                            }else{
+                                return(
+                                    <View 
+                                        style={{ flexDirection: "row", marginTop: 5, flex: 1, backgroundColor: "#eee", paddingVertical: 10 }}
+                                    >
+                                        <View style={{ flex: 0.1, alignItems: "center", justifyContent: "center" }}>
+                                            <Text style={[styles.text, { color: "#000" }]}>{index+1}</Text>
+                                        </View>
+                                        <View style={{ flex: 0.266, alignItems: "center", justifyContent: "center" }}>
+                                            <Text style={[styles.text, { color: "#000" }]}>{item.number_of_boxes}</Text>
+                                        </View>
+                                        <View style={{ flex: 0.266, alignItems: "center", justifyContent: "center" }}>
+                                            <Text style={[styles.text, { color: "#000" }]}>{item.number_of_medicines}</Text>
+                                        </View>
+                                        <View style={{ flex: 0.266, alignItems: "center", justifyContent: "center" }}>
+                                            <Text style={[styles.text], { color: "#000" }}>{item.quantity}</Text>
+                                        </View>
+                                        <TouchableOpacity style={{ flex: 0.1, alignItems: "center", justifyContent: "center" }}
+                                            onPress={() => {
+                                                this.createAlert(item)
+                                            }}
+                                        >
+                                            <Entypo name="cross" size={20} color="red" />
+                                        </TouchableOpacity>
+                                    </View>
+                                )
+                            }
+               
                         }}
                     />
                     <DateTimePickerModal

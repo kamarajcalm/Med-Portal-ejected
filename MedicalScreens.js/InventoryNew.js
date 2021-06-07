@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Dimensions, TouchableOpacity, StyleSheet, TextInput, FlatList, Image, SafeAreaView, Alert,} from 'react-native';
+import { View, Text, Dimensions, TouchableOpacity, StyleSheet, TextInput, FlatList, Image, SafeAreaView, Alert, ScrollView} from 'react-native';
 import { Ionicons, Entypo, AntDesign, MaterialIcons} from '@expo/vector-icons';
 import { connect } from 'react-redux';
 import { selectTheme } from '../actions';
@@ -34,6 +34,7 @@ let types = [
 
 ]
 import Modal from 'react-native-modal';
+
 const initialLayout = { width: Dimensions.get('window').width };
 class InventoryNew extends Component {
     constructor(props) {
@@ -205,6 +206,7 @@ class InventoryNew extends Component {
      this.getItems()  
      this.getOrders()
         this._unsubscribe = this.props.navigation.addListener('focus', () => {
+            this.getItems()
             this.getOrders()
         });
     }
@@ -285,23 +287,28 @@ class InventoryNew extends Component {
                     //    orders
     orderHeaders =()=>{
         return(
-            <View style={{flexDirection:"row",flex:1,marginTop:10}}>
-                <View style={{flex:0.1,alignItems:'center',justifyContent:"center"}}>
+            <View style={{flexDirection:"row",marginTop:10}}>
+                <View style={{ width:width*0.1,alignItems:'center',justifyContent:"center"}}>
                   <Text style={[styles.text,{color:"#000"}]}>#</Text>
                 </View>
-                <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
-                    <Text style={[styles.text, { color: "#000" }]}>Created</Text>
+                <View style={{ width: width * 0.3, alignItems: 'center', justifyContent: "center" }}>
+                    <Text style={[styles.text, { color: "#000" }]}>Arriving Date</Text>
                 </View>
-                <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
-                    <Text style={[styles.text, { color: "#000" }]}>Arriving</Text>
+                <View style={{ width: width * 0.35, alignItems: 'center', justifyContent: "center" }}>
+                    <Text style={[styles.text, { color: "#000" }]}>Distributor Name</Text>
                 </View>
-                <View style={{ flex: 0.3, alignItems: 'center', justifyContent: "center" }}>
-                    <Text style={[styles.text, { color: "#000" }]}>Detail</Text>
+                <View style={{ width: width * 0.3, alignItems: 'center', justifyContent: "center" }}>
+                    <Text style={[styles.text, { color: "#000" }]}>Mobile No</Text>
                 </View>
-                <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
+                <View style={{ width: width * 0.2, alignItems: 'center', justifyContent: "center" }}>
+                    <Text style={[styles.text, { color: "#000" }]}>Discount</Text>
+                </View>
+                <View style={{ width: width * 0.2, alignItems: 'center', justifyContent: "center" }}>
                     <Text style={[styles.text, { color: "#000" }]}>Status</Text>
                 </View>
-              
+                <View style={{ width: width * 0.1, alignItems: 'center', justifyContent: "center" }}>
+                 
+                </View>
             </View>
         )
     }
@@ -324,141 +331,187 @@ class InventoryNew extends Component {
                 </Modal>
         )
     }
-    modal = () => {
+    // modal = () => {
         
-        return (
-            <Modal
-                deviceHeight={screenHeight}
-                isVisible={this.state.modal}
-                onBackdropPress={() => { this.setState({ modal: false }) }}
-            >
-                <View style={{ flex: 1, justifyContent: "center" }}>
-                    <View style={{ height: height * 0.6, backgroundColor: "#eee", borderRadius: 10, }}>
-                        <View style={{ marginHorizontal: 20, marginTop: 10 }}>
-                            <Text style={[styles.text, { color: '#000' }]}>Select status</Text>
-                            <View style={{ marginTop: 10 }}>
-                                <DropDownPicker
-                                    items={types}
-                                    defaultValue={types[0].value}
-                                    containerStyle={{ height: 40, width: width * 0.4 }}
-                                    style={{ backgroundColor: '#fafafa' }}
-                                    itemStyle={{
-                                        justifyContent: 'flex-start'
-                                    }}
-                                    dropDownStyle={{ backgroundColor: '#fafafa', width: width * 0.4 }}
+    //     return (
+    //         <Modal
+    //             deviceHeight={screenHeight}
+    //             isVisible={this.state.modal}
+    //             onBackdropPress={() => { this.setState({ modal: false }) }}
+    //         >
+    //             <View style={{ flex: 1, justifyContent: "center" }}>
+    //                 <View style={{ height: height * 0.6, backgroundColor: "#eee", borderRadius: 10, }}>
+    //                     <View style={{ marginHorizontal: 20, marginTop: 10 }}>
+    //                         <Text style={[styles.text, { color: '#000' }]}>Select status</Text>
+    //                         <View style={{ marginTop: 10 }}>
+    //                             <DropDownPicker
+    //                                 items={types}
+    //                                 defaultValue={types[0].value}
+    //                                 containerStyle={{ height: 40, width: width * 0.4 }}
+    //                                 style={{ backgroundColor: '#fafafa' }}
+    //                                 itemStyle={{
+    //                                     justifyContent: 'flex-start'
+    //                                 }}
+    //                                 dropDownStyle={{ backgroundColor: '#fafafa', width: width * 0.4 }}
 
-                                    onChangeItem={(item) => {
-                                        this.setState({ selectedStatus: item.value })
-                                    }}
-                                />
-                            </View>
-                            <View style={{ marginTop:10 }}>
-                                <Text style={[styles.text, { color: '#000' }]}>order Details</Text>
-                                <TextInput
+    //                                 onChangeItem={(item) => {
+    //                                     this.setState({ selectedStatus: item.value })
+    //                                 }}
+    //                             />
+    //                         </View>
+    //                         <View style={{ marginTop:10 }}>
+    //                             <Text style={[styles.text, { color: '#000' }]}>order Details</Text>
+    //                             <TextInput
                                    
-                                    multiline={true}
-                                    style={{ width: width * 0.8, height: height * 0.07, backgroundColor: "#fff", borderRadius: 5, marginTop: 10, textAlignVertical: "top" }}
-                                    selectionColor={themeColor}
-                                    value={this.state.orderDetails}
-                                    onChangeText={(orderDetails) => { this.setState({ orderDetails }) }}
-                                />
-                            </View>
-                            <View style={{ marginTop: 10,}}>
-                                <Text style={[styles.text, { color: "#000" }]}>Expected Arriving</Text>
-                                <View style={{ flexDirection: "row", marginTop: 10 }}>
-                                    <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center' }}
-                                        onPress={() => { this.setState({ show: true }) }}
-                                    >
-                                        <MaterialIcons name="date-range" size={24} color="black" />
-                                    </TouchableOpacity>
-                                    <View style={{ alignItems: 'center', justifyContent: "center", marginLeft: 10 }}>
-                                        <Text style={[styles.text]}>{this.state.today}</Text>
-                                    </View>
-                                </View>
-                            </View>
-                            <View style={{ marginTop: 10 }}>
-                                <Text style={[styles.text, { color: '#000' }]}>Discount</Text>
-                                <TextInput
-                                    keyboardType={"numeric"}
-                                    style={{ width: width * 0.8, height: height * 0.05, backgroundColor: "#fff", borderRadius: 5, marginTop: 10 }}
-                                    selectionColor={themeColor}
-                                    value={this.state.Discount}
-                                    onChangeText={(Discount) => { this.setState({ Discount }) }}
-                                />
-                            </View>
-                            <View style={{ marginTop: 10 }}>
-                                <Text style={[styles.text, { color: '#000' }]}>Amount</Text>
-                                <TextInput
-                                    keyboardType={"numeric"}
-                                    style={{ width: width * 0.8, height: height * 0.05, backgroundColor: "#fff", borderRadius: 5, marginTop: 10 }}
-                                    selectionColor={themeColor}
-                                    value={this.state.Amount}
-                                    onChangeText={(Amount) => { this.setState({ Amount }) }}
-                                />
-                            </View>
-                            <View style={{ alignItems: "center", justifyContent: "center" }}>
-                                <TouchableOpacity style={{ backgroundColor: themeColor, height: height * 0.05, width: width * 0.4, alignItems: 'center', justifyContent: 'center', marginTop: 25, borderRadius: 5 }}
-                                    onPress={() => { this.createOrders() }}
-                                >
-                                    {!this.state.creating ? <Text style={[styles.text, { color: '#fff' }]}>Add</Text> :
-                                        <ActivityIndicator size={"small"} color={"#fff"} />
-                                    }
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                    </View>
+    //                                 multiline={true}
+    //                                 style={{ width: width * 0.8, height: height * 0.07, backgroundColor: "#fff", borderRadius: 5, marginTop: 10, textAlignVertical: "top" }}
+    //                                 selectionColor={themeColor}
+    //                                 value={this.state.orderDetails}
+    //                                 onChangeText={(orderDetails) => { this.setState({ orderDetails }) }}
+    //                             />
+    //                         </View>
+    //                         <View style={{ marginTop: 10,}}>
+    //                             <Text style={[styles.text, { color: "#000" }]}>Expected Arriving</Text>
+    //                             <View style={{ flexDirection: "row", marginTop: 10 }}>
+    //                                 <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center' }}
+    //                                     onPress={() => { this.setState({ show: true }) }}
+    //                                 >
+    //                                     <MaterialIcons name="date-range" size={24} color="black" />
+    //                                 </TouchableOpacity>
+    //                                 <View style={{ alignItems: 'center', justifyContent: "center", marginLeft: 10 }}>
+    //                                     <Text style={[styles.text]}>{this.state.today}</Text>
+    //                                 </View>
+    //                             </View>
+    //                         </View>
+    //                         <View style={{ marginTop: 10 }}>
+    //                             <Text style={[styles.text, { color: '#000' }]}>Discount</Text>
+    //                             <TextInput
+    //                                 keyboardType={"numeric"}
+    //                                 style={{ width: width * 0.8, height: height * 0.05, backgroundColor: "#fff", borderRadius: 5, marginTop: 10 }}
+    //                                 selectionColor={themeColor}
+    //                                 value={this.state.Discount}
+    //                                 onChangeText={(Discount) => { this.setState({ Discount }) }}
+    //                             />
+    //                         </View>
+    //                         <View style={{ marginTop: 10 }}>
+    //                             <Text style={[styles.text, { color: '#000' }]}>Amount</Text>
+    //                             <TextInput
+    //                                 keyboardType={"numeric"}
+    //                                 style={{ width: width * 0.8, height: height * 0.05, backgroundColor: "#fff", borderRadius: 5, marginTop: 10 }}
+    //                                 selectionColor={themeColor}
+    //                                 value={this.state.Amount}
+    //                                 onChangeText={(Amount) => { this.setState({ Amount }) }}
+    //                             />
+    //                         </View>
+    //                         <View style={{ alignItems: "center", justifyContent: "center" }}>
+    //                             <TouchableOpacity style={{ backgroundColor: themeColor, height: height * 0.05, width: width * 0.4, alignItems: 'center', justifyContent: 'center', marginTop: 25, borderRadius: 5 }}
+    //                                 onPress={() => { this.createOrders() }}
+    //                             >
+    //                                 {!this.state.creating ? <Text style={[styles.text, { color: '#fff' }]}>Add</Text> :
+    //                                     <ActivityIndicator size={"small"} color={"#fff"} />
+    //                                 }
+    //                             </TouchableOpacity>
+    //                         </View>
+    //                     </View>
+    //                 </View>
 
-                </View>
-            </Modal>
-        )
+    //             </View>
+    //         </Modal>
+    //     )
+    // }
+    deleteOrders = async(item)=>{
+        let api = `${url}/api/prescription/inventoryorders/${item.id}/`
+        let del = await HttpsClient.delete(api)
+        if (del.type == "success") {
+            this.showSimpleMessage("Deleted SuccessFully", "#00A300", "success")
+            this.getOrders()
+        } else {
+            this.showSimpleMessage("Try again", "#B22222", "danger")
+        }
+    }
+    AlertForOrderDelete =(item)=>{
+        Alert.alert(
+            "Do you want to delete?",
+            `${item?.order_details}`,
+            [
+                {
+                    text: "No",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
+                { text: "Yes", onPress: () => { this.deleteOrders(item) } }
+            ]
+        );
     }
     SecondRoute =()=>{
         return (
             <View style={{flex:1}}>
+                <ScrollView
+                 horizontal={true}
+                 showsHorizontalScrollIndicator={false}
+                >
+               
                <FlatList 
                  ListHeaderComponent ={this.orderHeaders()}
                  data ={this.state.orders}
-                 keyExtractor ={(item,index)=>{index.toString()}}
+                 keyExtractor ={(item,index)=>index.toString()}
                  renderItem = {({item,index})=>{
                    return(
                        <TouchableOpacity style={{ flexDirection: "row", flex: 1, marginTop: 10,backgroundColor:"#eee" ,paddingVertical:20}}
                          onPress ={()=>{this.props.navigation.navigate('ViewOrders',{item})}}
                        >
-                           <View style={{ flex: 0.1, alignItems: 'center', justifyContent: "center" }}>
+                           <View style={{ width: width * 0.1, alignItems: 'center', justifyContent: "center" }}>
                                <Text style={[styles.text, { color: "#000" }]}>{index+1}</Text>
                            </View>
-                           <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
-                               <Text style={[styles.text, { color: "#000" ,fontSize:10}]}>{moment(item.created).format("YYYY-MM-DD")}</Text>
+                           <View style={{ width: width * 0.3, alignItems: 'center', justifyContent: "center" }}>
+                               <Text style={[styles.text, { color: "#000" }]}>{item.expected_arriving}</Text>
                            </View>
-                           <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
-                               <Text style={[styles.text, { color: "#000", fontSize: 10}]}>{item.expected_arriving}</Text>
+                           <View style={{ width: width * 0.35, alignItems: 'center', justifyContent: "center" }}>
+                               <Text style={[styles.text, { color: "#000" }]}>{item.from_contact}</Text>
                            </View>
-                           <View style={{ flex: 0.3, alignItems: 'center', justifyContent: "center" }}>
-                               <Text style={[styles.text, { color: "#000" }]}>{item.order_details}</Text>
+                           <View style={{ width: width * 0.3, alignItems: 'center', justifyContent: "center" }}>
+                               <Text style={[styles.text, { color: "#000" }]}>{item.from_contactNo}</Text>
                            </View>
-                           <View style={{ flex: 0.2, alignItems: 'center', justifyContent: "center" }}>
+                           <View style={{ width: width * 0.2, alignItems: 'center', justifyContent: "center" }}>
+                               <Text style={[styles.text, { color: "#000" }]}>{item.discount}</Text>
+                           </View>
+                           <View style={{ width: width * 0.2, alignItems: 'center', justifyContent: "center" }}>
                                <Text style={[styles.text, { color: this.validateColor(item.status) }]}>{item.status}</Text>
                            </View>
+                           <TouchableOpacity style={{ width: width * 0.1, alignItems: 'center', justifyContent: "center" }}
+                               onPress={() => { this.AlertForOrderDelete(item) }}
+                           >
+                               <Entypo name="cross" size={20} color="red" />
+                           </TouchableOpacity>
                            
                        </TouchableOpacity>
                    )
                  }}
                />
+
+                </ScrollView>
                 <View style={{
                     position: "absolute",
                     bottom: 50,
                     left: 20,
                     right: 20,
                     flex: 1,
+                    flexDirection:"row",
                     alignItems: "center",
-                    justifyContent: "center",
-
+                    justifyContent:"space-around",
                     borderRadius: 20
                 }}>
                     <TouchableOpacity
-                        onPress={() => { this.setState({ modal: true }) }}
+                        style={{ backgroundColor: themeColor, width: width * 0.4, alignItems: "center", justifyContent: "center", borderRadius: 5, height: height * 0.05 }}
+                        onPress={() => { this.props.navigation.navigate('CreateBill') }}
                     >
-                        <AntDesign name="pluscircle" size={40} color={themeColor} />
+                        <Text style={[styles.text, { color: "#fff" }]}>Create Bill</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={{backgroundColor:themeColor,width:width*0.4,alignItems:"center",justifyContent:"center",borderRadius:5,height:height*0.05}}
+                        onPress={() => { this.props.navigation.navigate('CreateOrders') }}
+                    >
+                      <Text style={[styles.text,{color:"#fff"}]}>Create orders</Text>
                     </TouchableOpacity>
                 </View>
               
@@ -528,9 +581,9 @@ class InventoryNew extends Component {
                         }
 
                     />
-                    {
+                    {/* {
                         this.modal()
-                    }
+                    } */}
                     {
                         this.modal2()
                     }
