@@ -60,10 +60,37 @@ class InventoryNew extends Component {
             Discount:"",
             Amount:"",
             selectedStatus:types[0].value,
-            modal2:false
+            modal2:false,
+            soldItems:[]
         };
     }
-    createAlert = (item) => {
+    deleteSold = async(item,index)=>{
+        let api = `${url}/api/prescription/soldinventory/${item.id}/`
+        let del = await HttpsClient.delete(api)
+        if (del.type == "success") {
+            this.showSimpleMessage("Deleted SuccessFully", "#00A300", "success")
+            let duplicate =this.state.soldItems
+            duplicate.splice(index,1)
+            this.setState({ soldItems:duplicate})
+        } else {
+            this.showSimpleMessage("Try again", "#B22222", "danger")
+        }
+    }
+    createAlertSold =(item,index)=>{
+        Alert.alert(
+            "Do you want to delete?",
+            `${item.contact_details}`,
+            [
+                {
+                    text: "No",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
+                { text: "Yes", onPress: () => { this.deleteSold(item,index)} }
+            ]
+        );
+    }
+    createAlert = (item,index) => {
         
         Alert.alert(
             "Do you want to delete?",
@@ -74,7 +101,7 @@ class InventoryNew extends Component {
                     onPress: () => console.log("Cancel Pressed"),
                     style: "cancel"
                 },
-                { text: "Yes", onPress: () => { this.deleteCategory(item) } }
+                { text: "Yes", onPress: () => { this.deleteCategory(item,index) } }
             ]
         );
 
@@ -191,23 +218,34 @@ class InventoryNew extends Component {
             this.showSimpleMessage("Try again", "#B22222", "danger")
         }
     }
-    deleteCategory = async(item)=>{
+    deleteCategory = async(item,index)=>{
         let api = `${url}/api/prescription/inventorycategory/${item.id}/`
         let del =await HttpsClient.delete(api)
          if(del.type =="success"){
              this.showSimpleMessage("Deleted SuccessFully", "#00A300", "success")
-             this.getItems()
+             let duplicate = this.state.items
+             duplicate.splice(index,1)
+             this.setState({ items: duplicate})
          }else{
              this.showSimpleMessage("Try again", "#B22222", "danger")
          }
     }
- 
+    getSold =async()=>{
+        let api = `${url}/api/prescription/soldinventory/?inventory=${this.props.medical.inventory}`
+        const data = await HttpsClient.get(api)
+        console.log(api)
+        if(data.type=="success"){
+              this.setState({soldItems:data.data})
+        }
+    }
     componentDidMount() {
      this.getItems()  
      this.getOrders()
+     this.getSold()
         this._unsubscribe = this.props.navigation.addListener('focus', () => {
             this.getItems()
             this.getOrders()
+            this.getSold()
         });
     }
     componentWillUnmount(){
@@ -273,7 +311,7 @@ class InventoryNew extends Component {
                                 <Text style={[styles.text, {  textDecorationLine:"underline"}]}>View</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={{ flex: 0.2, alignItems: 'center', justifyContent: 'center' }}
-                             onPress ={()=>{this.createAlert(item)}}
+                             onPress ={()=>{this.createAlert(item,index)}}
                             >
                                 <Entypo name="cross" size={20} color="red" />
                             </TouchableOpacity>
@@ -518,26 +556,123 @@ class InventoryNew extends Component {
             </View>
         )
     }
+    renderHeader3 =()=>{
+        return(
+            <View 
+             style={{flexDirection:"row",marginTop:10,paddingVertical:15}}
+              
+            >
+            <View 
+             style={{width:width*0.1,alignItems:"center",justifyContent:"center"}}
+            >
+               <Text style={[styles.text,{color:"#000"}]}>#</Text>
+            </View>
+                <View
+                    style={{ width: width * 0.3, alignItems: "center", justifyContent: "center" }}
+                >
+                    <Text style={[styles.text, { color: "#000" }]}>Name</Text>
+                </View>
+                <View
+                    style={{ width: width * 0.3, alignItems: "center", justifyContent: "center" }}
+                >
+                    <Text style={[styles.text, { color: "#000" }]}>Mobile</Text>
+                </View>
+                <View
+                    style={{ width: width * 0.2, alignItems: "center", justifyContent: "center" }}
+                >
+                    <Text style={[styles.text, { color: "#000" }]}>Date</Text>
+                </View>
+                <View
+                    style={{ width: width * 0.2, alignItems: "center", justifyContent: "center" }}
+                >
+                    <Text style={[styles.text, { color: "#000" }]}>Amount</Text>
+                </View>
+                <View
+                    style={{ width: width * 0.2, alignItems: "center", justifyContent: "center" }}
+                >
+                    <Text style={[styles.text, { color: "#000" }]}>Discount</Text>
+                </View>
+                <View
+                    style={{ width: width * 0.2, alignItems: "center", justifyContent: "center" }}
+                >
+                    <Text style={[styles.text, { color: "#000" }]}>Item Count</Text>
+                </View>
+                <View
+                    style={{ width: width * 0.2, alignItems: "center", justifyContent: "center" }}
+                >
+                    <Text style={[styles.text, { color: "#000" }]}>Action</Text>
+                </View>
+            </View>
+        )
+    }
     ThirdRoute =()=>{
         return (
             <View style={{flex:1}}>
-                <View style={{
-                    position: "absolute",
-                    bottom: 50,
-                    left: 20,
-                    right: 20,
-                    flex: 1,
-                    alignItems: "center",
-                    justifyContent: "center",
+              <ScrollView
+                horizontal={true}
+                showsHorizontalScrollIndicator={false}
+              >
+                   <FlatList 
+                     data ={this.state.soldItems}
+                     keyExtractor={(item,index)=>index.toString()}
+                     ListHeaderComponent ={this.renderHeader3()}
+                     renderItem ={({item,index})=>{
+                         return(
+                             <TouchableOpacity
+                                 style={{ flexDirection: "row", marginTop: 0.4 ,backgroundColor:"#eee",paddingVertical:10}}
+                                 onPress ={()=>{this.props.navigation.navigate("ViewSold",{item})}}
+                             >
+                                 <View
+                                     style={{ width: width * 0.1, alignItems: "center", justifyContent: "center" }}
+                                 >
+                                     <Text style={[styles.text, {color:"#000"  }]}>{index+1}</Text>
+                                 </View>
+                                 <View
+                                     style={{ width: width * 0.3, alignItems: "center", justifyContent: "center" }}
+                                 >
+                                     <Text style={[styles.text, {color:"#000"}]}>{item.contact_details}</Text>
+                                 </View>
+                                 <View
+                                     style={{ width: width * 0.3, alignItems: "center", justifyContent: "center" }}
+                                 >
+                                     <Text style={[styles.text, {color:"#000"}]}>{item.contact_no}</Text>
+                                 </View>
+                                 <View
+                                     style={{ width: width * 0.2, alignItems: "center", justifyContent: "center" }}
+                                 >
+                                     <Text style={[styles.text, {color:"#000"}]}>{moment(item.created).format('DD-MM-YYYY')}</Text>
+                                 </View>
+                                 <View
+                                     style={{ width: width * 0.2, alignItems: "center", justifyContent: "center" }}
+                                 >
+                                     <Text style={[styles.text, { color:"#000" }]}>{item.total}</Text>
+                                 </View>
+                                 <View
+                                     style={{ width: width * 0.2, alignItems: "center", justifyContent: "center" }}
+                                 >
+                                     <Text style={[styles.text, { color:"#000" }]}>{item.discount}</Text>
+                                 </View>
+                                 <View
+                                     style={{ width: width * 0.2, alignItems: "center", justifyContent: "center" }}
+                                 >
+                                     <Text style={[styles.text, { color:"#000" }]}>{item.items.length}</Text>
+                                 </View>
+                                 <View
+                                     style={{ width: width * 0.2, alignItems: "center", justifyContent: "center" }}
+                                 >
+                                     <TouchableOpacity 
+                                      onPress ={()=>{this.createAlertSold(item,index)}}
+                                     >
+                                         <Entypo name="circle-with-cross" size={24} color="red" />
+                                     </TouchableOpacity>
+                                
+                                 </View>
+                             </TouchableOpacity>
+                         )
+                     }}
+                   />
 
-                    borderRadius: 20
-                }}>
-                    <TouchableOpacity
-                        onPress={() => { this.setState({modal2: true })}}
-                    >
-                        <AntDesign name="pluscircle" size={40} color={themeColor} />
-                    </TouchableOpacity>
-                </View>
+              </ScrollView>
             </View>
         )
     }

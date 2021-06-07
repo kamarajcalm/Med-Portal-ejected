@@ -12,6 +12,7 @@ import ViewItem from '../MedicalScreens.js/ViewItem';
 import ViewOrders from '../MedicalScreens.js/ViewOrders';
 import CreateOrders from '../MedicalScreens.js/CreateOrders';
 import CreateBill from '../MedicalScreens.js/CreateBill';
+import ViewSold from '../MedicalScreens.js/ViewSold';
 const Stack = createStackNavigator();
 export default class MedicalInventoryStack extends Component {
     constructor(props) {
@@ -32,6 +33,7 @@ export default class MedicalInventoryStack extends Component {
                 <Stack.Screen name="ViewOrders" component={ViewOrders} options={{ headerShown: false }} />
                 <Stack.Screen name="CreateOrders" component={CreateOrders} options={{ headerShown: false }} />
                 <Stack.Screen name="CreateBill" component={CreateBill} options={{ headerShown: false }} />
+                <Stack.Screen name="ViewSold" component={ViewSold} options={{ headerShown: false }} />
             </Stack.Navigator>
         );
     }

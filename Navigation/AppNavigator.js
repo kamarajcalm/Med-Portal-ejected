@@ -35,6 +35,7 @@ import ViewDoctor from '../AdminScreens/ViewDoctor';
 import EditDoctorTimings from '../AdminScreens/EditDoctorTimings';
 import EditClinicDetails from '../AdminScreens/EditClinicDetails';
 import SearchDoctors from '../AdminScreens/SearchDoctors';
+import PrescriptionView from '../MedicalScreens.js/PrescriptionView';
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
@@ -101,6 +102,7 @@ export default class AppNavigator extends Component {
                     <Stack.Screen name="ViewDoctor" component={ViewDoctor} options={{ headerShown: false }} />
                     <Stack.Screen name="EditDoctorTimings" component={EditDoctorTimings} options={{ headerShown: false }} />
                     <Stack.Screen name="EditClinicDetails" component={EditClinicDetails} options={{ headerShown: false }} />
+                    <Stack.Screen name="PrescriptionView" component={PrescriptionView} options={{ headerShown: false }} />
                  </Stack.Navigator>
                 
             </NavigationContainer>

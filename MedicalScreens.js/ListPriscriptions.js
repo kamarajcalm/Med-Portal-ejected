@@ -107,7 +107,7 @@ class ListPriscriptions extends Component {
                         </View> : <FlatList
                            
                             data={this.state.priscriptions}
-                            keyExtractor={(item, index) => { index.toString() }}
+                            keyExtractor={(item, index) =>  index.toString() }
                             renderItem={({ item, index }) => {
                                 
                                 return (

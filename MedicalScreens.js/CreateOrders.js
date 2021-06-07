@@ -49,9 +49,22 @@ class CreateOrders extends Component {
         medicines:[],
         Quantity:"",
         NoofStrips:"",
-        selectedItem:null
+        selectedItem:null,
+        minOrder:false,
     };
   }
+    loadModal =()=>{
+        return(
+            <Modal
+               isVisible ={this.state.loadModal}
+               deviceHeight ={screenHeight}
+            >
+             <View style={{flex:1,alignItems:"center",justifyContent:"center"}}>
+                 <ActivityIndicator size={"large"} color={"#fff"}/>
+             </View>
+            </Modal>
+        )
+    }
     showSimpleMessage(content, color, type = "info", props = {}) {
         const message = {
             message: content,
@@ -238,7 +251,7 @@ class CreateOrders extends Component {
          let pushObject = {
              medicine:{
                  id:this.state.selectedItem.id,
-                 name: this.state.selectedItem.title,
+                 title: this.state.selectedItem.title,
                  type:this.state.selectedItem.type
 
              },
@@ -415,6 +428,18 @@ class CreateOrders extends Component {
             this.showSimpleMessage("Something went wrong", "#B22222", "danger")
         }
     }
+    getMinOrder = async()=>{
+        this.setState({loadModal:true})
+        let api = `${url}/api/prescription/showMinimum/?inventory=${this.props.medical.inventory}`
+        console.log(api,"ppp")
+        const data = await HttpsClient.get(api)
+        if(data.type =="success"){
+            this.setState({ medicines: data.data, loadModal:false})
+        }else{
+            this.setState({ loadModal: false })
+            this.showSimpleMessage("Something went wrong", "#B22222", "danger")
+        }
+    }
   render() {
     return (
           <>
@@ -581,7 +606,7 @@ class CreateOrders extends Component {
                                                 <Text style={[styles.text,{marginLeft:10}]}>Name</Text>
                                            </View>
                                            <View style={{flex:0.7}}>
-                                                <Text style={[styles.text]}>: {item.medicine.name}</Text>
+                                                <Text style={[styles.text]}>: {item.medicine.title}</Text>
                                            </View>
                                  
                                        </View>
@@ -669,6 +694,19 @@ class CreateOrders extends Component {
                             </TouchableOpacity>
                         </View>
                     }
+                    {
+                        !this.state.minOrder && <View style={{ marginHorizontal: 20, marginVertical: 10, alignItems: "center", justifyContent: "center" }}>
+                            <TouchableOpacity style={{ height: height * 0.05, width: width * 0.4, alignItems: "center", justifyContent: "center", backgroundColor: themeColor, borderRadius: 5 }}
+                                onPress={() => {
+                                   this.setState({minOrder:true},()=>{
+                                         this.getMinOrder()
+                                   })
+                                }}
+                            >
+                                <Text style={[styles.text, { color: "#fff" }]}>Min Order</Text>
+                            </TouchableOpacity>
+                        </View>
+                    }
                     <DateTimePickerModal
                         testID="2"
                         isVisible={this.state.show}
@@ -679,6 +717,9 @@ class CreateOrders extends Component {
                 </ScrollView>
              {
                  this.Modal()
+             }
+             {
+                 this.loadModal()
              }
             </SafeAreaView>
         </>
