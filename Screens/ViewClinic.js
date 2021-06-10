@@ -191,7 +191,7 @@ class ViewClinic extends Component {
                 <SafeAreaView style={styles.bottomSafeArea}>
                     <View style={{ flex: 1 }}>
                         {/* HEADERS */}
-                        <View style={{ height: height * 0.1, backgroundColor: themeColor, borderBottomRightRadius: 20, borderBottomLeftRadius: 20, flexDirection: 'row', alignItems: "center" }}>
+                        <View style={{ height: height * 0.1, backgroundColor: themeColor, flexDirection: 'row', alignItems: "center" }}>
                             <TouchableOpacity style={{ flex: 0.2, alignItems: "center", justifyContent: 'center' }}
                                 onPress={() => { this.props.navigation.goBack() }}
                             >

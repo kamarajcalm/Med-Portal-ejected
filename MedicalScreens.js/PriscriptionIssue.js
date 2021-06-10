@@ -198,7 +198,7 @@ class PriscriptionIssue extends Component {
                             renderItem={({ item, index }) => {
                                 return (
                                     <TouchableOpacity style={[styles.card, { flexDirection: "row", borderRadius: 5 ,marginTop:15}]}
-                                        onPress={() => { this.props.navigation.navigate('PrescriptionView', { item, }) }}
+                                        // onPress={() => { this.props.navigation.navigate('PrescriptionView', { item, }) }}
                                     >
                                         <View style={{ flex: 0.3, alignItems: 'center', justifyContent: "center" }}>
                                             <Image

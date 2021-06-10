@@ -189,7 +189,7 @@ class Appointments extends Component {
             api = `${url}/api/prescription/appointments/?clinic=${this.props.user.profile.recopinistclinics[0].clinicpk}&pending=true&accepted=true&limit=5&offset=${this.state.offset}`
         }
         else{
-            api = `${url}/api/prescription/appointments/?requesteduser=${this.props.user.id}&pending=true&accepted=true`
+            api = `${url}/api/prescription/appointments/?requesteduser=${this.props.user.id}&pending=true&accepted=true&limit=5&offset=${this.state.offset}`
         }
         console.log(api,"first")
         const data =await HttpsClient.get(api,"lll")
@@ -378,21 +378,21 @@ class Appointments extends Component {
     }
     validateInformation =(item)=>{
         
-        if (item.status == "Pending" || item.status == "Rejected") {
+        if (item?.status == "Pending" || item?.status == "Rejected") {
             return(
                 <View style={{marginTop:10}}>
                     <Text style={[styles.text]}>{item.requestedtime}</Text>
                 </View>
             )
     }
-        if (item.status == "Accepted") {
+        if (item?.status == "Accepted") {
             return (
                 <View style={{ marginTop: 10 }}>
                     <Text style={[styles.text]}>{item.acceptedtime}</Text>
                 </View>
             )
         }
-        if (item.status == "Completed") {
+        if (item?.status == "Completed") {
             return (
                 <View style={{ marginTop: 10 }}>
                     <Text style={[styles.text]}>{item.acceptedtime}</Text>
@@ -463,7 +463,7 @@ class Appointments extends Component {
     }
     handleEndReached2 = () => {
         if (this.state.next2) {
-            this.setState({ offset: this.state.offset2 + 5 }, () => {
+            this.setState({ offset2: this.state.offset2 + 5 }, () => {
                 this.getAppointments2()
             })
         }
@@ -491,12 +491,13 @@ class Appointments extends Component {
               onEndReachedThreshold={0.1}
               keyExtractor ={(item,index)=>index.toString()}
               renderItem ={({item,index})=>{
-             
+               
+
             if (this.props.user.profile.occupation == "Customer") {
-              console.log(item)
+          
                             let dp =null
-                            if (item.doctordetails.dp){
-                                dp = `${url}${item.doctordetails.dp}`
+                            if (item?.doctordetails?.dp){
+                                dp = `${url}${item?.doctordetails?.dp}`
                             }
                
                 return(
@@ -520,20 +521,20 @@ class Appointments extends Component {
                           </View>
                           <View style={{flex:0.7,paddingLeft:10}}>
                               <View style={{marginTop:20}}>
-                                    <Text style={[styles.text,{color:"#000",fontWeight:"bold"}]}>{item.clinicname.name}</Text>
+                                    <Text style={[styles.text,{color:"#000",fontWeight:"bold"}]}>{item?.clinicname?.name}</Text>
                               </View>
                                 <View style={{ marginTop: 10,flexDirection:"row" }}>
                                     <Text style={[styles.text, { color: "#000", }]}>Reason :</Text>
-                                    <Text style={[styles.text, { color: "#000",  }]}> {item.reason}</Text>
+                                    <Text style={[styles.text, { color: "#000",  }]}> {item?.reason}</Text>
                                 </View>
                                 <View style={{ flexDirection: "row", marginTop: 10,}}>
-                                    <Text style={[styles.text, { color: "#000", }]}>{item.requesteddate}</Text>
+                                    <Text style={[styles.text, { color: "#000", }]}>{item?.requesteddate}</Text>
                                     <Text style={[styles.text, { color: "#000", }]}>|</Text>
-                                    <Text style={[styles.text, { color: "#000", }]}>{item.requestedtime}</Text>
+                                    <Text style={[styles.text, { color: "#000", }]}>{item?.requestedtime}</Text>
                                 </View>
                                 <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 10,}}>
                                     <View style={{flex:0.7}}>
-                                        <Text style={[styles.text,{color:this.validateColor(item.status)}]}>{item.status}</Text>
+                                        <Text style={[styles.text,{color:this.validateColor(item?.status)}]}>{item?.status}</Text>
                                     </View>
                                     <View style={{flexDirection:'row',justifyContent:"space-around",alignItems:"center",flex:0.3}}>
                                          <TouchableOpacity style={[styles.boxWithShadow,{backgroundColor:"#fff",height:30,width:30,borderRadius:15,alignItems:"center",justifyContent:'center'}]}
@@ -611,14 +612,14 @@ class Appointments extends Component {
                                         </View>
                                     </View>
                                     <View style={{ paddingLeft: 10, paddingTop: 10 ,}}>
-                                        <Text style={[styles.text, { fontWeight: "bold", color: this.validateColor(item.status) }]}>{item.status}</Text>
+                                        <Text style={[styles.text, { fontWeight: "bold", color: this.validateColor(item?.status) }]}>{item?.status}</Text>
                                     </View>
                                </View>
                                <View style={{flex:0.4}}>
 
                                     <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
 
-                                        {item.status == "Pending" ? <TouchableOpacity style={{ height: height * 0.05, width: "80%", borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: "#32CD32" }}
+                                        {item?.status == "Pending" ? <TouchableOpacity style={{ height: height * 0.05, width: "80%", borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: "#32CD32" }}
                                             onPress={() => { this.setState({ modal: true, selectedAppointment: item, selectedIndex: index, today: item.requesteddate, time: item.requestedtime }) }}
                                         >
                                             <Text style={[styles.text, { color: "#fff" }]}>Accept</Text>
@@ -634,7 +635,7 @@ class Appointments extends Component {
                                         </TouchableOpacity>}
                                     </View>
 
-                                    {item.status != "Completed" && <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
+                                    {item?.status != "Completed" && <View style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
                                         <TouchableOpacity style={{ height: height * 0.05, width: "80%", borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: "#B22222" }}
                                             onPress={() => {
                                                 this.setState({ selectedAppointment: item, selectedIndex: index }, () => {
@@ -749,7 +750,7 @@ class Appointments extends Component {
                 renderItem={({ item, index }) => {
                     if (this.props.user.profile.occupation == "Customer") {
                         let dp = null
-                        if (item.doctordetails.dp) {
+                        if (item?.doctordetails?.dp) {
                             dp = `${url}${item.doctordetails.dp}`
                         }
                         return (
@@ -786,7 +787,7 @@ class Appointments extends Component {
                                         </View>
                                         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 10, }}>
                                             <View style={{ flex: 0.7 }}>
-                                                <Text style={[styles.text, { color: this.validateColor(item.status) }]}>{item.status}</Text>
+                                                <Text style={[styles.text, { color: this.validateColor(item?.status) }]}>{item?.status}</Text>
                                             </View>
                                             <View style={{ flexDirection: 'row', justifyContent: "space-around", alignItems: "center", flex: 0.3 }}>
                                                 <TouchableOpacity style={[styles.boxWithShadow, { backgroundColor: "#fff", height: 30, width: 30, borderRadius: 15, alignItems: "center", justifyContent: 'center' }]}
@@ -877,7 +878,7 @@ class Appointments extends Component {
                                              this.validateInformation(item)
                                          }
                                          <View style={{marginTop:5}}>
-                                             <Text style={[styles.text,{color:this.validateColor(item.status)}]}>{item.status}</Text>
+                                             <Text style={[styles.text,{color:this.validateColor(item?.status)}]}>{item?.status}</Text>
                                          </View>
                                      </View>
                                     {/* <View style={{ flex: 0.6, justifyContent: "center" }}>

@@ -68,7 +68,7 @@ class ChatScreen extends Component {
         return (
             <Image
                 style={{ height: 30, width: width * 0.4, resizeMode: "stretch" }}
-                source={require('../assets/sound.png')}
+                source={require('../assets/sound2.png')}
             />
         )
       
