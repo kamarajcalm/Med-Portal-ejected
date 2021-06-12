@@ -52,7 +52,7 @@ PODS:
     - UMCore
   - EXStructuredHeaders (1.0.1):
     - UMCore
-  - EXUpdates (0.5.4):
+  - EXUpdates (0.5.5):
     - EXStructuredHeaders
     - React-Core
     - UMCore
@@ -344,7 +344,7 @@ PODS:
     - React-jsi (= 0.63.4)
   - RNCMaskedView (0.1.10):
     - React
-  - RNDateTimePicker (3.2.0):
+  - RNDateTimePicker (3.4.7):
     - React-Core
   - RNGestureHandler (1.10.3):
     - React-Core
@@ -655,7 +655,7 @@ SPEC CHECKSUMS:
   EXPermissions: 8f8c1c05580c4e02d4ee2c8dd74bfe173ff6a723
   EXSplashScreen: a9baaf4fa866003884c90ba049f18760d6a8ce39
   EXStructuredHeaders: be834496a4d9fd0069cd12ec1cc57b31c6d3b256
-  EXUpdates: e191b83e00d3e7ebfd7db3986806ceca09b7b322
+  EXUpdates: efe0e8c514dcff06a8fd0b63be6019a6365fb9c7
   FBLazyVector: 3bb422f41b18121b71783a905c10e58606f7dc3e
   FBReactNativeSpec: f2c97f2529dd79c083355182cc158c9f98f4bd6e
   Folly: b73c3869541e86821df3c387eb0af5f65addfab4
@@ -692,7 +692,7 @@ SPEC CHECKSUMS:
   React-RCTVibration: ae4f914cfe8de7d4de95ae1ea6cc8f6315d73d9d
   ReactCommon: 73d79c7039f473b76db6ff7c6b159c478acbbb3b
   RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
-  RNDateTimePicker: 17593e41b6b1585aeb8ecbe1c1cbc30cba3d0b4b
+  RNDateTimePicker: 8dcfab802edece406f4f4780130974a0e04213b4
   RNGestureHandler: a479ebd5ed4221a810967000735517df0d2db211
   RNReanimated: 70f662b5232dd5d19ccff581e919a54ea73df51c
   RNScreens: e8e8dd0588b5da0ab57dcca76ab9b2d8987757e0
